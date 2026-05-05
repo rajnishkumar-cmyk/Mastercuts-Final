@@ -20,7 +20,8 @@ type Surface =
   | 'cart'
   | 'profile'
   | 'audience-picker'
-  | 'service-detail';
+  | 'service-detail'
+  | 'login';
 
 export type CheckoutStep = 'none' | 'phone-login' | 'otp-verify' | 'address' | 'edit-contact' | 'date-time';
 
@@ -60,6 +61,7 @@ interface CartContextValue {
   openCart: (initialView?: DrawerView) => void;
   closeCart: () => void;
   openCheckout: () => void;
+  openLogin: () => void;
   openProfile: () => void;
   openAudiencePicker: () => void;
   openServiceDetail: (serviceId: string, ritualId: RitualId) => void;
@@ -417,6 +419,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setBookingResult(null);
     setPaymentMethod('cash');
   }, []);
+  const openLogin = useCallback(() => {
+    setSurface('login');
+    setCheckoutStep('phone-login');
+  }, []);
   const openProfile = useCallback(() => setSurface('profile'), []);
   const openAudiencePicker = useCallback(() => setSurface('audience-picker'), []);
   const openServiceDetail = useCallback<CartContextValue['openServiceDetail']>(
@@ -469,6 +475,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     openCart,
     closeCart,
     openCheckout,
+    openLogin,
     openProfile,
     openAudiencePicker,
     openServiceDetail,

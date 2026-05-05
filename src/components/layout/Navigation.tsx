@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, ChevronDown, Phone, Plus, X } from 'lucide-react';
+import { Menu, ChevronDown, Phone, Plus, X, User as UserIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetClose, SheetTrigger } from '@/components/ui/sheet';
 import { useCart } from '@/components/cart/CartProvider';
@@ -17,7 +17,7 @@ export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [heroInView, setHeroInView] = useState(true);
   const headerRef = useRef<HTMLElement>(null);
-  const { openCart, cart } = useCart();
+  const { openCart, cart, account, openLogin, openProfile } = useCart();
   const cartHasItemsRef = useRef(false);
   cartHasItemsRef.current = cart.items.length > 0;
   const navigate = useNavigate();
@@ -88,6 +88,18 @@ export function Navigation() {
   // On ritual pages the hero is dark, so treat nav like scrolled (dark chrome).
   const darkChrome = scrolled || !isHome;
 
+  const initials = account?.name
+    ? account.name
+        .trim()
+        .split(/\s+/)
+        .map((p) => p[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
+    : account?.phone
+      ? account.phone.slice(-2)
+      : '';
+
   const goToSection = (sectionId: string) => {
     if (isHome) {
       document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -133,13 +145,13 @@ export function Navigation() {
             </div>
             <div
               className={`flex flex-col -space-y-0.3 transition-colors duration-300 ${
-                darkChrome ? 'text-white' : 'max-lg:text-text-primary lg:text-white'
+                darkChrome ? 'text-white' : 'text-text-primary'
               }`}
             >
               <span className="text-sm font-medium tracking-wide leading-none">Ra</span>
               <span
                 className={`text-sm font-medium tracking-wide leading-none ${
-                  darkChrome ? 'text-white/70' : 'max-lg:text-text-primary/70 lg:text-white/70'
+                  darkChrome ? 'text-white/70' : 'text-text-primary/70'
                 }`}
               >
                 by Mastercuts
@@ -213,25 +225,44 @@ export function Navigation() {
             <a
               href="tel:+97145550100"
               className={`flex items-center gap-2 text-sm transition-colors duration-200 hover:opacity-70 ${
-                darkChrome ? 'text-white' : 'text-white'
+                darkChrome ? 'text-white' : 'text-text-primary'
               }`}
             >
               <Phone className="w-4 h-4" />
               <span className="font-medium">+971 4 555 0100</span>
-              <span className={`text-xs ${darkChrome ? 'text-white/60' : 'text-white/80'}`}>
+              <span className={`text-xs ${darkChrome ? 'text-white/60' : 'text-text-primary/60'}`}>
                 Dubai
               </span>
             </a>
 
-            <CartIcon tone="light" />
+            <CartIcon tone={darkChrome ? 'light' : 'dark'} />
 
-            <Button
-              onClick={() => openCart()}
-              className="bg-white text-text-primary hover:bg-white/90 rounded-full px-6 py-2 text-sm font-medium flex items-center gap-2 group"
-            >
-              Book Now
-              <Plus className="w-4 h-4 transition-transform duration-200 group-hover:rotate-90" />
-            </Button>
+            {account ? (
+              <button
+                type="button"
+                onClick={openProfile}
+                aria-label="Open profile"
+                className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-medium tracking-wide transition-colors duration-200 ${
+                  darkChrome
+                    ? 'bg-white text-text-primary hover:bg-white/90'
+                    : 'bg-bg-dark text-white hover:bg-bg-dark/90'
+                }`}
+              >
+                {initials || <UserIcon className="w-4 h-4" />}
+              </button>
+            ) : (
+              <Button
+                onClick={openLogin}
+                className={`rounded-full px-6 py-2 text-sm font-medium flex items-center gap-2 transition-colors duration-200 ${
+                  darkChrome
+                    ? 'bg-white text-text-primary hover:bg-white/90'
+                    : 'bg-bg-dark text-white hover:bg-bg-dark/90'
+                }`}
+              >
+                <UserIcon className="w-4 h-4" />
+                Log in
+              </Button>
+            )}
           </div>
 
           {/* Mobile Right Buttons */}

@@ -7,7 +7,7 @@ const OTP_LENGTH = 6;
 const RESEND_COOLDOWN = 30;
 
 export function OtpVerifyStep() {
-  const { saveLightAccount, setCheckoutStep } = useCart();
+  const { saveLightAccount, setCheckoutStep, surface, closeAll } = useCart();
 
   const phone = sessionStorage.getItem('ra-login-phone') ?? '';
   const [otp, setOtp] = useState('');
@@ -39,9 +39,13 @@ export function OtpVerifyStep() {
     });
 
     sessionStorage.removeItem('ra-login-phone');
-    setCheckoutStep('address');
+    if (surface === 'login') {
+      closeAll();
+    } else {
+      setCheckoutStep('address');
+    }
     setVerifying(false);
-  }, [otp, phone, saveLightAccount, setCheckoutStep]);
+  }, [otp, phone, saveLightAccount, setCheckoutStep, surface, closeAll]);
 
   const handleResend = () => {
     if (cooldown > 0) return;

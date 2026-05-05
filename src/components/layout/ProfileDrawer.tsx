@@ -16,11 +16,16 @@ function formatDateLabel(key: string): string {
 }
 
 export function ProfileDrawer() {
-  const { surface, closeAll, account, bookings, openCart, signOut } = useCart();
+  const { surface, closeAll, account, bookings, openCart, signOut, openLogin } = useCart();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const open = surface === 'profile';
   const side = isMobile ? 'bottom' : 'right';
+
+  const handleSignIn = () => {
+    closeAll();
+    setTimeout(openLogin, 220);
+  };
 
   const now = Date.now();
   const upcoming = bookings.filter((b) => {
@@ -77,14 +82,21 @@ export function ProfileDrawer() {
               <h3 className="font-serif text-3xl text-text-primary leading-[1.05] mb-3">
                 Save your <span className="italic">rituals</span>
               </h3>
-              <p className="text-sm text-text-secondary leading-relaxed mb-8">
-                On checkout, tick <em>“Save my details for next time”</em> to create a
-                passwordless profile. Your next visit will know your name, your
-                preferences, and your favourite stylist.
+              <p className="text-sm text-text-secondary leading-relaxed mb-6">
+                Sign in with your phone to save your details, view bookings, and
+                pick up where you left off on your next visit.
               </p>
 
+              <button
+                type="button"
+                onClick={handleSignIn}
+                className="w-full rounded-full bg-bg-dark text-white py-4 text-sm font-medium hover:bg-bg-darker transition-colors mb-8"
+              >
+                Sign in with phone
+              </button>
+
               <p className="text-[10px] uppercase tracking-[0.18em] text-text-secondary mb-3">
-                Start browsing
+                Or start browsing
               </p>
               <div className="space-y-2">
                 {rituals.map((r) => (

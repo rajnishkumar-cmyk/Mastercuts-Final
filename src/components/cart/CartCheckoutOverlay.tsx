@@ -74,15 +74,26 @@ function getTotalVisualSteps(hasAccount: boolean): number {
   return hasAccount ? 2 : 3;
 }
 
-export function CartCheckoutOverlay() {
-  const { checkoutStep, setCheckoutStep, closeAll, account } = useCart();
-  const isOpen = checkoutStep !== 'none';
+interface OverlayProps {
+  mode?: 'embedded' | 'standalone';
+}
+
+export function CartCheckoutOverlay({ mode = 'embedded' }: OverlayProps = {}) {
+  const { checkoutStep, setCheckoutStep, closeAll, account, surface } = useCart();
+  // Embedded overlay belongs to the cart drawer; standalone overlay belongs to
+  // the login surface. Each only renders when its own surface is active so the
+  // two never collide.
+  const surfaceMatches = mode === 'standalone' ? surface === 'login' : surface === 'cart';
+  const isOpen = checkoutStep !== 'none' && surfaceMatches;
   const hasAccount = !!account;
 
   const handleBack = () => {
     const prev = getPrevStep(checkoutStep, hasAccount);
     if (prev) {
       setCheckoutStep(prev);
+    } else if (mode === 'standalone') {
+      // Standalone has no underlying surface to return to — fully close.
+      closeAll();
     } else {
       setCheckoutStep('none');
     }
@@ -90,6 +101,14 @@ export function CartCheckoutOverlay() {
 
   const stepNum = getVisualStep(checkoutStep, hasAccount);
   const totalSteps = getTotalVisualSteps(hasAccount);
+
+  const isStandalone = mode === 'standalone';
+  const backdropClass = isStandalone
+    ? 'fixed inset-0 bg-black/40 z-[70]'
+    : 'absolute inset-0 bg-black/30 z-10';
+  const sheetClass = isStandalone
+    ? 'fixed inset-x-0 bottom-0 top-12 z-[80] bg-bg-primary rounded-t-2xl flex flex-col overflow-hidden shadow-xl mx-auto sm:max-w-md sm:left-1/2 sm:-translate-x-1/2 sm:top-auto sm:bottom-0 sm:max-h-[640px] sm:rounded-2xl'
+    : 'absolute inset-x-0 bottom-0 top-12 z-20 bg-bg-primary rounded-t-2xl flex flex-col overflow-hidden shadow-xl';
 
   return (
     <AnimatePresence>
@@ -102,7 +121,7 @@ export function CartCheckoutOverlay() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="absolute inset-0 bg-black/30 z-10"
+            className={backdropClass}
             onClick={handleBack}
           />
 
@@ -113,7 +132,7 @@ export function CartCheckoutOverlay() {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-            className="absolute inset-x-0 bottom-0 top-12 z-20 bg-bg-primary rounded-t-2xl flex flex-col overflow-hidden shadow-xl"
+            className={sheetClass}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-5 pt-5 pb-3 flex-shrink-0">

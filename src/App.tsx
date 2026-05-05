@@ -6,11 +6,13 @@ import { JourneyPage } from './pages/JourneyPage';
 import { ExplorePage } from './pages/ExplorePage';
 import { CartProvider } from './components/cart/CartProvider';
 import { CartDrawer } from './components/cart/CartDrawer';
+import { CartCheckoutOverlay } from './components/cart/CartCheckoutOverlay';
 import { CartStrip } from './components/cart/CartStrip';
 import { ProfileDrawer } from './components/layout/ProfileDrawer';
 import { AudiencePickerSheet } from './components/layout/AudiencePickerSheet';
 import { BottomNav } from './components/layout/BottomNav';
 import { ServiceDetailSheet } from './components/services/ServiceDetailSheet';
+import { WelcomeAnnouncement } from './components/layout/WelcomeAnnouncement';
 
 function App() {
   return (
@@ -27,11 +29,13 @@ function App() {
 
           {/* Global surfaces */}
           <CartDrawer />
+          <CartCheckoutOverlay mode="standalone" />
           <ProfileDrawer />
           <AudiencePickerSheet />
           <ServiceDetailSheet />
           <CartStrip />
           <BottomNav />
+          <WelcomeAnnouncement />
 
           <Toaster
             position="top-center"
