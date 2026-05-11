@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, HeartHandshake, Wand2, Wind, MapPin, X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -9,11 +9,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 
-const services = [
-  { icon: HeartHandshake, label: 'Massages' },
-  { icon: Wand2, label: 'Nail care' },
-  { icon: Wind, label: 'Blow-dry' },
-] as const;
+const RA_EMBLEM = '/assets/Logo/ra-emblem.png';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const NEWSLETTER_KEY = 'mastercuts-newsletter-emails';
@@ -42,7 +38,7 @@ export function WelcomeAnnouncement() {
 
   const handleExplore = () => {
     setOpen(false);
-    navigate('/explore');
+    navigate('/at-home');
   };
 
   const handleEmailSubmit = (e: React.FormEvent) => {
@@ -70,14 +66,14 @@ export function WelcomeAnnouncement() {
         {open && (
           <DialogContent
             showCloseButton={false}
-            className="bg-bg-primary border-none p-0 sm:max-w-lg w-[calc(100%-2rem)] max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl"
+            className="bg-bg-primary border-none p-0 sm:max-w-3xl w-[calc(100%-2rem)] max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
-              className="flex flex-col max-h-[90vh]"
+              className="grid grid-cols-1 sm:grid-cols-12 max-h-[90vh]"
             >
               {/* Close button */}
               <button
@@ -89,79 +85,39 @@ export function WelcomeAnnouncement() {
                 <X className="w-4 h-4" />
               </button>
 
-              <div className="flex-1 overflow-y-auto px-6 pt-10 pb-6 sm:px-10 sm:pt-12">
-                {/* Eyebrow */}
-                <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary mb-4">
-                  A note from Mastercuts
+              {/* LEFT — Ra emblem, large and centered */}
+              <div className="sm:col-span-5 bg-circle-light flex items-center justify-center px-8 py-10 sm:py-12">
+                <img
+                  src={RA_EMBLEM}
+                  alt="Ra"
+                  className="w-32 h-32 sm:w-52 sm:h-52 object-contain"
+                />
+              </div>
+
+              {/* RIGHT — editorial copy */}
+              <div className="sm:col-span-7 flex flex-col px-6 sm:px-10 pt-8 sm:pt-12 pb-6 sm:pb-10 overflow-y-auto">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary mb-3">
+                  A note from us
                 </p>
 
-                {/* Headline */}
                 <DialogTitle asChild>
-                  <h2 className="font-serif text-text-primary leading-[1.05] text-3xl sm:text-4xl mb-1">
+                  <h2 className="font-serif text-text-primary leading-[1.05] text-2xl sm:text-3xl mb-1">
                     We've relocated.
                   </h2>
                 </DialogTitle>
-                <p className="font-serif italic text-text-primary leading-[1.05] text-3xl sm:text-4xl mb-6">
+                <p className="font-serif italic text-text-primary leading-[1.05] text-2xl sm:text-3xl mb-5">
                   And we're transforming.
                 </p>
 
-                <div className="h-px bg-accent-gold/40 mb-6" />
-
-                {/* Body intro */}
                 <DialogDescription asChild>
-                  <p className="text-sm text-text-secondary leading-relaxed mb-6">
-                    In the meantime, our signature care comes to you —
-                    <span className="text-text-primary"> select at-home services</span>{' '}
-                    you can book today:
+                  <p className="text-sm text-text-secondary leading-relaxed mb-6 max-w-prose">
+                    Select at-home services are available now while the new
+                    studio takes shape on Imperial Avenue, Downtown Dubai.
                   </p>
                 </DialogDescription>
 
-                {/* Service icons */}
-                <div className="flex items-start justify-center gap-3 sm:gap-5 mb-7">
-                  {services.map(({ icon: Icon, label }) => (
-                    <div
-                      key={label}
-                      className="flex flex-col items-center gap-2 flex-1 min-w-0"
-                    >
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-circle-light flex items-center justify-center shadow-sm">
-                        <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-accent-gold" strokeWidth={1.5} />
-                      </div>
-                      <span className="text-[10px] sm:text-xs uppercase tracking-[0.14em] text-text-primary text-center">
-                        {label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="h-px bg-accent-gold/40 mb-6" />
-
-                {/* New home */}
-                <div className="flex items-center gap-2 mb-2">
-                  <MapPin className="w-3.5 h-3.5 text-accent-gold" strokeWidth={2} />
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary">
-                    Our new home
-                  </p>
-                </div>
-                <p className="font-serif text-text-primary text-xl sm:text-2xl leading-tight mb-1">
-                  Imperial Avenue
-                </p>
-                <p className="text-sm text-text-secondary mb-6">
-                  Burj Khalifa Street, Downtown Dubai
-                </p>
-
-                <div className="h-px bg-accent-gold/40 mb-6" />
-
-                {/* Closer */}
-                <p className="font-serif italic text-text-primary text-sm sm:text-base leading-relaxed">
-                  Stay connected as we prepare to unveil the{' '}
-                  <span className="not-italic">OGee</span> experience —
-                  refined, immersive, and thoughtfully designed for you.
-                </p>
-
-                <div className="h-px bg-accent-gold/40 mt-6 mb-5" />
-
-                {/* Email capture */}
-                <form onSubmit={handleEmailSubmit}>
+                {/* Email capture — primary action */}
+                <form onSubmit={handleEmailSubmit} className="mb-6">
                   <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary mb-3">
                     Be there when we open
                   </p>
@@ -175,54 +131,49 @@ export function WelcomeAnnouncement() {
                       </p>
                     </div>
                   ) : (
-                    <>
-                      <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
-                        <input
-                          type="email"
-                          inputMode="email"
-                          autoComplete="email"
-                          value={email}
-                          onChange={(e) => {
-                            setEmail(e.target.value);
-                            if (emailError) setEmailError('');
-                          }}
-                          placeholder="you@email.com"
-                          className="flex-1 bg-transparent border-b border-black/15 py-2 text-text-primary placeholder:text-text-muted focus:border-text-primary outline-none transition-colors text-sm"
-                        />
-                        <button
-                          type="submit"
-                          className="shrink-0 rounded-full bg-bg-dark text-white px-5 py-2.5 text-[11px] uppercase tracking-wider font-medium hover:bg-bg-darker transition-colors"
-                        >
-                          Notify me
-                        </button>
-                      </div>
+                    <div className="space-y-3">
+                      <input
+                        type="email"
+                        inputMode="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (emailError) setEmailError('');
+                        }}
+                        placeholder="you@email.com"
+                        className="w-full bg-transparent border-b border-black/15 py-2 text-text-primary placeholder:text-text-muted focus:border-text-primary outline-none transition-colors text-sm"
+                      />
+                      <button
+                        type="submit"
+                        className="w-full rounded-full bg-bg-dark text-white py-3.5 text-sm font-medium hover:bg-bg-darker transition-colors"
+                      >
+                        Notify me
+                      </button>
                       {emailError && (
-                        <p className="text-xs text-red-600 mt-1.5">{emailError}</p>
+                        <p className="text-xs text-red-600">{emailError}</p>
                       )}
-                      <p className="text-[10px] uppercase tracking-[0.18em] text-text-secondary mt-2">
-                        We'll only write when there's something to share.
-                      </p>
-                    </>
+                    </div>
                   )}
                 </form>
-              </div>
 
-              {/* Sticky CTA bar */}
-              <div className="flex-shrink-0 border-t border-black/10 bg-bg-primary px-6 py-4 sm:px-10 flex flex-col sm:flex-row gap-2 sm:gap-3">
-                <button
-                  type="button"
-                  onClick={handleExplore}
-                  className="flex-1 rounded-full bg-bg-dark text-white py-3.5 text-sm font-medium hover:bg-bg-darker transition-colors"
-                >
-                  Explore at-home services
-                </button>
-                <button
-                  type="button"
-                  onClick={dismiss}
-                  className="flex-1 rounded-full border border-black/15 text-text-primary py-3.5 text-sm font-medium hover:bg-black/5 transition-colors"
-                >
-                  Continue browsing
-                </button>
+                {/* Secondary CTAs */}
+                <div className="mt-auto flex flex-col sm:flex-row gap-2 sm:gap-3">
+                  <button
+                    type="button"
+                    onClick={handleExplore}
+                    className="flex-1 rounded-full border border-black/15 text-text-primary py-3 text-sm font-medium hover:bg-black/5 transition-colors"
+                  >
+                    Explore Ra at Home
+                  </button>
+                  <button
+                    type="button"
+                    onClick={dismiss}
+                    className="flex-1 rounded-full border border-black/15 text-text-primary py-3 text-sm font-medium hover:bg-black/5 transition-colors"
+                  >
+                    Continue browsing
+                  </button>
+                </div>
               </div>
             </motion.div>
           </DialogContent>
