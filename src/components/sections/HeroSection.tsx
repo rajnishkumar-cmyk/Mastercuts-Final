@@ -75,11 +75,8 @@ export function HeroSection() {
           </motion.div>
         </div>
 
-        {/* Desktop Left Half — light beige bg */}
-        <div className="hidden lg:block w-1/2 relative z-0 flex-none bg-bg-primary" />
-
-        {/* Desktop Right Half — fixed 50% width video */}
-        <div className="hidden lg:block absolute right-0 top-0 h-full w-1/2 z-0 flex-none overflow-hidden">
+        {/* Desktop full-width video — fills the entire hero */}
+        <div className="hidden lg:block absolute inset-0 z-0 overflow-hidden">
           <motion.div
             initial={{ scale: 1.1, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -106,8 +103,8 @@ export function HeroSection() {
               animate={isLoaded ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, ease: 'easeOut', delay: 1.2 }}
             >
-              <p className="text-sm text-text-secondary mb-2">Based in:</p>
-              <div className="text-text-primary font-medium">
+              <p className="text-sm text-white/60 mb-2">Based in:</p>
+              <div className="text-white font-medium">
                 <p>Downtown</p>
                 <p>Marina District</p>
                 <p>Uptown</p>
