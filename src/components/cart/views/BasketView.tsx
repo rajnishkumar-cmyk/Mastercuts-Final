@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, ArrowRight, ArrowUpRight, ChevronDown, Pencil, Sparkles, User, MapPin, Clock, Banknote, CreditCard } from 'lucide-react';
+import { X, ArrowRight, ArrowUpRight, ChevronDown, Pencil, User, MapPin, Clock, Banknote, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart, useCartTotals, formatAed, formatDuration } from '../CartProvider';
 import { CartItemRow } from '../CartItemRow';
@@ -152,30 +152,6 @@ export function BasketView({ onClose, onContinue }: Props) {
                 </span>
                 <span className="text-[11px] uppercase tracking-wider text-text-secondary mt-1">
                   Browse the five sanctuaries
-                </span>
-              </span>
-              <span className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-text-primary group-hover:bg-black/10 transition-colors flex-shrink-0">
-                <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </span>
-            </button>
-
-            {/* Journey entry */}
-            <button
-              type="button"
-              onClick={() => { onClose(); navigate('/explore#curated-journeys'); }}
-              className="group w-full flex items-center justify-between gap-4 py-5 border-b border-black/10 text-left"
-            >
-              <span className="flex items-center gap-3 min-w-0">
-                <span className="w-10 h-10 rounded-full bg-bg-dark text-white flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="w-4 h-4" />
-                </span>
-                <span className="flex flex-col min-w-0">
-                  <span className="font-serif text-lg text-text-primary leading-tight">
-                    Add a curated <span className="italic">journey</span>
-                  </span>
-                  <span className="text-[11px] uppercase tracking-wider text-text-secondary mt-1">
-                    Hand-assembled · save up to 15%
-                  </span>
                 </span>
               </span>
               <span className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-text-primary group-hover:bg-black/10 transition-colors flex-shrink-0">
