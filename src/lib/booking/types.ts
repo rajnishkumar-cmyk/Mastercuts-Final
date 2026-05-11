@@ -9,6 +9,8 @@ export type RitualId =
 
 export type ServiceAudience = 'gentlemen' | 'ladies' | 'unisex';
 
+export type ServiceLocation = 'salon' | 'home' | 'both';
+
 export interface RitualFaq {
   q: string;
   a: string;
@@ -44,6 +46,7 @@ export interface Service {
   price: number;
   image: string;
   audience: ServiceAudience;
+  location?: ServiceLocation;
   requiresConsultation?: boolean;
   variants?: ServiceVariant[];
 }

@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, ChevronDown, Phone, Plus, X, User as UserIcon } from 'lucide-react';
+import { Menu, ChevronDown, Phone, X, User as UserIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetClose, SheetTrigger } from '@/components/ui/sheet';
 import { useCart } from '@/components/cart/CartProvider';
 import { CartIcon } from '@/components/cart/CartIcon';
-import { rituals } from '@/lib/booking/catalog';
+import { useAudience } from '@/components/services/useAudience';
 import { DesktopMenu } from './DesktopMenu';
 
 export function Navigation() {
@@ -17,7 +17,8 @@ export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [heroInView, setHeroInView] = useState(true);
   const headerRef = useRef<HTMLElement>(null);
-  const { openCart, cart, account, openLogin, openProfile } = useCart();
+  const { cart, account, openLogin, openProfile, openAudiencePicker, openWellnessHub } = useCart();
+  const [, setAudience] = useAudience();
   const cartHasItemsRef = useRef(false);
   cartHasItemsRef.current = cart.items.length > 0;
   const navigate = useNavigate();
@@ -108,6 +109,24 @@ export function Navigation() {
     }
   };
 
+  // Shared service handlers — used by both the desktop dropdown and the
+  // mobile hamburger Services list. Each closes its own menu before firing.
+  const goToSalon = (audience: 'gentlemen' | 'ladies', closeMenu: () => void) => {
+    setAudience(audience);
+    closeMenu();
+    navigate('/explore');
+  };
+
+  const goToAtHome = (closeMenu: () => void) => {
+    closeMenu();
+    setTimeout(() => openAudiencePicker('/at-home'), 220);
+  };
+
+  const goToWellnessHub = (closeMenu: () => void) => {
+    closeMenu();
+    setTimeout(openWellnessHub, 220);
+  };
+
   return (
   <>
     <motion.header
@@ -134,55 +153,40 @@ export function Navigation() {
 
       <div className={`w-full px-6 lg:px-12 transition-[padding] duration-300 ${darkChrome ? 'py-4' : 'py-6'}`}>
         <nav className="flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="relative">
-              <img
-                src="/assets/Logo/mastercutlogo.png"
-                alt="Ra Logo"
-                className="w-10 h-10 transition-transform duration-300 group-hover:scale-105 object-contain"
-              />
-            </div>
-            <div
-              className={`flex flex-col -space-y-0.3 transition-colors duration-300 ${
-                darkChrome ? 'text-white' : 'text-text-primary'
+          {/* Logo — Mastercuts wordmark. Takes 50% on desktop so the right
+              cluster starts exactly at viewport middle. */}
+          <Link to="/" className="flex items-center gap-3 group lg:w-1/2">
+            <img
+              src="/assets/Logo/mastercut-wordmark.png"
+              alt="Mastercuts"
+              className={`h-7 lg:h-9 transition-all duration-300 group-hover:scale-105 object-contain ${
+                darkChrome ? 'brightness-0 invert' : ''
               }`}
-            >
-              <span className="text-sm font-medium tracking-wide leading-none">Ra</span>
-              <span
-                className={`text-sm font-medium tracking-wide leading-none ${
-                  darkChrome ? 'text-white/70' : 'text-text-primary/70'
-                }`}
-              >
-                by Mastercuts
-              </span>
-            </div>
+            />
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-8">
+          {/* Desktop right half — Menu/Services on the left edge (viewport middle),
+              Phone/Cart/Login on the far right. */}
+          <div className="hidden lg:flex lg:w-1/2 lg:items-center lg:justify-between">
+          <div className="flex items-center gap-8 pl-5">
             {/* Menu */}
             <div className="relative">
               <button
                 onClick={() => setDesktopMenuOpen(true)}
-                className={`flex items-center gap-2 text-sm font-medium transition-colors duration-200 hover:opacity-70 ${
-                  darkChrome ? 'text-white' : 'text-text-primary'
-                }`}
+                className="flex items-center gap-2 text-sm font-medium text-white transition-colors duration-200 hover:opacity-70"
               >
                 Menu
                 <Menu className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Rituals Dropdown */}
+            {/* Services Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setServicesOpen(!servicesOpen)}
-                className={`flex items-center gap-2 text-sm font-medium transition-colors duration-200 hover:opacity-70 ${
-                  darkChrome ? 'text-white' : 'text-text-primary'
-                }`}
+                className="flex items-center gap-2 text-sm font-medium text-white transition-colors duration-200 hover:opacity-70"
               >
-                Rituals
+                Services
                 <ChevronDown
                   className={`w-4 h-4 transition-transform duration-200 ${
                     servicesOpen ? 'rotate-180' : ''
@@ -199,70 +203,93 @@ export function Navigation() {
                     transition={{ duration: 0.2 }}
                     className="absolute top-full left-0 mt-4 w-72 bg-bg-dark rounded-lg shadow-xl overflow-hidden"
                   >
-                    {rituals.map((r) => (
-                      <Link
-                        key={r.id}
-                        to={`/explore#${r.id}`}
-                        className="flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group"
-                        onClick={() => setServicesOpen(false)}
-                      >
-                        <span className="text-sm text-white/80 group-hover:text-white">
-                          {r.title} <span className="italic">{r.titleItalic}</span>
-                        </span>
-                        <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60">
-                          {r.tagline}
-                        </span>
-                      </Link>
-                    ))}
+                    {/* Ra at Home leads (transition priority) */}
+                    <button
+                      type="button"
+                      onClick={() => goToAtHome(() => setServicesOpen(false))}
+                      className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
+                    >
+                      <span className="text-sm text-white/80 group-hover:text-white">
+                        Ra at <span className="italic">Home</span>
+                      </span>
+                      <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60">
+                        Nails · Massage · Threading
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => goToSalon('gentlemen', () => setServicesOpen(false))}
+                      className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
+                    >
+                      <span className="text-sm text-white/80 group-hover:text-white">
+                        Mastercuts For <span className="italic">Gents</span>
+                      </span>
+                      <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60">
+                        In salon
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => goToSalon('ladies', () => setServicesOpen(false))}
+                      className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
+                    >
+                      <span className="text-sm text-white/80 group-hover:text-white">
+                        Mastercuts For <span className="italic">Ladies</span>
+                      </span>
+                      <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60">
+                        In salon
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => goToWellnessHub(() => setServicesOpen(false))}
+                      className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
+                    >
+                      <span className="text-sm text-white/80 group-hover:text-white">
+                        Ra Wellness <span className="italic">Centre</span>
+                      </span>
+                      <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60">
+                        By invitation
+                      </span>
+                    </button>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
           </div>
 
-          {/* Right Side */}
-          <div className="hidden lg:flex items-center gap-6">
+          {/* Right Side — Phone, Cart, Login (inside the 50% right cluster) */}
+          <div className="flex items-center gap-6">
             <a
               href="tel:+97145550100"
-              className={`flex items-center gap-2 text-sm transition-colors duration-200 hover:opacity-70 ${
-                darkChrome ? 'text-white' : 'text-text-primary'
-              }`}
+              className="flex items-center gap-2 text-sm text-white transition-colors duration-200 hover:opacity-70"
             >
               <Phone className="w-4 h-4" />
               <span className="font-medium">+971 4 555 0100</span>
-              <span className={`text-xs ${darkChrome ? 'text-white/60' : 'text-text-primary/60'}`}>
-                Dubai
-              </span>
+              <span className="text-xs text-white/60">Dubai</span>
             </a>
 
-            <CartIcon tone={darkChrome ? 'light' : 'dark'} />
+            <CartIcon tone="light" />
 
             {account ? (
               <button
                 type="button"
                 onClick={openProfile}
                 aria-label="Open profile"
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-medium tracking-wide transition-colors duration-200 ${
-                  darkChrome
-                    ? 'bg-white text-text-primary hover:bg-white/90'
-                    : 'bg-bg-dark text-white hover:bg-bg-dark/90'
-                }`}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-medium tracking-wide bg-white text-text-primary hover:bg-white/90 transition-colors duration-200"
               >
                 {initials || <UserIcon className="w-4 h-4" />}
               </button>
             ) : (
               <Button
                 onClick={openLogin}
-                className={`rounded-full px-6 py-2 text-sm font-medium flex items-center gap-2 transition-colors duration-200 ${
-                  darkChrome
-                    ? 'bg-white text-text-primary hover:bg-white/90'
-                    : 'bg-bg-dark text-white hover:bg-bg-dark/90'
-                }`}
+                className="rounded-full px-6 py-2 text-sm font-medium flex items-center gap-2 bg-white text-text-primary hover:bg-white/90 transition-colors duration-200"
               >
                 <UserIcon className="w-4 h-4" />
                 Log in
               </Button>
             )}
+          </div>
           </div>
 
           {/* Mobile Right Buttons */}
@@ -290,21 +317,18 @@ export function Navigation() {
                 hideDefaultClose
               >
                 <div className="flex flex-col h-full px-8 pt-8 pb-10">
-                  <div className="flex items-center justify-between mb-12">
-                    <div className="flex flex-col -space-y-0.5">
-                      <span className="text-sm font-medium text-white tracking-wide leading-none">
-                        Ra
-                      </span>
-                      <span className="text-sm font-medium text-white/60 tracking-wide leading-none">
-                        by Mastercuts
-                      </span>
-                    </div>
+                  <div className="flex-shrink-0 flex items-center justify-between mb-8">
+                    <img
+                      src="/assets/Logo/mastercut-wordmark.png"
+                      alt="Mastercuts"
+                      className="h-7 object-contain brightness-0 invert"
+                    />
                     <SheetClose className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors duration-200">
                       <X className="w-5 h-5" />
                     </SheetClose>
                   </div>
 
-                  <nav className="flex flex-col gap-5">
+                  <nav className="flex-1 overflow-y-auto -mx-8 px-8 py-2 flex flex-col gap-5">
                     <button
                       type="button"
                       className="text-left text-2xl font-serif text-white hover:opacity-60 transition-opacity"
@@ -325,27 +349,70 @@ export function Navigation() {
                     >
                       About Us
                     </button>
+                    <button
+                      type="button"
+                      className="text-left text-2xl font-serif text-white hover:opacity-60 transition-opacity"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setTimeout(() => goToSection('dr-sara'), 220);
+                      }}
+                    >
+                      Dr Sara
+                    </button>
 
                     <div className="pt-2">
                       <p className="text-[10px] uppercase tracking-[0.22em] text-white/40 mb-3">
-                        Rituals
+                        Services
                       </p>
                       <div className="flex flex-col gap-4">
-                        {rituals.map((r) => (
-                          <Link
-                            key={r.id}
-                            to={`/explore#${r.id}`}
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="flex flex-col gap-0.5 group"
-                          >
-                            <span className="text-xl font-serif text-white/90 group-hover:text-white transition-colors">
-                              {r.title} <span className="italic">{r.titleItalic}</span>
-                            </span>
-                            <span className="text-[11px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60 transition-colors">
-                              {r.tagline}
-                            </span>
-                          </Link>
-                        ))}
+                        <button
+                          type="button"
+                          onClick={() => goToAtHome(() => setMobileMenuOpen(false))}
+                          className="flex flex-col gap-0.5 group text-left"
+                        >
+                          <span className="text-xl font-serif text-white/90 group-hover:text-white transition-colors">
+                            Ra at <span className="italic">Home</span>
+                          </span>
+                          <span className="text-[11px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60 transition-colors">
+                            Nails · Massage · Threading
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => goToSalon('gentlemen', () => setMobileMenuOpen(false))}
+                          className="flex flex-col gap-0.5 group text-left"
+                        >
+                          <span className="text-xl font-serif text-white/90 group-hover:text-white transition-colors">
+                            Mastercuts For <span className="italic">Gents</span>
+                          </span>
+                          <span className="text-[11px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60 transition-colors">
+                            In salon
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => goToSalon('ladies', () => setMobileMenuOpen(false))}
+                          className="flex flex-col gap-0.5 group text-left"
+                        >
+                          <span className="text-xl font-serif text-white/90 group-hover:text-white transition-colors">
+                            Mastercuts For <span className="italic">Ladies</span>
+                          </span>
+                          <span className="text-[11px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60 transition-colors">
+                            In salon
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => goToWellnessHub(() => setMobileMenuOpen(false))}
+                          className="flex flex-col gap-0.5 group text-left"
+                        >
+                          <span className="text-xl font-serif text-white/90 group-hover:text-white transition-colors">
+                            Ra Wellness <span className="italic">Centre</span>
+                          </span>
+                          <span className="text-[11px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60 transition-colors">
+                            By invitation
+                          </span>
+                        </button>
                       </div>
                     </div>
 
@@ -371,17 +438,34 @@ export function Navigation() {
                     </button>
                   </nav>
 
-                  <div className="mt-auto space-y-5">
-                    <Button
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        setTimeout(() => openCart(), 220);
-                      }}
-                      className="w-full bg-white text-text-primary hover:bg-white/90 rounded-full py-6 text-sm font-medium flex items-center justify-center gap-2 group"
-                    >
-                      Book Now
-                      <Plus className="w-4 h-4 transition-transform duration-200 group-hover:rotate-90" />
-                    </Button>
+                  <div className="flex-shrink-0 space-y-5 pt-5">
+                    {account ? (
+                      <Button
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setTimeout(() => openProfile(), 220);
+                        }}
+                        className="w-full bg-white text-text-primary hover:bg-white/90 rounded-full py-6 text-sm font-medium flex items-center justify-center gap-3"
+                      >
+                        <span className="w-7 h-7 rounded-full bg-bg-dark text-white flex items-center justify-center text-[11px] font-medium">
+                          {initials || <UserIcon className="w-3.5 h-3.5" />}
+                        </span>
+                        <span>
+                          {account.name ? account.name.split(/\s+/)[0] : 'Profile'}
+                        </span>
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setTimeout(() => openLogin(), 220);
+                        }}
+                        className="w-full bg-white text-text-primary hover:bg-white/90 rounded-full py-6 text-sm font-medium flex items-center justify-center gap-2"
+                      >
+                        <UserIcon className="w-4 h-4" />
+                        Log in
+                      </Button>
+                    )}
                     <div className="border-t border-white/10 pt-5">
                       <a
                         href="tel:+97145550100"

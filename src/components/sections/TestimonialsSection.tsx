@@ -23,13 +23,13 @@ const testimonials: Testimonial[] = [
   },
   {
     id: 3,
-    quote: "The deep conditioning ritual completely transformed my hair. After years of heat damage I had given up hope, but the team here knew exactly what my hair needed. The treatment was incredibly relaxing and the results were immediate — soft, shiny, and full of life again.",
+    quote: "The deep conditioning treatment completely transformed my hair. After years of heat damage I had given up hope, but the team here knew exactly what my hair needed. The treatment was incredibly relaxing and the results were immediate — soft, shiny, and full of life again.",
     author: "Priya M.",
-    service: "Deep Conditioning Ritual"
+    service: "Deep Conditioning Treatment"
   },
   {
     id: 4,
-    quote: "I cannot imagine a more perfect wedding day experience. The bridal hair team was calm, creative, and precise — they brought my vision to life better than I had pictured it. Every bridesmaid felt beautiful and the whole morning felt like a luxury ritual rather than a rushed appointment.",
+    quote: "I cannot imagine a more perfect wedding day experience. The bridal hair team was calm, creative, and precise — they brought my vision to life better than I had pictured it. Every bridesmaid felt beautiful and the whole morning felt like a luxury experience rather than a rushed appointment.",
     author: "Claire D.",
     service: "Bridal Hair Design"
   }
@@ -38,7 +38,7 @@ const testimonials: Testimonial[] = [
 const services = [
   'Signature Cut & Style',
   'Colour Transformation',
-  'Deep Conditioning Ritual',
+  'Deep Conditioning Treatment',
   'Bridal Hair Design'
 ];
 

@@ -14,7 +14,7 @@ const tabs: { id: TabId; label: string; icon: typeof Home }[] = [
 ];
 
 export function BottomNav() {
-  const { openProfile, openAudiencePicker, surface } = useCart();
+  const { openProfile, openExplorePicker, surface } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === '/';
@@ -43,7 +43,7 @@ export function BottomNav() {
       return;
     }
     if (id === 'explore') {
-      openAudiencePicker();
+      openExplorePicker();
     }
   };
 

@@ -17,9 +17,8 @@ export function AboutSection() {
   const portraitY     = useTransform(scrollYProgress, [0, 0.5, 1],  ["0vh",  "30vh", "22vh"]);
   const portraitX     = useTransform(scrollYProgress, [0, 0.5],     ["0vw",  "-19vw"]);
   const portraitScale = useTransform(scrollYProgress, [0, 0.5],     [1,      1.35]);
-  // Description + avatars exit upward fast — clear the rising body text
+  // Description exits upward fast — clear the rising body text
   const teamInfoY   = useTransform(scrollYProgress, [0, 1], ["0vh", "-40vh"]);
-  const avatarY     = useTransform(scrollYProgress, [0, 1], ["0vh", "-35vh"]);
   const goalTextY   = useTransform(scrollYProgress, [0, 1], ["0vh", "-70vh"]);
   const contentY    = useTransform(scrollYProgress, [0, 1], ["0vh", "-80vh"]);
 
@@ -32,7 +31,7 @@ export function AboutSection() {
   });
 
   return (
-    <section ref={sectionRef} id="about" className="relative z-10 w-full bg-bg-primary lg:-mt-[100vh]">
+    <section ref={sectionRef} id="about" className="relative z-10 w-full bg-bg-primary">
 
       {/* ── Desktop: sticky scroll-driven layout ── */}
       <div className="hidden lg:block h-[300vh]">
@@ -50,35 +49,6 @@ export function AboutSection() {
             </p>
           </motion.div>
 
-          {/* Avatar group — far right, slightly slower parallax */}
-          <motion.div
-            style={{ y: avatarY }}
-            className="absolute top-[9%] right-[3%] z-10"
-          >
-            <div className="flex items-center gap-5">
-              <div className="flex -space-x-6">
-                <img
-                  src="/assets/Images/headshot_1.png"
-                  alt="Team member"
-                  className="w-20 h-20 rounded-full border-4 border-bg-primary object-cover"
-                />
-                <img
-                  src="/assets/Images/headshot_2.png"
-                  alt="Team member"
-                  className="w-20 h-20 rounded-full border-4 border-bg-primary object-cover"
-                />
-                <img
-                  src="/assets/Images/headshot_3.png"
-                  alt="Team member"
-                  className="w-20 h-20 rounded-full border-4 border-bg-primary object-cover"
-                />
-              </div>
-              <div className="w-20 h-20 rounded-full bg-circle-dark flex items-center justify-center text-white text-lg font-medium">
-                +20
-              </div>
-            </div>
-          </motion.div>
-
           {/* Doctor portrait — scroll-driven: moves down+left and scales up */}
           <motion.div
             style={{ y: portraitY, x: portraitX, scale: portraitScale }}
@@ -86,8 +56,8 @@ export function AboutSection() {
           >
             <div className="aspect-[3/4] flex items-center justify-center">
               <img
-                src="/assets/Logo/mastercutlogo.png"
-                alt="Ra by Mastercuts"
+                src="/assets/Logo/mastercut-mark.png"
+                alt="Mastercuts"
                 className="w-full h-full object-contain"
               />
             </div>
@@ -99,7 +69,7 @@ export function AboutSection() {
             className="absolute top-[58%] left-[3%] z-20"
           >
             <h2 className="font-serif text-6xl lg:text-8xl text-text-primary leading-tight">
-              Ra goal is
+              Our goal is
             </h2>
           </motion.div>
 
@@ -127,17 +97,6 @@ export function AboutSection() {
 
       {/* ── Mobile: simple stacked layout ── */}
       <div className="lg:hidden px-6 py-24 space-y-12">
-        <div className="flex items-center gap-6">
-          <div className="flex -space-x-6">
-            <img src="/assets/Images/headshot_1.png" alt="Team member" className="w-20 h-20 rounded-full border-4 border-bg-primary object-cover" />
-            <img src="/assets/Images/headshot_2.png" alt="Team member" className="w-20 h-20 rounded-full border-4 border-bg-primary object-cover" />
-            <img src="/assets/Images/headshot_3.png" alt="Team member" className="w-20 h-20 rounded-full border-4 border-bg-primary object-cover" />
-          </div>
-          <div className="w-20 h-20 rounded-full bg-circle-dark flex items-center justify-center text-white text-lg font-medium">
-            +20
-          </div>
-        </div>
-
         <p className="text-sm text-text-secondary">
           With decades of combined experience and ongoing advanced education, our
           team delivers care rooted in knowledge, precision, and an unwavering
@@ -145,11 +104,11 @@ export function AboutSection() {
         </p>
 
         <div className="aspect-[3/4] flex items-center justify-center w-full max-w-xs mx-auto">
-          <img src="/assets/Logo/mastercutlogo.png" alt="Ra by Mastercuts" className="w-full h-full object-contain" />
+          <img src="/assets/Logo/mastercut-mark.png" alt="Mastercuts" className="w-full h-full object-contain" />
         </div>
 
         <h2 className="font-serif text-5xl text-text-primary leading-tight">
-          Ra goal is
+          Our goal is
         </h2>
 
         <p className="font-serif text-3xl text-text-primary leading-tight">

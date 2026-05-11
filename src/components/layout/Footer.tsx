@@ -1,7 +1,9 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Instagram, Linkedin } from 'lucide-react';
 import { useCart } from '@/components/cart/CartProvider';
+import { useAudience } from '@/components/services/useAudience';
 
 interface Location {
   name: string;
@@ -19,15 +21,44 @@ const locations: Location[] = [
   }
 ];
 
-const footerLinks = {
-  services: ['The Atelier', 'Solar Vitality', 'Somatic Recovery', 'Alchemic Aesthetics', 'The Longevity Lab'],
-  clinic: ['Home', 'About us', 'Contact']
-};
-
 export function Footer() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const { openCart } = useCart();
+  const { openExplorePicker, openAudiencePicker, openWellnessHub } = useCart();
+  const [, setAudience] = useAudience();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+
+  const goToSalon = (audience: 'gentlemen' | 'ladies') => {
+    setAudience(audience);
+    navigate('/explore');
+  };
+  const goToAtHome = () => openAudiencePicker('/at-home');
+
+  const goToSection = (id: string) => {
+    if (isHome) {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      navigate(`/#${id}`);
+    }
+  };
+
+  const goHome = () => {
+    if (isHome) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      navigate('/');
+    }
+  };
+
+  const clinicLinks: { label: string; onClick: () => void }[] = [
+    { label: 'Home', onClick: goHome },
+    { label: 'About us', onClick: () => goToSection('about') },
+    { label: 'A note from Dr Sara', onClick: () => goToSection('dr-sara') },
+    { label: 'Our team', onClick: () => goToSection('team') },
+    { label: 'Contact', onClick: () => goToSection('contact') },
+  ];
 
   return (
     <footer id="contact" className="bg-bg-dark pt-24 lg:pt-32 pb-8" ref={ref}>
@@ -60,7 +91,7 @@ export function Footer() {
           >
             <button
               type="button"
-              onClick={() => openCart()}
+              onClick={openExplorePicker}
               className="group relative w-full h-full rounded-full border border-white/30 flex items-center justify-center overflow-hidden transition-colors duration-500"
             >
               {/* Fill layer — scales up from center on hover */}
@@ -84,15 +115,44 @@ export function Footer() {
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <p className="text-white/50 text-sm mb-6">Rituals</p>
+            <p className="text-white/50 text-sm mb-6">Services</p>
             <ul className="space-y-3">
-              {footerLinks.services.map((link) => (
-                <li key={link}>
-                  <a href="#" className="text-white hover:text-white/70 transition-colors duration-200">
-                    {link}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <button
+                  type="button"
+                  onClick={goToAtHome}
+                  className="text-white hover:text-white/70 transition-colors duration-200 text-left"
+                >
+                  Ra at Home
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => goToSalon('gentlemen')}
+                  className="text-white hover:text-white/70 transition-colors duration-200 text-left"
+                >
+                  Mastercuts For Gents
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => goToSalon('ladies')}
+                  className="text-white hover:text-white/70 transition-colors duration-200 text-left"
+                >
+                  Mastercuts For Ladies
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={openWellnessHub}
+                  className="text-white hover:text-white/70 transition-colors duration-200 text-left"
+                >
+                  Ra Wellness Centre
+                </button>
+              </li>
             </ul>
           </motion.div>
 
@@ -104,11 +164,15 @@ export function Footer() {
           >
             <p className="text-white/50 text-sm mb-6">Our Salon</p>
             <ul className="space-y-3">
-              {footerLinks.clinic.map((link) => (
-                <li key={link}>
-                  <a href="#" className="text-white hover:text-white/70 transition-colors duration-200">
-                    {link}
-                  </a>
+              {clinicLinks.map((link) => (
+                <li key={link.label}>
+                  <button
+                    type="button"
+                    onClick={link.onClick}
+                    className="text-white hover:text-white/70 transition-colors duration-200 text-left"
+                  >
+                    {link.label}
+                  </button>
                 </li>
               ))}
             </ul>
@@ -166,7 +230,7 @@ export function Footer() {
         >
           <div className="text-white/50 text-sm">
             <p>Copyright 2026</p>
-            <p>Ra by Mastercuts</p>
+            <p>Mastercuts</p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 text-sm items-center sm:items-start">

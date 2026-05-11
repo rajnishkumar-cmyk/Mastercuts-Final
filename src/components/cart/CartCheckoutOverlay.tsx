@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, X } from 'lucide-react';
 import { useCart } from './CartProvider';
 import type { CheckoutStep } from './CartProvider';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { PhoneLoginStep } from './steps/PhoneLoginStep';
 import { OtpVerifyStep } from './steps/OtpVerifyStep';
 import { AddressStep } from './steps/AddressStep';
@@ -80,6 +81,7 @@ interface OverlayProps {
 
 export function CartCheckoutOverlay({ mode = 'embedded' }: OverlayProps = {}) {
   const { checkoutStep, setCheckoutStep, closeAll, account, surface } = useCart();
+  const isMobile = useIsMobile();
   // Embedded overlay belongs to the cart drawer; standalone overlay belongs to
   // the login surface. Each only renders when its own surface is active so the
   // two never collide.
@@ -103,12 +105,24 @@ export function CartCheckoutOverlay({ mode = 'embedded' }: OverlayProps = {}) {
   const totalSteps = getTotalVisualSteps(hasAccount);
 
   const isStandalone = mode === 'standalone';
+  // Standalone on desktop renders as a right-side drawer (same pattern as
+  // CartDrawer). Standalone on mobile and embedded everywhere stay as a
+  // bottom sheet.
+  const desktopDrawer = isStandalone && !isMobile;
+
   const backdropClass = isStandalone
     ? 'fixed inset-0 bg-black/40 z-[70]'
     : 'absolute inset-0 bg-black/30 z-10';
-  const sheetClass = isStandalone
-    ? 'fixed inset-x-0 bottom-0 top-12 z-[80] bg-bg-primary rounded-t-2xl flex flex-col overflow-hidden shadow-xl mx-auto sm:max-w-md sm:left-1/2 sm:-translate-x-1/2 sm:top-auto sm:bottom-0 sm:max-h-[640px] sm:rounded-2xl'
-    : 'absolute inset-x-0 bottom-0 top-12 z-20 bg-bg-primary rounded-t-2xl flex flex-col overflow-hidden shadow-xl';
+  const sheetClass = desktopDrawer
+    ? 'fixed right-0 top-0 bottom-0 z-[80] bg-bg-primary w-full max-w-md flex flex-col overflow-hidden shadow-2xl'
+    : isStandalone
+      ? 'fixed inset-x-0 bottom-0 top-12 z-[80] bg-bg-primary rounded-t-2xl flex flex-col overflow-hidden shadow-xl'
+      : 'absolute inset-x-0 bottom-0 top-12 z-20 bg-bg-primary rounded-t-2xl flex flex-col overflow-hidden shadow-xl';
+
+  // Slide-in from right on desktop standalone, slide-up from bottom otherwise.
+  const sheetMotion = desktopDrawer
+    ? { initial: { x: '100%' }, animate: { x: 0 }, exit: { x: '100%' } }
+    : { initial: { y: '100%' }, animate: { y: 0 }, exit: { y: '100%' } };
 
   return (
     <AnimatePresence>
@@ -125,12 +139,12 @@ export function CartCheckoutOverlay({ mode = 'embedded' }: OverlayProps = {}) {
             onClick={handleBack}
           />
 
-          {/* Bottom sheet */}
+          {/* Drawer / sheet */}
           <motion.div
             key={`checkout-sheet-${checkoutStep}`}
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
+            initial={sheetMotion.initial}
+            animate={sheetMotion.animate}
+            exit={sheetMotion.exit}
             transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
             className={sheetClass}
           >

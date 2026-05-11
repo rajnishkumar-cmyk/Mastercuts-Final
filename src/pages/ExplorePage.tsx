@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowLeft, ArrowRight, Plus, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { rituals, getServicesForRitual, packages } from '@/lib/booking/catalog';
 import { useCart } from '@/components/cart/CartProvider';
@@ -13,6 +14,10 @@ import {
 } from '@/components/services/RitualChipRow';
 import { ServiceCard, JourneyCard } from '@/components/services/ServiceCard';
 
+// Flip to true once the salon reopens. Hides the live catalog and routes
+// users into Ra at Home during the transition.
+const SALON_OPEN = false;
+
 // Extra breathing room between the bottom of the sticky filter bar and
 // the heading of the section it "reveals". Keeps the heading from kissing
 // the filter on smooth scroll.
@@ -21,8 +26,83 @@ const SCROLL_BREATHING = 12;
 export function ExplorePage() {
   const { openCart } = useCart();
   const { hash } = useLocation();
+  const navigate = useNavigate();
   const [audience, setAudience] = useAudience();
   const [activeId, setActiveId] = useState<ChipId>('curated-journeys');
+  const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [searchHidden, setSearchHidden] = useState(false);
+
+  // Hide the search input on scroll-down (after 100px), reveal on scroll-up.
+  // Same direction-aware pattern used in Navigation.tsx.
+  useEffect(() => {
+    if (!SALON_OPEN) return;
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (y > lastY && y > 100) setSearchHidden(true);
+      else if (y < lastY) setSearchHidden(false);
+      lastY = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Renovation empty state — shown when the salon is closed for transition.
+  if (!SALON_OPEN) {
+    return (
+      <main
+        className="min-h-screen bg-bg-dark text-white flex flex-col"
+        style={{ paddingTop: 'var(--nav-offset, 0px)' }}
+      >
+        <div className="flex-1 flex items-center justify-center px-6 lg:px-16 py-16">
+          <div className="max-w-lg w-full text-center">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold mb-4">
+              In-salon services
+            </p>
+            <h1 className="font-serif text-4xl lg:text-5xl text-white leading-[1.05] mb-5">
+              Our <span className="italic">salon</span> is renovating.
+            </h1>
+            <p className="text-sm lg:text-base text-white/65 leading-relaxed mb-10 max-w-md mx-auto">
+              During this transition, we continue to serve you at home — nails,
+              massage, and threading, brought to your door by our senior team.
+              Our new space opens at Imperial Avenue, Burj Khalifa Street, soon.
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate('/at-home')}
+              className="group inline-flex items-center justify-center gap-2 rounded-full bg-white text-text-primary px-7 py-3.5 text-sm font-medium hover:bg-white/90 transition-colors"
+            >
+              Explore Ra at Home
+              <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
+            </button>
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back to home
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Debounce the query 150ms so live-typing doesn't thrash render
+  useEffect(() => {
+    const t = window.setTimeout(() => setDebouncedQuery(query.trim().toLowerCase()), 150);
+    return () => window.clearTimeout(t);
+  }, [query]);
+
+  const isSearching = debouncedQuery.length > 0;
+  const matchesQuery = useCallback(
+    (text: string) => text.toLowerCase().includes(debouncedQuery),
+    [debouncedQuery],
+  );
 
   const filterRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<ChipId, HTMLElement | null>>({} as never);
@@ -138,22 +218,62 @@ export function ExplorePage() {
       >
         <div className="px-6 lg:px-16 flex items-center justify-between mb-3">
           <p className="text-white/50 text-[11px] uppercase tracking-[0.18em]">
-            Our Rituals for
+            Our services for
           </p>
           <AudienceToggle value={audience} onChange={setAudience} size="sm" />
         </div>
-        <RitualChipRow
-          activeId={activeId}
-          onChange={handleChipChange}
-          variant="dark"
-        />
+
+        {/* Search input — collapses on scroll-down, reveals on scroll-up */}
+        <motion.div
+          initial={false}
+          animate={{
+            height: searchHidden ? 0 : 'auto',
+            opacity: searchHidden ? 0 : 1,
+            marginBottom: searchHidden ? 0 : 12,
+          }}
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+          className="overflow-hidden"
+        >
+          <div className="px-6 lg:px-16">
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search services"
+                aria-label="Search services"
+                className="w-full bg-white/5 border border-white/10 rounded-full pl-10 pr-10 py-2.5 text-sm text-white placeholder:text-white/40 focus:bg-white/10 focus:border-white/30 outline-none transition-colors"
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery('')}
+                  aria-label="Clear search"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-white/60 hover:bg-white/10 hover:text-white transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Chip row hides while searching to keep the focus on results */}
+        {!isSearching && (
+          <RitualChipRow
+            activeId={activeId}
+            onChange={handleChipChange}
+            variant="dark"
+          />
+        )}
       </div>
 
       {/* ───────── Curated Journeys ───────── */}
       <section
         ref={setSectionRef('curated-journeys')}
         id="curated-journeys"
-        className="px-6 lg:px-16 pt-10 pb-14"
+        className={`px-6 lg:px-16 pt-10 pb-14 ${isSearching ? 'hidden' : ''}`}
         style={{ scrollMarginTop: 'calc(var(--explore-filter-h, 180px) + 12px)' }}
       >
         <div className="mx-auto max-w-lg">
@@ -177,42 +297,66 @@ export function ExplorePage() {
       </section>
 
       {/* ───────── Every ritual, in chip order ───────── */}
-      {rituals.map((ritual) => {
-        const services = getServicesForRitual(ritual.id, audience);
+      {(() => {
+        let totalMatches = 0;
+        const sections = rituals.map((ritual) => {
+          const base = getServicesForRitual(ritual.id, audience);
+          const services = isSearching
+            ? base.filter((s) => matchesQuery(s.name) || matchesQuery(s.description))
+            : base;
+          if (isSearching) totalMatches += services.length;
+          if (isSearching && services.length === 0) return null;
+          return (
+            <section
+              key={ritual.id}
+              ref={setSectionRef(ritual.id)}
+              id={ritual.id}
+              className="px-6 lg:px-16 pt-4 pb-14 border-t border-white/5"
+              style={{ scrollMarginTop: 'calc(var(--explore-filter-h, 180px) + 12px)' }}
+            >
+              <div className="mx-auto max-w-lg pt-8">
+                <div className="mb-6 space-y-2">
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold">
+                    {ritual.tagline}
+                  </p>
+                  <h2 className="font-serif text-3xl lg:text-4xl text-white leading-[1.05]">
+                    <span className="italic text-white/90">{ritual.title}</span>{' '}
+                    {ritual.titleItalic}
+                  </h2>
+                  <p className="text-white/60 text-sm lg:text-base leading-6 max-w-prose">
+                    {ritual.description}
+                  </p>
+                </div>
+                <div className="space-y-4">
+                  {services.length === 0 ? (
+                    <div className="rounded-xl border border-white/10 bg-white/[0.02] py-6 px-5 text-sm text-white/50 italic">
+                      No services available for this audience yet. Try switching the filter above.
+                    </div>
+                  ) : (
+                    services.map((svc) => <ServiceCard key={svc.id} service={svc} />)
+                  )}
+                </div>
+              </div>
+            </section>
+          );
+        });
         return (
-          <section
-            key={ritual.id}
-            ref={setSectionRef(ritual.id)}
-            id={ritual.id}
-            className="px-6 lg:px-16 pt-4 pb-14 border-t border-white/5"
-            style={{ scrollMarginTop: 'calc(var(--explore-filter-h, 180px) + 12px)' }}
-          >
-            <div className="mx-auto max-w-lg pt-8">
-              <div className="mb-6 space-y-2">
-                <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold">
-                  {ritual.tagline}
-                </p>
-                <h2 className="font-serif text-3xl lg:text-4xl text-white leading-[1.05]">
-                  <span className="italic text-white/90">{ritual.title}</span>{' '}
-                  {ritual.titleItalic}
-                </h2>
-                <p className="text-white/60 text-sm lg:text-base leading-6 max-w-prose">
-                  {ritual.description}
-                </p>
+          <>
+            {isSearching && (
+              <div className="px-6 lg:px-16 pt-6 pb-2">
+                <div className="mx-auto max-w-lg">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-white/50">
+                    {totalMatches === 0
+                      ? `No services match "${debouncedQuery}"`
+                      : `${totalMatches} ${totalMatches === 1 ? 'service' : 'services'} match "${debouncedQuery}"`}
+                  </p>
+                </div>
               </div>
-              <div className="space-y-4">
-                {services.length === 0 ? (
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02] py-6 px-5 text-sm text-white/50 italic">
-                    No services available for this audience yet. Try switching the filter above.
-                  </div>
-                ) : (
-                  services.map((svc) => <ServiceCard key={svc.id} service={svc} />)
-                )}
-              </div>
-            </div>
-          </section>
+            )}
+            {sections}
+          </>
         );
-      })}
+      })()}
 
       {/* ───────── Cart CTA ───────── */}
       <div className="px-6 lg:px-16 pt-6">

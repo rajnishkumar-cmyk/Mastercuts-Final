@@ -2,8 +2,10 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { AboutSection } from '@/components/sections/AboutSection';
-import { ServicesSection } from '@/components/sections/ServicesSection';
-import { TeamSection } from '@/components/sections/TeamSection';
+import { ExploreCategoriesSection } from '@/components/sections/ExploreCategoriesSection';
+import { RaAtHomeSection } from '@/components/sections/RaAtHomeSection';
+import { DrSaraMessageSection } from '@/components/sections/DrSaraMessageSection';
+import { StatsTeamSection } from '@/components/sections/StatsTeamSection';
 import { StatsSection } from '@/components/sections/StatsSection';
 import { TestimonialsSection } from '@/components/sections/TestimonialsSection';
 import { CTASection } from '@/components/sections/CTASection';
@@ -29,10 +31,11 @@ export function HomePage() {
     <>
       <main>
         <HeroSection />
-        <ServicesSection />
+        <ExploreCategoriesSection />
+        <RaAtHomeSection />
         <AboutSection />
-        {/* <TechnologySection /> */}
-        <TeamSection />
+        <DrSaraMessageSection />
+        <StatsTeamSection />
         <StatsSection />
         <TestimonialsSection />
         <CTASection />

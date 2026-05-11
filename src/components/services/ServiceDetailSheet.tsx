@@ -389,7 +389,7 @@ export function ServiceDetailSheet() {
               {relatedServices.length > 0 && (
                 <section className="pt-10 border-t border-white/5">
                   <p className="text-[10px] uppercase tracking-[0.22em] text-white/50 mb-3">
-                    Also in this ritual
+                    Also in this category
                   </p>
                   <h2 className="font-serif text-3xl lg:text-4xl leading-tight mb-8">
                     Other <span className="italic">{ritual.titleItalic.toLowerCase()}</span> services

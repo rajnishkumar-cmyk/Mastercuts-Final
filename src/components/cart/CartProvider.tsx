@@ -21,7 +21,10 @@ type Surface =
   | 'profile'
   | 'audience-picker'
   | 'service-detail'
-  | 'login';
+  | 'login'
+  | 'explore-picker'
+  | 'payment-method'
+  | 'wellness-hub';
 
 export type CheckoutStep = 'none' | 'phone-login' | 'otp-verify' | 'address' | 'edit-contact' | 'date-time';
 
@@ -63,7 +66,11 @@ interface CartContextValue {
   openCheckout: () => void;
   openLogin: () => void;
   openProfile: () => void;
-  openAudiencePicker: () => void;
+  openAudiencePicker: (destination?: string) => void;
+  audiencePickerDestination: string;
+  openExplorePicker: () => void;
+  openPaymentMethod: () => void;
+  openWellnessHub: () => void;
   openServiceDetail: (serviceId: string, ritualId: RitualId) => void;
   closeServiceDetail: () => void;
   closeAll: () => void;
@@ -110,6 +117,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
   const [drawerStack, setDrawerStack] = useState<DrawerView[]>([]);
   const [serviceDetail, setServiceDetail] = useState<ServiceDetailContext | null>(null);
+  const [audiencePickerDestination, setAudiencePickerDestination] = useState<string>('/explore');
   const hydratedRef = useRef(false);
   const cartItemCountRef = useRef(0);
 
@@ -182,33 +190,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       let added = false;
       setCart((prev) => {
-        const existing = prev.items.find((i) => i.serviceId === serviceId);
-
-        // Already in cart — update variant in-place if it differs
-        if (existing) {
-          if (existing.variantId === effectiveVariantId) {
-            toast.info(`${service.name} is already in your cart`);
-            return prev;
-          }
-          added = true;
-          toast.success(`${service.name} · updated to ${effectiveVariantLabel}`);
-          return {
-            ...prev,
-            items: prev.items.map((i) =>
-              i.id === existing.id
-                ? {
-                    ...i,
-                    variantId: effectiveVariantId,
-                    variantLabel: effectiveVariantLabel,
-                    durationMin: effectiveDuration,
-                    price: effectivePrice,
-                  }
-                : i
-            ),
-            updatedAt: Date.now(),
-          };
-        }
-
         if (prev.items.length >= 10) {
           toast.warning("That's a lot \u2014 please check out before adding more");
           return prev;
@@ -424,7 +405,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCheckoutStep('phone-login');
   }, []);
   const openProfile = useCallback(() => setSurface('profile'), []);
-  const openAudiencePicker = useCallback(() => setSurface('audience-picker'), []);
+  const openAudiencePicker = useCallback((destination = '/explore') => {
+    setAudiencePickerDestination(destination);
+    setSurface('audience-picker');
+  }, []);
+  const openExplorePicker = useCallback(() => setSurface('explore-picker'), []);
+  const openPaymentMethod = useCallback(() => setSurface('payment-method'), []);
+  const openWellnessHub = useCallback(() => setSurface('wellness-hub'), []);
   const openServiceDetail = useCallback<CartContextValue['openServiceDetail']>(
     (serviceId, ritualId) => {
       setServiceDetail({ serviceId, ritualId });
@@ -478,6 +465,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     openLogin,
     openProfile,
     openAudiencePicker,
+    audiencePickerDestination,
+    openExplorePicker,
+    openPaymentMethod,
+    openWellnessHub,
     openServiceDetail,
     closeServiceDetail,
     closeAll,

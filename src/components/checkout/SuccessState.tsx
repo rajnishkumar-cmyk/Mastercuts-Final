@@ -100,9 +100,22 @@ export function SuccessState({ booking, onDone }: Props) {
             ))}
           </div>
 
-          <div className="border-t border-white/10 pt-4 flex items-baseline justify-between">
-            <span className="text-xs uppercase tracking-wider text-white/50">Total</span>
-            <span className="font-serif text-2xl">{formatAed(booking.totalPrice)}</span>
+          <div className="border-t border-white/10 pt-4 space-y-1.5">
+            <div className="flex items-baseline justify-between">
+              <span className="text-xs uppercase tracking-wider text-white/50">Subtotal</span>
+              <span className="text-sm text-white/80">{formatAed(booking.totalPrice)}</span>
+            </div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-xs uppercase tracking-wider text-white/50">VAT (5%)</span>
+              <span className="text-sm text-white/80">{formatAed(Math.round(booking.totalPrice * 0.05))}</span>
+            </div>
+            <div className="flex items-baseline justify-between pt-2 border-t border-white/10">
+              <span className="text-xs uppercase tracking-wider text-white">Total</span>
+              <span className="font-serif text-2xl">{formatAed(booking.totalPrice + Math.round(booking.totalPrice * 0.05))}</span>
+            </div>
+            <p className="text-[10px] text-white/40 leading-relaxed pt-1">
+              All prices in AED. Includes 5% VAT.
+            </p>
           </div>
 
           <p className="text-[11px] text-white/50 pt-1">We'll text you 24h and 2h before your appointment.</p>

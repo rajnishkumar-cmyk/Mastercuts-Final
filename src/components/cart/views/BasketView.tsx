@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, ArrowRight, ArrowUpRight, Sparkles, User, MapPin, Clock, Banknote, CreditCard } from 'lucide-react';
+import { X, ArrowRight, ArrowUpRight, ChevronDown, Pencil, Sparkles, User, MapPin, Clock, Banknote, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart, useCartTotals, formatAed, formatDuration } from '../CartProvider';
 import { CartItemRow } from '../CartItemRow';
@@ -36,7 +36,7 @@ export function BasketView({ onClose, onContinue }: Props) {
     confirmBooking,
     getSelectedAddress,
     paymentMethod,
-    setPaymentMethod,
+    openPaymentMethod,
   } = useCart();
   const { totalPrice, totalDuration, count } = useCartTotals();
   const navigate = useNavigate();
@@ -48,8 +48,11 @@ export function BasketView({ onClose, onContinue }: Props) {
   const selectedAddress = getSelectedAddress();
   const hasAddress = !!selectedAddress;
   const hasTimeSlot = !!(cart.draftCheckout?.date && cart.draftCheckout?.time);
+  const isFinalState = hasAddress && hasTimeSlot;
 
-  const canPay = hasAddress && hasTimeSlot && policyAccepted && !submitting;
+  const vat = Math.round(totalPrice * 0.05);
+  const grandTotal = totalPrice + vat;
+  const canPay = isFinalState && policyAccepted && !submitting;
 
   const handlePay = async () => {
     if (!canPay) return;
@@ -71,7 +74,7 @@ export function BasketView({ onClose, onContinue }: Props) {
             Your cart
           </p>
           <h2 className="font-serif text-2xl text-text-primary leading-none">
-            Ritual <span className="italic">Cart</span>
+            Your <span className="italic">Cart</span>
             {count > 0 && (
               <span className="ml-3 text-sm text-text-secondary align-middle">
                 {count} {count === 1 ? 'item' : 'items'}
@@ -97,23 +100,23 @@ export function BasketView({ onClose, onContinue }: Props) {
               Your cart is empty
             </p>
             <h3 className="font-serif text-4xl leading-[1.05] text-text-primary mb-4">
-              Begin your <span className="italic">ritual</span>
+              Begin your <span className="italic">visit</span>
             </h3>
             <p className="text-text-secondary text-sm max-w-xs mb-8 leading-relaxed">
-              Explore the five sanctuaries of Ra and add your favourite services to begin building your visit.
+              Explore our services and add your favourite to begin building your visit.
             </p>
             <button
               type="button"
               onClick={() => { onClose(); navigate('/#services'); }}
               className="group inline-flex items-center justify-center gap-2 rounded-full bg-bg-dark text-white px-6 py-3.5 text-sm font-medium hover:bg-bg-darker transition-colors"
             >
-              Browse rituals
+              Browse services
               <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </button>
           </div>
         ) : (
           <div className="px-6">
-            {/* Contact info for returning users */}
+            {/* Contact info for returning users (passive header) */}
             {account && account.name && (
               <div className="flex items-center gap-3 py-4 border-b border-black/10">
                 <div className="w-9 h-9 rounded-full bg-bg-dark text-white flex items-center justify-center shrink-0">
@@ -137,7 +140,7 @@ export function BasketView({ onClose, onContinue }: Props) {
             {/* Frequently added together */}
             <FrequentlyAddedSection />
 
-            {/* Inline "Add more rituals" row */}
+            {/* Inline "Add more services" row */}
             <button
               type="button"
               onClick={() => { onClose(); navigate('/#services'); }}
@@ -145,7 +148,7 @@ export function BasketView({ onClose, onContinue }: Props) {
             >
               <span className="flex flex-col min-w-0">
                 <span className="font-serif text-lg text-text-primary leading-tight">
-                  Add more <span className="italic">rituals</span>
+                  Add more <span className="italic">services</span>
                 </span>
                 <span className="text-[11px] uppercase tracking-wider text-text-secondary mt-1">
                   Browse the five sanctuaries
@@ -180,7 +183,63 @@ export function BasketView({ onClose, onContinue }: Props) {
               </span>
             </button>
 
-            <div className="py-6 border-b border-black/10">
+            {/* Edit your details — only when logged in. Just above the payment
+                breakdown. Opens the same EditContactOverlay used by the
+                address selector flow. */}
+            {account && (
+              <div className="flex items-center justify-between gap-4 py-4 border-b border-black/10">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <span className="w-10 h-10 rounded-full bg-circle-light flex items-center justify-center text-text-primary shrink-0">
+                    <User className="w-4 h-4" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[10px] uppercase tracking-[0.18em] text-text-secondary mb-0.5">
+                      Your details
+                    </p>
+                    <p className="text-sm text-text-primary truncate">
+                      {account.name ? `${account.name} · ` : ''}{account.phone}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCheckoutStep('edit-contact')}
+                  className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-text-primary hover:bg-black/5 transition-colors"
+                >
+                  <Pencil className="w-3 h-3" />
+                  Edit
+                </button>
+              </div>
+            )}
+
+            {/* Payment breakdown card — always visible when cart has items */}
+            <div className="my-5 rounded-2xl border border-black/10 bg-circle-light/40 px-5 py-4">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-text-secondary mb-3">
+                Payment breakdown
+              </p>
+              <div className="flex items-baseline justify-between mb-2">
+                <span className="text-xs uppercase tracking-wider text-text-secondary">Subtotal</span>
+                <span className="text-sm text-text-primary">{formatAed(totalPrice)}</span>
+              </div>
+              <div className="flex items-baseline justify-between mb-3 pb-3 border-b border-black/10">
+                <span className="text-xs uppercase tracking-wider text-text-secondary">VAT (5%)</span>
+                <span className="text-sm text-text-primary">{formatAed(vat)}</span>
+              </div>
+              <div className="flex items-baseline justify-between mb-2">
+                <span className="text-xs uppercase tracking-wider text-text-primary font-medium">Total</span>
+                <span className="font-serif text-2xl text-text-primary">{formatAed(grandTotal)}</span>
+              </div>
+              <div className="flex items-baseline justify-between mb-2">
+                <span className="text-xs uppercase tracking-wider text-text-secondary">Duration</span>
+                <span className="text-sm text-text-primary">{formatDuration(totalDuration)}</span>
+              </div>
+              <p className="text-[10px] text-text-secondary leading-relaxed">
+                All prices in AED. Includes 5% VAT.
+              </p>
+            </div>
+
+            {/* Good to know */}
+            <div className="py-6 border-t border-black/10">
               <p className="text-[10px] uppercase tracking-[0.2em] text-text-secondary mb-3">
                 Good to know
               </p>
@@ -194,10 +253,11 @@ export function BasketView({ onClose, onContinue }: Props) {
         )}
       </div>
 
-      {/* Progressive sticky footer — only when cart has items */}
+      {/* Sticky footer — address + time chips live here (reverted from body),
+          followed by policy + horizontal Pay-via pill + Pay CTA. */}
       {!isEmpty && (
         <div className="flex-shrink-0 border-t border-black/10 bg-bg-primary px-6 pt-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
-          {/* Address row (visible after address is saved) */}
+          {/* Address row (when set) */}
           {hasAddress && (
             <div className="flex items-center justify-between py-2.5 mb-2 border-b border-black/10">
               <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -216,7 +276,7 @@ export function BasketView({ onClose, onContinue }: Props) {
             </div>
           )}
 
-          {/* Time row (visible after date/time is selected) */}
+          {/* Time row (when set) */}
           {hasAddress && hasTimeSlot && (
             <div className="flex items-center justify-between py-2.5 mb-2 border-b border-black/10">
               <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -235,87 +295,54 @@ export function BasketView({ onClose, onContinue }: Props) {
             </div>
           )}
 
-          {/* Payment method toggle (visible in final state) */}
-          {hasAddress && hasTimeSlot && (
-            <div className="flex items-center gap-2 py-2.5 mb-3">
-              <span className="text-[10px] uppercase tracking-wider text-text-secondary shrink-0">
-                Pay via
-              </span>
-              <div className="flex gap-1.5">
+          {isFinalState ? (
+            <>
+              {/* Policy checkbox */}
+              <label className="flex items-start gap-2.5 text-xs text-text-secondary mb-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={policyAccepted}
+                  onChange={(e) => setPolicyAccepted(e.target.checked)}
+                  className="mt-0.5 accent-bg-dark"
+                />
+                <span>I agree to the booking & cancellation policy</span>
+              </label>
+
+              {/* Horizontal: Pay via pill + Pay CTA */}
+              <div className="flex items-stretch gap-2">
                 <button
                   type="button"
-                  onClick={() => setPaymentMethod('cash')}
+                  onClick={openPaymentMethod}
+                  className="flex items-center justify-between gap-2 rounded-full border border-black/15 bg-white px-4 py-3.5 text-xs text-text-primary hover:border-black/30 transition-colors min-w-[110px]"
+                  aria-label="Change payment method"
+                >
+                  <span className="flex items-center gap-1.5">
+                    {paymentMethod === 'cash' ? (
+                      <Banknote className="w-3.5 h-3.5" />
+                    ) : (
+                      <CreditCard className="w-3.5 h-3.5" />
+                    )}
+                    <span className="font-medium">
+                      {paymentMethod === 'cash' ? 'Cash' : 'Card'}
+                    </span>
+                  </span>
+                  <ChevronDown className="w-3.5 h-3.5 text-text-secondary shrink-0" />
+                </button>
+                <button
+                  type="button"
+                  disabled={!canPay}
+                  onClick={handlePay}
                   className={cn(
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] border transition-colors',
-                    paymentMethod === 'cash'
-                      ? 'border-bg-dark bg-bg-dark text-white'
-                      : 'border-black/15 text-text-primary hover:bg-black/5'
+                    'flex-1 rounded-full py-3.5 text-sm font-medium transition-colors',
+                    canPay
+                      ? 'bg-bg-dark text-white hover:bg-bg-darker'
+                      : 'bg-black/10 text-text-muted cursor-not-allowed',
                   )}
                 >
-                  <Banknote className="w-3 h-3" />
-                  Cash
+                  {submitting ? 'Confirming...' : `Pay Now · ${formatAed(grandTotal)}`}
                 </button>
-                <button
-                  type="button"
-                  disabled
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] border border-black/10 text-text-muted cursor-not-allowed opacity-50"
-                >
-                  <CreditCard className="w-3 h-3" />
-                  Card
-                  <span className="text-[9px] uppercase tracking-wider bg-black/5 px-1.5 py-0.5 rounded-full">
-                    Soon
-                  </span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Policy + Pay (final state) */}
-          {hasAddress && hasTimeSlot && (
-            <label className="flex items-start gap-2.5 text-xs text-text-secondary mb-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={policyAccepted}
-                onChange={(e) => setPolicyAccepted(e.target.checked)}
-                className="mt-0.5 accent-bg-dark"
-              />
-              <span>
-                I agree to the booking & cancellation policy
-              </span>
-            </label>
-          )}
-
-          {/* Subtotal row (always visible) */}
-          {!(hasAddress && hasTimeSlot) && (
-            <>
-              <div className="flex items-baseline justify-between mb-1">
-                <span className="text-xs uppercase tracking-wider text-text-secondary">Subtotal</span>
-                <span className="font-serif text-2xl text-text-primary">{formatAed(totalPrice)}</span>
-              </div>
-              <div className="flex items-baseline justify-between mb-5">
-                <span className="text-xs uppercase tracking-wider text-text-secondary">Duration</span>
-                <span className="text-sm text-text-primary">{formatDuration(totalDuration)}</span>
               </div>
             </>
-          )}
-
-          {/* CTA button — changes based on state */}
-          {hasAddress && hasTimeSlot ? (
-            <button
-              type="button"
-              disabled={!canPay}
-              onClick={handlePay}
-              className={cn(
-                'w-full rounded-full py-4 text-sm font-medium transition-colors',
-                canPay
-                  ? 'bg-bg-dark text-white hover:bg-bg-darker'
-                  : 'bg-black/10 text-text-muted cursor-not-allowed'
-              )}
-            >
-              {submitting
-                ? 'Confirming...'
-                : `Pay via ${paymentMethod === 'cash' ? 'Cash' : 'Card'} · ${formatAed(totalPrice)}`}
-            </button>
           ) : hasAddress ? (
             <button
               type="button"

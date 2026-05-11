@@ -54,7 +54,7 @@ export function CTASection() {
             onClick={() => openCart()}
             className="bg-white text-text-primary hover:bg-white/90 rounded-full px-8 py-6 text-sm font-medium flex items-center gap-3 group mx-auto"
           >
-            Book Your Ritual
+            Book Your Visit
             <Plus className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90" />
           </Button>
         </motion.div>

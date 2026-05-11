@@ -80,7 +80,7 @@ export function ProfileDrawer() {
                 <UserIcon className="w-5 h-5 text-text-primary" />
               </div>
               <h3 className="font-serif text-3xl text-text-primary leading-[1.05] mb-3">
-                Save your <span className="italic">rituals</span>
+                Save your <span className="italic">visits</span>
               </h3>
               <p className="text-sm text-text-secondary leading-relaxed mb-6">
                 Sign in with your phone to save your details, view bookings, and
@@ -159,7 +159,7 @@ export function ProfileDrawer() {
                           <span className="text-xs text-text-secondary">{b.time}</span>
                         </div>
                         <p className="text-xs text-text-secondary mb-1">
-                          {b.items.length} {b.items.length === 1 ? 'ritual' : 'rituals'} ·{' '}
+                          {b.items.length} {b.items.length === 1 ? 'service' : 'services'} ·{' '}
                           {formatDuration(b.totalDuration)}
                         </p>
                         <p className="text-xs text-text-secondary">

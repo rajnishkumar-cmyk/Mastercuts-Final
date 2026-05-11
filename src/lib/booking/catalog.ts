@@ -189,7 +189,7 @@ export const rituals: Ritual[] = [
     description:
       'Science-led protocols and next-generation aesthetics for those invested in long-term vitality.',
     longDescription:
-      "The Longevity Lab is the clinical floor of Ra. This is where biomarkers, IV drips, cryotherapy, and functional aesthetics live — protocols built for people thinking in years, not in days. Every first visit begins with a consultation: the story of your sleep, your stress, your labs, your intentions.\n\nFrom there, we design a rhythm. Some clients come monthly; others treat the Lab as a seasonal reset. We do not sell what we don't believe in, and we don't chase trends. The brief here is measurable, patient, and quiet.",
+      "The Longevity Lab is the clinical floor of Mastercuts. This is where biomarkers, IV drips, cryotherapy, and functional aesthetics live — protocols built for people thinking in years, not in days. Every first visit begins with a consultation: the story of your sleep, your stress, your labs, your intentions.\n\nFrom there, we design a rhythm. Some clients come monthly; others treat the Lab as a seasonal reset. We do not sell what we don't believe in, and we don't chase trends. The brief here is measurable, patient, and quiet.",
     philosophy: 'Measured, patient, informed.',
     faqs: [
       {
@@ -253,7 +253,7 @@ export const services: Service[] = [
   {
     id: 'atelier-deep-conditioning',
     ritualId: 'atelier',
-    name: 'Deep Conditioning Ritual',
+    name: 'Deep Conditioning Treatment',
     description: 'Restorative bond-building masque, scalp massage, and silk blow-dry.',
     highlights: [
       'Bond-building masque under steam',
@@ -378,6 +378,7 @@ export const services: Service[] = [
     price: 450,
     image: '/assets/Images/H-05.png',
     audience: 'unisex',
+    location: 'both',
     variants: [
       { id: '60', label: '60 minutes', durationMin: 60, price: 450 },
       { id: '90', label: '90 minutes', durationMin: 90, price: 580 },
@@ -400,6 +401,7 @@ export const services: Service[] = [
     price: 460,
     image: '/assets/Images/H-02.png',
     audience: 'unisex',
+    location: 'both',
     variants: [
       { id: '60', label: '60 minutes', durationMin: 60, price: 460 },
       { id: '75', label: '75 minutes', durationMin: 75, price: 520 },
@@ -421,6 +423,7 @@ export const services: Service[] = [
     price: 450,
     image: '/assets/Images/H-06.png',
     audience: 'unisex',
+    location: 'both',
   },
   {
     id: 'somatic-prenatal',
@@ -438,6 +441,7 @@ export const services: Service[] = [
     price: 420,
     image: '/assets/Images/H-07.png',
     audience: 'ladies',
+    location: 'both',
   },
 
   // Alchemic Aesthetics
@@ -457,6 +461,7 @@ export const services: Service[] = [
     price: 220,
     image: '/assets/Images/H-06.png',
     audience: 'unisex',
+    location: 'both',
   },
   {
     id: 'alchemic-luxury-pedicure',
@@ -474,6 +479,7 @@ export const services: Service[] = [
     price: 280,
     image: '/assets/Images/H-08.png',
     audience: 'unisex',
+    location: 'both',
   },
   {
     id: 'alchemic-nail-art',
@@ -491,6 +497,7 @@ export const services: Service[] = [
     price: 360,
     image: '/assets/Images/H-09.png',
     audience: 'ladies',
+    location: 'both',
   },
   {
     id: 'alchemic-paraffin',
@@ -508,6 +515,7 @@ export const services: Service[] = [
     price: 180,
     image: '/assets/Images/H-10.png',
     audience: 'unisex',
+    location: 'both',
   },
 
   // The Longevity Lab
@@ -650,6 +658,60 @@ export const services: Service[] = [
     price: 320,
     image: '/assets/Images/H-10.png',
     audience: 'gentlemen',
+  },
+  {
+    id: 'velvet-threading-brows',
+    ritualId: 'velvet-smooth',
+    name: 'Eyebrow Threading',
+    description: 'Precise brow shaping using ancient cotton-thread technique.',
+    highlights: [
+      'Cotton thread, no wax or pulling',
+      'Reads the brow’s natural arch',
+      'Gentle on sensitive skin',
+    ],
+    detail:
+      'A heritage technique that uses a twisted cotton thread to lift each hair from the root, line by line. The shaping reads your natural arch and the angle of the bone beneath, lifting strays and refining the line without the heat or pull of wax.\n\nQuick, precise, and ideal for sensitive skin. Available at the salon and at home.',
+    durationMin: 20,
+    price: 60,
+    image: '/assets/Images/H-06.png',
+    audience: 'ladies',
+    location: 'both',
+  },
+  {
+    id: 'velvet-threading-lip',
+    ritualId: 'velvet-smooth',
+    name: 'Upper Lip Threading',
+    description: 'Fast, precise upper-lip hair removal by thread.',
+    highlights: [
+      'Under ten minutes',
+      'No heat, no chemicals',
+      'Calming aloe finish',
+    ],
+    detail:
+      'A short, precise service to lift fine upper-lip hair using cotton thread. Closes with a calming aloe touch. Pairs naturally with an eyebrow thread or a manicure.',
+    durationMin: 10,
+    price: 30,
+    image: '/assets/Images/H-07.png',
+    audience: 'ladies',
+    location: 'both',
+  },
+  {
+    id: 'velvet-threading-face',
+    ritualId: 'velvet-smooth',
+    name: 'Full Face Threading',
+    description: 'Complete facial hair removal — cheeks, chin, brows, lip.',
+    highlights: [
+      'Brows, lip, chin, cheeks & sideburns',
+      'Even, glow-revealing finish',
+      'Followed by a cooling rosewater mist',
+    ],
+    detail:
+      'A full-face threading session covering brows, upper lip, chin, cheeks, and sideburns. The result is a more even skin tone and a finish that catches light cleanly under makeup or on bare skin.\n\nWe close with a cooling rosewater mist. Allow thirty minutes.',
+    durationMin: 30,
+    price: 120,
+    image: '/assets/Images/H-08.png',
+    audience: 'ladies',
+    location: 'both',
   },
 
   // Body Renewal
@@ -877,7 +939,7 @@ export const packages: Package[] = [
     description:
       'IV drip therapy, cryotherapy, and a full biomarker assessment in a single, clinical visit.',
     longDescription:
-      'The Longevity Immersion is the clinical floor of Ra in a single sitting. A biomarker panel taken first, reviewed with our longevity specialist. A tailored IV protocol drawn from your goals. A cryotherapy session to close. The visit is long — three hours of clinical attention — and the output is quiet: a written plan, a starting set of numbers, and a recommendation you can actually act on.\n\nThis is for people thinking in years, not days. Best suited to a first visit when you want measurable ground under your next quarter.',
+      'The Longevity Immersion is the clinical floor of Mastercuts in a single sitting. A biomarker panel taken first, reviewed with our longevity specialist. A tailored IV protocol drawn from your goals. A cryotherapy session to close. The visit is long — three hours of clinical attention — and the output is quiet: a written plan, a starting set of numbers, and a recommendation you can actually act on.\n\nThis is for people thinking in years, not days. Best suited to a first visit when you want measurable ground under your next quarter.',
     philosophy: 'Measured, patient, informed.',
     image: '/assets/Images/H-07.png',
     serviceIds: ['longevity-iv-drip', 'longevity-cryotherapy', 'longevity-biomarker'],
@@ -886,7 +948,7 @@ export const packages: Package[] = [
   {
     id: 'full-ra',
     name: 'The Khaleeji Heritage Journey',
-    tagline: 'A half-day of Ra, end to end',
+    tagline: 'A half-day of Mastercuts, end to end',
     category: 'Cultural Ritual',
     description:
       'Inspired by the ancient beauty customs of the Gulf — a Ra signature from hair to skin to touch.',
@@ -944,6 +1006,18 @@ export function getServicesForRitual(
 ): Service[] {
   return services.filter((s) => {
     if (s.ritualId !== ritualId) return false;
+    if (!audience || audience === 'unisex') return true;
+    return s.audience === audience || s.audience === 'unisex';
+  });
+}
+
+// Returns services eligible for at-home booking, filtered by audience.
+// At-home services are limited to Nails, Massage, and Threading per current
+// transition-period operations.
+export function getAtHomeServices(audience?: ServiceAudience): Service[] {
+  return services.filter((s) => {
+    const loc = s.location ?? 'salon';
+    if (loc === 'salon') return false;
     if (!audience || audience === 'unisex') return true;
     return s.audience === audience || s.audience === 'unisex';
   });

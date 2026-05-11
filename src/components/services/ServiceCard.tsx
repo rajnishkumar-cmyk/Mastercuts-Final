@@ -1,4 +1,4 @@
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Minus, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
 import type { Service, Package } from '@/lib/booking/types';
@@ -21,8 +21,9 @@ export function ServiceCard({
   const { openServiceDetail, addToCart, removeItem, cart } = useCart();
   const ritual = getRitual(service.ritualId);
 
-  const cartItem = cart.items.find((i) => i.serviceId === service.id);
-  const inCart = !!cartItem;
+  const itemsOfService = cart.items.filter((i) => i.serviceId === service.id);
+  const count = itemsOfService.length;
+  const inCart = count > 0;
 
   const hasVariants = (service.variants?.length ?? 0) > 1;
   const startingPrice = hasVariants
@@ -40,11 +41,24 @@ export function ServiceCard({
       openServiceDetail(service.id, service.ritualId);
       return;
     }
-    if (inCart && cartItem) {
-      removeItem(cartItem.id);
-      return;
-    }
     addToCart(service.id, 'any');
+  };
+
+  const handleIncrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // For variant services, re-add the same variant as the most recently added
+    // instance so the user can quickly stack more of the same. To pick a
+    // different variant, they'd open the detail sheet via Read more.
+    const last = itemsOfService[itemsOfService.length - 1];
+    addToCart(service.id, 'any', last?.variantId);
+  };
+
+  const handleDecrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const last = itemsOfService[itemsOfService.length - 1];
+    if (last) removeItem(last.id);
   };
 
   const handleReadMore = () => {
@@ -128,23 +142,57 @@ export function ServiceCard({
                 className="w-full h-full object-cover"
               />
             </div>
-            <button
-              type="button"
-              onClick={handleAdd}
-              aria-label={inCart ? `Remove ${service.name} from cart` : `Add ${service.name} to cart`}
-              className={cn(
-                'absolute left-1/2 -translate-x-1/2 -bottom-[14px] z-10',
-                'min-w-[76px] rounded-md px-3 py-2',
-                'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.18)]',
-                'font-sans text-[13px] font-semibold tracking-[0.02em]',
-                'transition-colors duration-150',
-                inCart
-                  ? 'text-text-primary border border-accent-gold'
-                  : 'text-accent-gold hover:text-text-primary',
-              )}
-            >
-              {inCart ? 'Added' : 'Add'}
-            </button>
+            {inCart ? (
+              <div
+                className={cn(
+                  'absolute left-1/2 -translate-x-1/2 -bottom-[14px] z-10',
+                  'flex items-stretch rounded-md',
+                  'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.18)] border border-accent-gold',
+                  'font-sans text-[13px] font-semibold tracking-[0.02em]',
+                )}
+              >
+                <button
+                  type="button"
+                  onClick={handleDecrement}
+                  aria-label={`Remove one ${service.name}`}
+                  className="w-8 h-9 flex items-center justify-center text-accent-gold hover:text-text-primary transition-colors"
+                >
+                  <Minus className="w-3.5 h-3.5" strokeWidth={2.5} />
+                </button>
+                <span
+                  className="min-w-[28px] flex items-center justify-center text-text-primary border-x border-accent-gold/30 select-none"
+                  aria-live="polite"
+                >
+                  {count}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleIncrement}
+                  aria-label={`Add another ${service.name}`}
+                  className="w-8 h-9 flex items-center justify-center text-accent-gold hover:text-text-primary transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleAdd}
+                aria-label={`Add ${service.name} to cart`}
+                className={cn(
+                  'absolute left-1/2 -translate-x-1/2 -bottom-[14px] z-10',
+                  'min-w-[76px] rounded-md px-3 py-2',
+                  'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.18)]',
+                  'font-sans text-[13px] font-semibold tracking-[0.02em]',
+                  'transition-colors duration-150',
+                  inCart
+                    ? 'text-text-primary border border-accent-gold'
+                    : 'text-accent-gold hover:text-text-primary',
+                )}
+              >
+                {inCart ? 'Added' : 'Add'}
+              </button>
+            )}
           </div>
           {hasVariants && (
             <p className="mt-6 text-center text-[11px] font-sans text-text-primary/50">
