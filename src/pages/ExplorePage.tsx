@@ -1,10 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Plus, Search, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ArrowLeft, ArrowRight, Search, X } from 'lucide-react';
 import { rituals, getServicesForRitual, packages } from '@/lib/booking/catalog';
-import { useCart } from '@/components/cart/CartProvider';
 import { useAudience } from '@/components/services/useAudience';
 import { AudienceToggle } from '@/components/services/AudienceToggle';
 import {
@@ -24,7 +22,6 @@ const SALON_OPEN = false;
 const SCROLL_BREATHING = 12;
 
 export function ExplorePage() {
-  const { openCart } = useCart();
   const { hash } = useLocation();
   const navigate = useNavigate();
   const [audience, setAudience] = useAudience();
@@ -358,18 +355,6 @@ export function ExplorePage() {
         );
       })()}
 
-      {/* ───────── Cart CTA ───────── */}
-      <div className="px-6 lg:px-16 pt-6">
-        <div className="mx-auto max-w-lg">
-          <Button
-            onClick={() => openCart()}
-            className="bg-white text-text-primary hover:bg-white/90 rounded-full px-8 py-6 text-sm font-medium flex items-center justify-center gap-3 group w-full"
-          >
-            Open Cart
-            <Plus className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90" />
-          </Button>
-        </div>
-      </div>
     </main>
   );
 }

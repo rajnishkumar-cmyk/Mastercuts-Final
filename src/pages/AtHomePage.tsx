@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentType } from 'react';
-import { Feather, Plus, Sparkles, Wand2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Feather, Sparkles, Wand2 } from 'lucide-react';
 import { getAtHomeServices } from '@/lib/booking/catalog';
-import { useCart } from '@/components/cart/CartProvider';
 import { useAudience } from '@/components/services/useAudience';
 import { AudienceToggle } from '@/components/services/AudienceToggle';
 import { ServiceCard } from '@/components/services/ServiceCard';
@@ -56,7 +54,6 @@ const GROUPS: Group[] = [
 const SCROLL_BREATHING = 12;
 
 export function AtHomePage() {
-  const { openCart } = useCart();
   const [audience, setAudience] = useAudience();
   const [activeId, setActiveId] = useState<GroupId>('massage');
 
@@ -152,18 +149,19 @@ export function AtHomePage() {
         className="sticky z-30 bg-bg-dark/95 backdrop-blur-md border-b border-white/5 pt-4 pb-4"
         style={{ top: 'var(--nav-offset, 0px)' }}
       >
-        {/* Audience toggle row */}
-        <div className="mx-auto max-w-lg px-6 lg:px-16 flex items-center justify-between gap-4 mb-3">
+        {/* Audience toggle row — full width on desktop, capped on mobile */}
+        <div className="mx-auto max-w-lg lg:max-w-none px-6 lg:px-16 flex items-center justify-between gap-4 mb-3">
           <p className="text-white/50 text-[11px] uppercase tracking-[0.18em] whitespace-nowrap">
             Home services for
           </p>
           <AudienceToggle value={audience} onChange={setAudience} size="sm" />
         </div>
 
-        {/* Category chip row — matches RitualChipRow visual: icon + title + subtitle */}
+        {/* Category chip row — full width container. Inner uses w-max so it
+            centers when content fits and overflows-scrolls when it doesn't. */}
         {grouped.length > 0 && (
-          <div className="mx-auto max-w-lg px-6 lg:px-16">
-            <div className="flex gap-2 overflow-x-auto -mx-1 px-1 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="px-6 lg:px-16 flex justify-center">
+            <div className="flex gap-2 w-max max-w-full overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {grouped.map(({ group }) => {
                 const active = group.id === activeId;
                 const Icon = group.icon;
@@ -261,18 +259,6 @@ export function AtHomePage() {
         ))
       )}
 
-      {/* Cart CTA */}
-      <div className="px-6 lg:px-16 pt-8">
-        <div className="mx-auto max-w-lg">
-          <Button
-            onClick={() => openCart()}
-            className="bg-white text-text-primary hover:bg-white/90 rounded-full px-8 py-6 text-sm font-medium flex items-center justify-center gap-3 group w-full"
-          >
-            Open Cart
-            <Plus className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90" />
-          </Button>
-        </div>
-      </div>
     </main>
   );
 }

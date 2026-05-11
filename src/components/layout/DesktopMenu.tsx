@@ -331,6 +331,18 @@ export function DesktopMenu({ open, onClose }: DesktopMenuProps) {
                     </div>
                   </motion.button>
                 </div>
+
+                {/* Explore all services — secondary CTA below the 4-card grid */}
+                <motion.div variants={itemVariants} className="mt-6 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('/explore')}
+                    className="group inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-xs uppercase tracking-[0.18em] text-white/80 hover:text-white hover:border-white/50 transition-colors"
+                  >
+                    Explore all services
+                    <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </button>
+                </motion.div>
               </div>
             </div>
           </motion.div>

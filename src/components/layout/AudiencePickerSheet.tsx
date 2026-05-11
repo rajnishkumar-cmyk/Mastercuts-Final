@@ -21,13 +21,13 @@ const OPTIONS: {
     key: 'ladies',
     label: 'Ladies',
     tagline: 'Services tailored to her',
-    image: '/assets/Images/H-04.png',
+    image: '/assets/Images/pretty-young-eyebrow-master-put-paint-models-face.jpg',
   },
   {
     key: 'gentlemen',
     label: 'Gentlemen',
     tagline: 'Services tailored to him',
-    image: '/assets/Images/H-10.png',
+    image: '/assets/Images/medium-shot-hairstylist-cutting-client-s-hair.jpg',
   },
 ];
 
@@ -84,7 +84,7 @@ function PickerBody({ onSelect, onClose, tone }: PickerBodyProps) {
                 alt=""
                 className="w-full h-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
             </div>
             <div className="absolute inset-x-0 bottom-0 p-5">
               <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold mb-1.5">
