@@ -23,10 +23,9 @@ type Surface =
   | 'service-detail'
   | 'login'
   | 'explore-picker'
-  | 'payment-method'
   | 'wellness-hub';
 
-export type CheckoutStep = 'none' | 'phone-login' | 'otp-verify' | 'address' | 'edit-contact' | 'date-time';
+export type CheckoutStep = 'none' | 'phone-login' | 'otp-verify' | 'address' | 'date-time';
 
 export type DrawerView =
   | { name: 'basket' }
@@ -56,6 +55,13 @@ interface CartContextValue {
   // payment
   paymentMethod: 'cash' | 'card';
   setPaymentMethod: (m: 'cash' | 'card') => void;
+
+  // layered modals (don't disturb the underlying surface)
+  isContactEditOpen: boolean;
+  openContactEdit: () => void;
+  closeContactEdit: () => void;
+  isPaymentMethodOpen: boolean;
+  closePaymentMethod: () => void;
 
   drawerStack: DrawerView[];
   currentDrawerView: DrawerView;
@@ -115,6 +121,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>('none');
   const [bookingResult, setBookingResult] = useState<BookingRecord | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
+  const [isContactEditOpen, setIsContactEditOpen] = useState(false);
+  const [isPaymentMethodOpen, setIsPaymentMethodOpen] = useState(false);
   const [drawerStack, setDrawerStack] = useState<DrawerView[]>([]);
   const [serviceDetail, setServiceDetail] = useState<ServiceDetailContext | null>(null);
   const [audiencePickerDestination, setAudiencePickerDestination] = useState<string>('/explore');
@@ -410,7 +418,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setSurface('audience-picker');
   }, []);
   const openExplorePicker = useCallback(() => setSurface('explore-picker'), []);
-  const openPaymentMethod = useCallback(() => setSurface('payment-method'), []);
+  const openPaymentMethod = useCallback(() => setIsPaymentMethodOpen(true), []);
+  const closePaymentMethod = useCallback(() => setIsPaymentMethodOpen(false), []);
+  const openContactEdit = useCallback(() => setIsContactEditOpen(true), []);
+  const closeContactEdit = useCallback(() => setIsContactEditOpen(false), []);
   const openWellnessHub = useCallback(() => setSurface('wellness-hub'), []);
   const openServiceDetail = useCallback<CartContextValue['openServiceDetail']>(
     (serviceId, ritualId) => {
@@ -430,6 +441,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCheckoutStep('none');
     setBookingResult(null);
     setPaymentMethod('cash');
+    setIsContactEditOpen(false);
+    setIsPaymentMethodOpen(false);
   }, []);
 
   const pushDrawerView = useCallback((view: DrawerView) => {
@@ -457,6 +470,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     resetCheckout,
     paymentMethod,
     setPaymentMethod,
+    isContactEditOpen,
+    openContactEdit,
+    closeContactEdit,
+    isPaymentMethodOpen,
+    closePaymentMethod,
     drawerStack,
     currentDrawerView,
     openCart,

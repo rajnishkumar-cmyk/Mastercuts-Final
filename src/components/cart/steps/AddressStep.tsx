@@ -15,7 +15,13 @@ const addressSchema = z.object({
 type AddressFormValues = z.infer<typeof addressSchema>;
 
 export function AddressStep() {
-  const { account, saveLightAccount, updateDraftCheckout, setCheckoutStep } = useCart();
+  const {
+    account,
+    saveLightAccount,
+    updateDraftCheckout,
+    setCheckoutStep,
+    openContactEdit,
+  } = useCart();
 
   const savedAddresses = account?.addresses ?? [];
   const [mode, setMode] = useState<'select' | 'new'>(
@@ -278,7 +284,7 @@ export function AddressStep() {
             </div>
             <button
               type="button"
-              onClick={() => setCheckoutStep('edit-contact')}
+              onClick={openContactEdit}
               className="flex items-center gap-1 text-[11px] text-text-secondary hover:text-text-primary transition-colors shrink-0"
             >
               <Pencil className="w-3 h-3" /> Edit

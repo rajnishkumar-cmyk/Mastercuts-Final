@@ -37,6 +37,7 @@ export function BasketView({ onClose, onContinue }: Props) {
     getSelectedAddress,
     paymentMethod,
     openPaymentMethod,
+    openContactEdit,
   } = useCart();
   const { totalPrice, totalDuration, count } = useCartTotals();
   const navigate = useNavigate();
@@ -179,7 +180,7 @@ export function BasketView({ onClose, onContinue }: Props) {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setCheckoutStep('edit-contact')}
+                  onClick={openContactEdit}
                   className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-text-primary hover:bg-black/5 transition-colors"
                 >
                   <Pencil className="w-3 h-3" />

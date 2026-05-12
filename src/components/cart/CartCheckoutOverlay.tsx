@@ -6,10 +6,9 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { PhoneLoginStep } from './steps/PhoneLoginStep';
 import { OtpVerifyStep } from './steps/OtpVerifyStep';
 import { AddressStep } from './steps/AddressStep';
-import { EditContactOverlay } from './steps/EditContactOverlay';
 import { DateTimeStep } from './steps/DateTimeStep';
 
-function getPrevStep(current: CheckoutStep, hasAccount: boolean): CheckoutStep | null {
+function getPrevStep(current: CheckoutStep, _hasAccount: boolean): CheckoutStep | null {
   switch (current) {
     case 'phone-login':
       return null; // back to basket
@@ -17,10 +16,8 @@ function getPrevStep(current: CheckoutStep, hasAccount: boolean): CheckoutStep |
       return 'phone-login';
     case 'address':
       return null; // back to basket
-    case 'edit-contact':
-      return 'address';
     case 'date-time':
-      return hasAccount ? null : null; // back to basket — address is "done"
+      return null; // back to basket — address is "done"
     default:
       return null;
   }
@@ -33,8 +30,6 @@ function getStepLabel(step: CheckoutStep): string {
       return 'Login';
     case 'address':
       return 'Address';
-    case 'edit-contact':
-      return 'Contact';
     case 'date-time':
       return 'Date & time';
     default:
@@ -48,7 +43,6 @@ function getVisualStep(step: CheckoutStep, hasAccount: boolean): number {
     // Returning user: address=1, time=2
     switch (step) {
       case 'address':
-      case 'edit-contact':
         return 1;
       case 'date-time':
         return 2;
@@ -62,7 +56,6 @@ function getVisualStep(step: CheckoutStep, hasAccount: boolean): number {
     case 'otp-verify':
       return 1;
     case 'address':
-    case 'edit-contact':
       return 2;
     case 'date-time':
       return 3;
@@ -195,7 +188,6 @@ export function CartCheckoutOverlay({ mode = 'embedded' }: OverlayProps = {}) {
               {checkoutStep === 'phone-login' && <PhoneLoginStep />}
               {checkoutStep === 'otp-verify' && <OtpVerifyStep />}
               {checkoutStep === 'address' && <AddressStep />}
-              {checkoutStep === 'edit-contact' && <EditContactOverlay />}
               {checkoutStep === 'date-time' && <DateTimeStep />}
             </div>
           </motion.div>

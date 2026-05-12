@@ -18,6 +18,7 @@ import { WellnessHubSheet } from './components/layout/WellnessHubSheet';
 import { BottomNav } from './components/layout/BottomNav';
 import { ServiceDetailSheet } from './components/services/ServiceDetailSheet';
 import { WelcomeAnnouncement } from './components/layout/WelcomeAnnouncement';
+import { EditContactOverlay } from './components/cart/steps/EditContactOverlay';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <AudiencePickerSheet />
           <ExploreCategoriesSheet />
           <PaymentMethodSheet />
+          <EditContactOverlay />
           <WellnessHubSheet />
           <ServiceDetailSheet />
           <CartStrip />

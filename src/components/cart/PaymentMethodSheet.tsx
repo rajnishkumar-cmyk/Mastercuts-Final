@@ -90,37 +90,47 @@ function Body({ selected, onSelect, onClose }: BodyProps) {
 }
 
 export function PaymentMethodSheet() {
-  const { surface, closeAll, paymentMethod, setPaymentMethod } = useCart();
+  const {
+    isPaymentMethodOpen,
+    closePaymentMethod,
+    paymentMethod,
+    setPaymentMethod,
+  } = useCart();
   const isMobile = useIsMobile();
-  const open = surface === 'payment-method';
 
   const handleSelect = (method: 'cash') => {
     setPaymentMethod(method);
-    closeAll();
+    closePaymentMethod();
   };
 
   if (isMobile) {
     return (
-      <Sheet open={open} onOpenChange={(v) => (v ? null : closeAll())}>
+      <Sheet
+        open={isPaymentMethodOpen}
+        onOpenChange={(v) => (v ? null : closePaymentMethod())}
+      >
         <SheetContent
           side="bottom"
           hideDefaultClose
-          className="bg-bg-primary border-none p-0 w-full max-w-full rounded-t-3xl h-auto max-h-[88vh]"
+          className="bg-bg-primary border-none p-0 w-full max-w-full rounded-t-3xl h-auto max-h-[88vh] z-[90]"
         >
           <div className="absolute top-3 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-black/20" />
-          <Body selected={paymentMethod} onSelect={handleSelect} onClose={closeAll} />
+          <Body selected={paymentMethod} onSelect={handleSelect} onClose={closePaymentMethod} />
         </SheetContent>
       </Sheet>
     );
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => (v ? null : closeAll())}>
+    <Dialog
+      open={isPaymentMethodOpen}
+      onOpenChange={(v) => (v ? null : closePaymentMethod())}
+    >
       <DialogContent
         showCloseButton={false}
-        className="bg-bg-primary border-none p-0 sm:max-w-md w-[calc(100%-2rem)] overflow-hidden rounded-2xl shadow-2xl"
+        className="bg-bg-primary border-none p-0 sm:max-w-md w-[calc(100%-2rem)] overflow-hidden rounded-2xl shadow-2xl z-[90]"
       >
-        <Body selected={paymentMethod} onSelect={handleSelect} onClose={closeAll} />
+        <Body selected={paymentMethod} onSelect={handleSelect} onClose={closePaymentMethod} />
       </DialogContent>
     </Dialog>
   );
