@@ -1,12 +1,24 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { useCart } from '@/components/cart/CartProvider';
 
 export function HeroSection() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const { openAudiencePicker } = useCart();
 
   useEffect(() => {
     setIsLoaded(true);
   }, []);
+
+  const handleBookAtHome = () => {
+    openAudiencePicker('/at-home');
+  };
+
+  const handleExploreAll = () => {
+    const el = document.getElementById('services');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <section id="hero" className="relative w-full h-auto lg:h-screen bg-bg-primary overflow-hidden">
@@ -149,6 +161,30 @@ export function HeroSection() {
                 <span className="italic">beauty &amp; inner power</span>
               </h1>
             </div>
+          </motion.div>
+
+          {/* CTAs — primary (Book Ra at Home) + secondary (Explore all services) */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={isLoaded ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, ease: 'easeOut', delay: 1.0 }}
+            className="mt-10 flex items-center gap-3 pointer-events-auto"
+          >
+            <button
+              type="button"
+              onClick={handleBookAtHome}
+              className="group inline-flex items-center gap-2 rounded-full bg-white text-text-primary px-7 py-3.5 text-sm font-medium hover:bg-white/90 transition-colors"
+            >
+              Book Ra at Home
+              <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </button>
+            <button
+              type="button"
+              onClick={handleExploreAll}
+              className="rounded-full border border-white/40 text-white px-7 py-3.5 text-sm font-medium hover:bg-white/10 hover:border-white/60 transition-colors"
+            >
+              Explore all services
+            </button>
           </motion.div>
         </div>
 
