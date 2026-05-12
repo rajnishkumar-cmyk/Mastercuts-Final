@@ -72,43 +72,31 @@ export function AtHomePage() {
     return () => window.clearTimeout(t);
   }, [searchQuery]);
 
-  // Scroll-direction collapse for the search row only. Uses an anchor +
-  // delta-threshold so trackpad micro-jitter doesn't toggle the height
-  // animation mid-flight (which caused the visible glitch when scrolling
-  // up before the search bar finished expanding).
+  // Collapse the search row based on absolute scrollY with a wide
+  // hysteresis band. Direction-based detection is unstable on slow scroll —
+  // sub-pixel jitter flips the perceived direction and re-fires the height
+  // animation, which then visibly shifts content. Absolute thresholds with
+  // a 180px dead zone mean the animation fires at most once per region.
   useEffect(() => {
-    let lastY = window.scrollY;
-    let anchorY = lastY;
-    let anchorDir: 1 | -1 | 0 = 0;
+    const HIDE_BELOW = 240;
+    const SHOW_ABOVE = 60;
     let raf = 0;
-    const TRIGGER_DELTA = 16;
-    const HIDE_THRESHOLD = 120;
+    const apply = () => {
+      const y = window.scrollY;
+      setSearchHidden((prev) => {
+        if (y > HIDE_BELOW) return true;
+        if (y < SHOW_ABOVE) return false;
+        return prev;
+      });
+    };
     const onScroll = () => {
       if (raf) return;
       raf = requestAnimationFrame(() => {
-        const y = window.scrollY;
-        const delta = y - lastY;
-        if (delta > 0) {
-          if (anchorDir !== 1) {
-            anchorDir = 1;
-            anchorY = lastY;
-          }
-          if (y - anchorY > TRIGGER_DELTA && y > HIDE_THRESHOLD) {
-            setSearchHidden(true);
-          }
-        } else if (delta < 0) {
-          if (anchorDir !== -1) {
-            anchorDir = -1;
-            anchorY = lastY;
-          }
-          if (anchorY - y > TRIGGER_DELTA) {
-            setSearchHidden(false);
-          }
-        }
-        lastY = y;
+        apply();
         raf = 0;
       });
     };
+    apply();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', onScroll);

@@ -18,7 +18,14 @@ export function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === '/';
-  const isExplorePage = location.pathname.startsWith('/explore');
+  // All service-browsing pages count as "Explore" — the bottom-nav Explore
+  // tab opens a picker that routes to /explore or /at-home, so both
+  // destinations should light up the same tab. /wellness-hub follows the
+  // same role.
+  const isExplorePage =
+    location.pathname.startsWith('/explore') ||
+    location.pathname.startsWith('/at-home') ||
+    location.pathname.startsWith('/wellness-hub');
   const [activeTab, setActiveTab] = useState<TabId>('home');
 
   useEffect(() => {
