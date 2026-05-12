@@ -112,7 +112,7 @@ export function HeroSection() {
       titleItalic: 'beauty & inner power',
       tagline:
         "Experience the pinnacle of beauty and wellness at Dubai's most exclusive spa and salon destination.",
-      media: { type: 'video', src: '/assets/Images/hero-section-video.mp4' },
+      media: { type: 'video', src: '/assets/Images/Hero%20Final.mp4' },
       topMark: '/assets/Logo/mastercut-mark.png',
       durationMs: 24000,
       primaryCta: { label: 'Book Ra at Home', onClick: () => openAudiencePicker('/at-home') },

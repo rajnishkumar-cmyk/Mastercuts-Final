@@ -41,8 +41,7 @@ const CATEGORIES: Category[] = [
       'Signature, hot stone, lymphatic, and prenatal — sixty to one-twenty minutes of restorative time, with no commute on either side.',
     icon: Sparkles,
     imageGents: '/assets/Images/side-view-man-getting-professional-massage.jpg',
-    imageLadies:
-      '/assets/Images/young-woman-having-back-massage-by-female-therapist-spa-focus-is-massage-therapist.jpg',
+    imageLadies: '/assets/Images/Massage%20Ladies%20final.jpg',
     matches: (id) => id.startsWith('somatic-'),
   },
   {
