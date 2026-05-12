@@ -65,6 +65,30 @@ export function HeroSection() {
           >
             Experience the pinnacle of beauty and wellness at Dubai's most exclusive spa and salon destination.
           </motion.p>
+
+          {/* Mobile CTAs — stacked, dark-on-cream styling */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isLoaded ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, ease: 'easeOut', delay: 1.1 }}
+            className="mt-8 flex flex-col gap-2.5 w-full max-w-[280px]"
+          >
+            <button
+              type="button"
+              onClick={handleBookAtHome}
+              className="group inline-flex items-center justify-center gap-2 rounded-full bg-bg-dark text-white px-6 py-3.5 text-sm font-medium hover:bg-bg-darker transition-colors"
+            >
+              Book Ra at Home
+              <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </button>
+            <button
+              type="button"
+              onClick={handleExploreAll}
+              className="rounded-full border border-black/20 text-text-primary px-6 py-3.5 text-sm font-medium hover:bg-black/5 hover:border-black/40 transition-colors"
+            >
+              Explore all services
+            </button>
+          </motion.div>
         </div>
 
         {/* Mobile Bottom Video */}
