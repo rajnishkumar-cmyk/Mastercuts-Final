@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentType } from 'react';
-import { Feather, Sparkles, Wand2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Feather, Search, Sparkles, Wand2, X } from 'lucide-react';
 import { getAtHomeServices } from '@/lib/booking/catalog';
 import { useAudience } from '@/components/services/useAudience';
 import { AudienceToggle } from '@/components/services/AudienceToggle';
@@ -57,17 +58,56 @@ export function AtHomePage() {
   const [audience, setAudience] = useAudience();
   const [activeId, setActiveId] = useState<GroupId>('massage');
 
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [searchHidden, setSearchHidden] = useState(false);
+
+  // Debounce query (150ms)
+  useEffect(() => {
+    const t = window.setTimeout(
+      () => setDebouncedQuery(searchQuery.trim().toLowerCase()),
+      150,
+    );
+    return () => window.clearTimeout(t);
+  }, [searchQuery]);
+
+  // Scroll-direction collapse for the search row only
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        const y = window.scrollY;
+        if (y > lastY && y > 80) setSearchHidden(true);
+        else if (y < lastY) setSearchHidden(false);
+        lastY = y;
+        raf = 0;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   const filterRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<GroupId, HTMLElement | null>>({} as never);
 
   const services = useMemo(() => getAtHomeServices(audience), [audience]);
 
   const grouped = useMemo(() => {
-    return GROUPS.map((g) => ({
-      group: g,
-      items: services.filter((s) => g.matches(s.id)),
-    })).filter((g) => g.items.length > 0);
-  }, [services]);
+    const matchesQuery = (text: string) => text.toLowerCase().includes(debouncedQuery);
+    return GROUPS.map((g) => {
+      const allItems = services.filter((s) => g.matches(s.id));
+      const items = debouncedQuery
+        ? allItems.filter((s) => matchesQuery(s.name) || matchesQuery(s.description))
+        : allItems;
+      return { group: g, items };
+    }).filter((g) => g.items.length > 0);
+  }, [services, debouncedQuery]);
 
   useLayoutEffect(() => {
     const update = () => {
@@ -156,6 +196,43 @@ export function AtHomePage() {
           </p>
           <AudienceToggle value={audience} onChange={setAudience} size="sm" />
         </div>
+
+        {/* Search row — sits between toggle and chips. Collapses to height: 0
+            on scroll-down (no leftover gap); re-expands on scroll-up. */}
+        <motion.div
+          initial={false}
+          animate={{
+            height: searchHidden ? 0 : 'auto',
+            opacity: searchHidden ? 0 : 1,
+            marginBottom: searchHidden ? 0 : 12,
+          }}
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+          className="overflow-hidden"
+        >
+          <div className="px-6 lg:px-16">
+            <div className="relative max-w-2xl mx-auto">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search at-home services"
+                aria-label="Search at-home services"
+                className="w-full bg-white/5 border border-white/10 rounded-full pl-10 pr-10 py-2 text-sm text-white placeholder:text-white/40 focus:bg-white/10 focus:border-white/30 outline-none transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  aria-label="Clear search"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-white/60 hover:bg-white/10 hover:text-white transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+        </motion.div>
 
         {/* Category chip row — full width container. Inner uses w-max so it
             centers when content fits and overflows-scrolls when it doesn't. */}

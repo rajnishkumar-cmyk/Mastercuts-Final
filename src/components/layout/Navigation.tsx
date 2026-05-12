@@ -482,6 +482,7 @@ export function Navigation() {
           </div>
         </nav>
       </div>
+
     </motion.header>
 
     <DesktopMenu open={desktopMenuOpen} onClose={() => setDesktopMenuOpen(false)} />
