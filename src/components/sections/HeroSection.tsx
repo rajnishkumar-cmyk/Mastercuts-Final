@@ -23,6 +23,9 @@ interface Slide {
   /** Brand mark shown at the top of the mobile slide. Defaults to the
    *  Mastercuts mark; Ra-branded slides use the Ra emblem. */
   topMark: string;
+  /** Per-slide display duration in ms. Video slides should approximate the
+   *  video length so the loop doesn't show before transitioning. */
+  durationMs?: number;
   primaryCta: { label: string; onClick: () => void };
   secondaryCta: { label: string; onClick: () => void };
 }
@@ -111,6 +114,7 @@ export function HeroSection() {
         "Experience the pinnacle of beauty and wellness at Dubai's most exclusive spa and salon destination.",
       media: { type: 'video', src: '/assets/Images/hero-section-video.mp4' },
       topMark: '/assets/Logo/mastercut-mark.png',
+      durationMs: 24000,
       primaryCta: { label: 'Book Ra at Home', onClick: () => openAudiencePicker('/at-home') },
       secondaryCta: { label: 'Explore all services', onClick: handleExploreAll },
     },
@@ -183,14 +187,15 @@ export function HeroSection() {
   // remaining distance. Reduced motion = no auto-advance, manual nav only.
   useEffect(() => {
     if (isPaused || reduceMotion) return;
-    const remainingMs = (1 - progress.get()) * AUTO_ADVANCE_MS;
+    const slideDurationMs = slide.durationMs ?? AUTO_ADVANCE_MS;
+    const remainingMs = (1 - progress.get()) * slideDurationMs;
     const controls = animate(progress, 1, {
       duration: remainingMs / 1000,
       ease: 'linear',
       onComplete: () => setActiveSlide((i) => (i + 1) % total),
     });
     return () => controls.stop();
-  }, [isPaused, activeSlide, total, reduceMotion, progress]);
+  }, [isPaused, activeSlide, total, reduceMotion, progress, slide.durationMs]);
 
   return (
     <section
