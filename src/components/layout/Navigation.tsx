@@ -12,7 +12,7 @@ import { DesktopMenu } from './DesktopMenu';
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
-  const [servicesOpen, setServicesOpen] = useState(false);
+  const [mastercutsOpen, setMastercutsOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [heroInView, setHeroInView] = useState(true);
@@ -152,10 +152,9 @@ export function Navigation() {
       )}
 
       <div className={`w-full px-6 lg:px-12 transition-[padding] duration-300 ${darkChrome ? 'py-4' : 'py-6'}`}>
-        <nav className="flex items-center justify-between">
-          {/* Logo — Mastercuts wordmark. Takes 50% on desktop so the right
-              cluster starts exactly at viewport middle. */}
-          <Link to="/" className="flex items-center gap-3 group lg:w-1/2">
+        <nav className="flex items-center justify-between gap-6">
+          {/* Logo — Mastercuts wordmark, natural width */}
+          <Link to="/" className="flex items-center gap-3 group shrink-0">
             <img
               src="/assets/Logo/mastercut-wordmark.png"
               alt="Mastercuts"
@@ -165,37 +164,25 @@ export function Navigation() {
             />
           </Link>
 
-          {/* Desktop right half — Menu/Services on the left edge (viewport middle),
-              Phone/Cart/Login on the far right. */}
-          <div className="hidden lg:flex lg:w-1/2 lg:items-center lg:justify-between">
-          <div className="flex items-center gap-8 pl-5">
-            {/* Menu */}
+          {/* Desktop primary nav — 4 dedicated items, center-flexed */}
+          <div className="hidden lg:flex items-center gap-7">
+            {/* Mastercuts dropdown (Gents, Ladies) */}
             <div className="relative">
               <button
-                onClick={() => setDesktopMenuOpen(true)}
-                className="flex items-center gap-2 text-sm font-medium text-white transition-colors duration-200 hover:opacity-70"
+                type="button"
+                onClick={() => setMastercutsOpen(!mastercutsOpen)}
+                className="flex items-center gap-1.5 text-sm font-medium text-white transition-colors duration-200 hover:opacity-70"
               >
-                Menu
-                <Menu className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Services Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setServicesOpen(!servicesOpen)}
-                className="flex items-center gap-2 text-sm font-medium text-white transition-colors duration-200 hover:opacity-70"
-              >
-                Services
+                Mastercuts
                 <ChevronDown
                   className={`w-4 h-4 transition-transform duration-200 ${
-                    servicesOpen ? 'rotate-180' : ''
+                    mastercutsOpen ? 'rotate-180' : ''
                   }`}
                 />
               </button>
 
               <AnimatePresence>
-                {servicesOpen && (
+                {mastercutsOpen && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -203,22 +190,9 @@ export function Navigation() {
                     transition={{ duration: 0.2 }}
                     className="absolute top-full left-0 mt-4 w-72 bg-bg-dark rounded-lg shadow-xl overflow-hidden"
                   >
-                    {/* Ra at Home leads (transition priority) */}
                     <button
                       type="button"
-                      onClick={() => goToAtHome(() => setServicesOpen(false))}
-                      className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
-                    >
-                      <span className="text-sm text-white/80 group-hover:text-white">
-                        Ra at <span className="italic">Home</span>
-                      </span>
-                      <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60">
-                        Nails · Massage · Threading
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => goToSalon('gentlemen', () => setServicesOpen(false))}
+                      onClick={() => goToSalon('gentlemen', () => setMastercutsOpen(false))}
                       className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
                     >
                       <span className="text-sm text-white/80 group-hover:text-white">
@@ -230,7 +204,7 @@ export function Navigation() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => goToSalon('ladies', () => setServicesOpen(false))}
+                      onClick={() => goToSalon('ladies', () => setMastercutsOpen(false))}
                       className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
                     >
                       <span className="text-sm text-white/80 group-hover:text-white">
@@ -240,26 +214,42 @@ export function Navigation() {
                         In salon
                       </span>
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => goToWellnessHub(() => setServicesOpen(false))}
-                      className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
-                    >
-                      <span className="text-sm text-white/80 group-hover:text-white">
-                        Ra Wellness <span className="italic">Centre</span>
-                      </span>
-                      <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60">
-                        By invitation
-                      </span>
-                    </button>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
+
+            {/* Ra at Home — direct */}
+            <button
+              type="button"
+              onClick={() => openAudiencePicker('/at-home')}
+              className="text-sm font-medium text-white transition-colors duration-200 hover:opacity-70 whitespace-nowrap"
+            >
+              Ra at Home
+            </button>
+
+            {/* Ra Wellness Hub — direct */}
+            <button
+              type="button"
+              onClick={openWellnessHub}
+              className="text-sm font-medium text-white transition-colors duration-200 hover:opacity-70 whitespace-nowrap"
+            >
+              Ra Wellness Hub
+            </button>
+
+            {/* More — opens the full-screen DesktopMenu overlay */}
+            <button
+              type="button"
+              onClick={() => setDesktopMenuOpen(true)}
+              className="flex items-center gap-1.5 text-sm font-medium text-white transition-colors duration-200 hover:opacity-70"
+            >
+              More
+              <Menu className="w-4 h-4" />
+            </button>
           </div>
 
-          {/* Right Side — Phone, Cart, Login (inside the 50% right cluster) */}
-          <div className="flex items-center gap-6">
+          {/* Right cluster — Phone, Cart, Login */}
+          <div className="hidden lg:flex items-center gap-5 shrink-0">
             <a
               href="tel:+97145550100"
               className="flex items-center gap-2 text-sm text-white transition-colors duration-200 hover:opacity-70"
@@ -283,13 +273,12 @@ export function Navigation() {
             ) : (
               <Button
                 onClick={openLogin}
-                className="rounded-full px-6 py-2 text-sm font-medium flex items-center gap-2 bg-white text-text-primary hover:bg-white/90 transition-colors duration-200"
+                className="rounded-full px-5 py-2 text-sm font-medium flex items-center gap-2 bg-white text-text-primary hover:bg-white/90 transition-colors duration-200"
               >
                 <UserIcon className="w-4 h-4" />
                 Log in
               </Button>
             )}
-          </div>
           </div>
 
           {/* Mobile Right Buttons */}
@@ -407,7 +396,7 @@ export function Navigation() {
                           className="flex flex-col gap-0.5 group text-left"
                         >
                           <span className="text-xl font-serif text-white/90 group-hover:text-white transition-colors">
-                            Ra Wellness <span className="italic">Centre</span>
+                            Ra Wellness <span className="italic">Hub</span>
                           </span>
                           <span className="text-[11px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60 transition-colors">
                             By invitation

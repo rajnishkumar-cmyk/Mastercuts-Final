@@ -132,7 +132,7 @@ export function HeroSection() {
         </div>
 
         {/* Desktop Bottom Info Overlay — Based-in + tagline */}
-        <div className="hidden lg:grid grid-cols-2 absolute bottom-12 left-0 w-full z-20 pointer-events-none items-start">
+        <div className="hidden lg:grid grid-cols-2 absolute bottom-12 left-0 w-full z-20 pointer-events-none items-end">
           <div className="px-12 xl:px-20 pointer-events-auto h-fit">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -148,14 +148,14 @@ export function HeroSection() {
             </motion.div>
           </div>
 
-          <div className="px-12 xl:px-20 pointer-events-auto h-fit">
+          <div className="px-12 xl:px-20 pointer-events-auto h-fit flex justify-end">
             <motion.div
               initial={{ opacity: 0 }}
               animate={isLoaded ? { opacity: 1 } : {}}
               transition={{ duration: 0.8, ease: 'easeOut', delay: 0.8 }}
               className="max-w-md"
             >
-              <p className="font-serif text-lg lg:text-xl xl:text-2xl text-white/90 italic leading-snug max-w-md">
+              <p className="font-serif text-lg lg:text-xl xl:text-2xl text-white/90 italic leading-snug max-w-md text-right">
                 Experience the pinnacle of beauty and wellness at Dubai's most exclusive spa and salon destination.
               </p>
             </motion.div>

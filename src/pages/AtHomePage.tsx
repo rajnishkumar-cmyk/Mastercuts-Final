@@ -72,16 +72,39 @@ export function AtHomePage() {
     return () => window.clearTimeout(t);
   }, [searchQuery]);
 
-  // Scroll-direction collapse for the search row only
+  // Scroll-direction collapse for the search row only. Uses an anchor +
+  // delta-threshold so trackpad micro-jitter doesn't toggle the height
+  // animation mid-flight (which caused the visible glitch when scrolling
+  // up before the search bar finished expanding).
   useEffect(() => {
     let lastY = window.scrollY;
+    let anchorY = lastY;
+    let anchorDir: 1 | -1 | 0 = 0;
     let raf = 0;
+    const TRIGGER_DELTA = 16;
+    const HIDE_THRESHOLD = 120;
     const onScroll = () => {
       if (raf) return;
       raf = requestAnimationFrame(() => {
         const y = window.scrollY;
-        if (y > lastY && y > 80) setSearchHidden(true);
-        else if (y < lastY) setSearchHidden(false);
+        const delta = y - lastY;
+        if (delta > 0) {
+          if (anchorDir !== 1) {
+            anchorDir = 1;
+            anchorY = lastY;
+          }
+          if (y - anchorY > TRIGGER_DELTA && y > HIDE_THRESHOLD) {
+            setSearchHidden(true);
+          }
+        } else if (delta < 0) {
+          if (anchorDir !== -1) {
+            anchorDir = -1;
+            anchorY = lastY;
+          }
+          if (anchorY - y > TRIGGER_DELTA) {
+            setSearchHidden(false);
+          }
+        }
         lastY = y;
         raf = 0;
       });

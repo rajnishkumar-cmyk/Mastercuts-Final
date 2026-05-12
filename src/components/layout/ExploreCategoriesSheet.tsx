@@ -161,7 +161,7 @@ function Body({ onClose }: { onClose: () => void }) {
         <MiniCard
           eyebrow="By invitation"
           titleStart="Ra Wellness"
-          titleItalic="Centre"
+          titleItalic="Hub"
           image="/assets/Images/two-hairstylers-posing-standing-modern-spacy-beaty-salon.jpg"
           raBadge
           onClick={handleHub}

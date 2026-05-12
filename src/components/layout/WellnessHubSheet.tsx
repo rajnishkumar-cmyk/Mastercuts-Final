@@ -43,7 +43,7 @@ function saveRequest(req: StoredRequest) {
 function buildWhatsAppLink(req: StoredRequest): string {
   const label = INTERESTS.find((i) => i.key === req.interest)?.label ?? '';
   const msg =
-    `Hello Mastercuts, I'd like to request Ra Wellness Centre membership.\n\n` +
+    `Hello Mastercuts, I'd like to request Ra Wellness Hub membership.\n\n` +
     `Name: ${req.name}\n` +
     `Phone: ${req.phone}\n` +
     `Email: ${req.email}\n` +
@@ -134,7 +134,7 @@ function Body({ onClose }: BodyProps) {
             </div>
             <DialogTitle asChild>
               <h2 className="font-serif text-3xl text-text-primary leading-[1.05] mb-3">
-                Ra Wellness <span className="italic">Centre</span>
+                Ra Wellness <span className="italic">Hub</span>
               </h2>
             </DialogTitle>
             <p className="text-sm text-text-secondary leading-relaxed mb-7">

@@ -14,7 +14,7 @@ const tabs: { id: TabId; label: string; icon: typeof Home }[] = [
 ];
 
 export function BottomNav() {
-  const { openProfile, openExplorePicker, surface } = useCart();
+  const { account, openLogin, openProfile, openExplorePicker, surface } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === '/';
@@ -31,7 +31,8 @@ export function BottomNav() {
 
   const onTabClick = (id: TabId) => {
     if (id === 'profile') {
-      openProfile();
+      if (account) openProfile();
+      else openLogin();
       return;
     }
     if (id === 'home') {

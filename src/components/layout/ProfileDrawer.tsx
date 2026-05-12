@@ -1,9 +1,7 @@
 import { X, LogOut, User as UserIcon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { rituals } from '@/lib/booking/catalog';
 
 function formatDateLabel(key: string): string {
   const [Y, M, D] = key.split('-').map(Number);
@@ -17,7 +15,6 @@ function formatDateLabel(key: string): string {
 
 export function ProfileDrawer() {
   const { surface, closeAll, account, bookings, openCart, signOut, openLogin } = useCart();
-  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const open = surface === 'profile';
   const side = isMobile ? 'bottom' : 'right';
@@ -36,11 +33,6 @@ export function ProfileDrawer() {
     const ts = new Date(`${b.date}T${b.time}`).getTime();
     return ts < now || b.status !== 'confirmed';
   });
-
-  const goToRitual = (ritualId: string) => {
-    closeAll();
-    setTimeout(() => navigate(`/rituals/${ritualId}`), 220);
-  };
 
   return (
     <Sheet open={open} onOpenChange={(v) => (v ? null : closeAll())}>
@@ -74,7 +66,7 @@ export function ProfileDrawer() {
 
         <div className="flex-1 overflow-y-auto">
           {!account ? (
-            /* Unauthenticated state */
+            /* Defensive fallback — primary entry now routes straight to the phone login sheet. */
             <div className="px-6 pt-10 pb-8">
               <div className="w-14 h-14 rounded-full bg-black/5 flex items-center justify-center mb-6">
                 <UserIcon className="w-5 h-5 text-text-primary" />
@@ -83,38 +75,15 @@ export function ProfileDrawer() {
                 Save your <span className="italic">visits</span>
               </h3>
               <p className="text-sm text-text-secondary leading-relaxed mb-6">
-                Sign in with your phone to save your details, view bookings, and
-                pick up where you left off on your next visit.
+                Sign in with your phone to save your details and view bookings.
               </p>
-
               <button
                 type="button"
                 onClick={handleSignIn}
-                className="w-full rounded-full bg-bg-dark text-white py-4 text-sm font-medium hover:bg-bg-darker transition-colors mb-8"
+                className="w-full rounded-full bg-bg-dark text-white py-4 text-sm font-medium hover:bg-bg-darker transition-colors"
               >
                 Sign in with phone
               </button>
-
-              <p className="text-[10px] uppercase tracking-[0.18em] text-text-secondary mb-3">
-                Or start browsing
-              </p>
-              <div className="space-y-2">
-                {rituals.map((r) => (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => goToRitual(r.id)}
-                    className="w-full flex items-baseline justify-between border-b border-black/10 py-3 text-left"
-                  >
-                    <span className="font-serif text-lg text-text-primary">
-                      {r.title} <span className="italic">{r.titleItalic}</span>
-                    </span>
-                    <span className="text-[10px] uppercase tracking-wider text-text-secondary">
-                      {r.tagline}
-                    </span>
-                  </button>
-                ))}
-              </div>
             </div>
           ) : (
             <div className="px-6 py-6 space-y-8">

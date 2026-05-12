@@ -150,7 +150,7 @@ export function Footer() {
                   onClick={openWellnessHub}
                   className="text-white hover:text-white/70 transition-colors duration-200 text-left"
                 >
-                  Ra Wellness Centre
+                  Ra Wellness Hub
                 </button>
               </li>
             </ul>

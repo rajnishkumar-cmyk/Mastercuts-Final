@@ -46,7 +46,7 @@ function saveRequest(req: StoredRequest) {
 function buildWhatsAppLink(req: StoredRequest): string {
   const label = INTERESTS.find((i) => i.key === req.interest)?.label ?? '';
   const msg =
-    `Hello Mastercuts, I'd like to request Ra Wellness Centre membership.\n\n` +
+    `Hello Mastercuts, I'd like to request Ra Wellness Hub membership.\n\n` +
     `Name: ${req.name}\n` +
     `Phone: ${req.phone}\n` +
     `Email: ${req.email}\n` +
@@ -130,7 +130,7 @@ export function WellnessHubPage() {
             By invitation
           </p>
           <h1 className="font-serif text-4xl lg:text-6xl text-text-primary leading-[1.02] mb-5">
-            Ra Wellness <span className="italic">Centre</span>
+            Ra Wellness <span className="italic">Hub</span>
           </h1>
           <p className="text-base text-text-secondary leading-relaxed max-w-prose">
             Members-only rituals, curated for you — a quieter, more considered

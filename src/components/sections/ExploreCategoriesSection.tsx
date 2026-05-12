@@ -159,7 +159,7 @@ export function ExploreCategoriesSection() {
             <CategoryCard
               eyebrow="By invitation"
               titleStart="Ra Wellness"
-              titleItalic="Centre"
+              titleItalic="Hub"
               image={IMG_WELLNESS}
               aspectClass="aspect-[2/1] lg:aspect-[5/6]"
               raBadge
