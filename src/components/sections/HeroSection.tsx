@@ -137,7 +137,7 @@ export function HeroSection() {
         'Sound, breath, body and mind — immersive sessions designed to slow the day and restore the self.',
       media: {
         type: 'image',
-        src: '/assets/Images/young-woman-having-back-massage-by-female-therapist-spa-focus-is-massage-therapist.jpg',
+        src: '/assets/Images/Massage%20Ladies%20final.jpg',
       },
       topMark: '/assets/Logo/ra-emblem.png',
       primaryCta: { label: 'Explore Wellness Hub', onClick: () => navigate('/wellness-hub') },
