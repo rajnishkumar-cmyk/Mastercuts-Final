@@ -194,21 +194,42 @@ export function BasketView({ onClose, onContinue }: Props) {
               <p className="text-[10px] uppercase tracking-[0.2em] text-text-secondary mb-3">
                 Payment breakdown
               </p>
+
+              {/* Service line items */}
+              <ul className="space-y-2 mb-3 pb-3 border-b border-black/10">
+                {cart.items.map((item) => (
+                  <li
+                    key={item.id}
+                    className="flex items-baseline justify-between gap-3"
+                  >
+                    <span className="min-w-0 flex-1 text-sm text-text-primary truncate">
+                      {item.name}
+                      {item.variantLabel && (
+                        <span className="text-text-secondary"> · {item.variantLabel}</span>
+                      )}
+                    </span>
+                    <span className="shrink-0 text-sm text-text-primary tabular-nums">
+                      {formatAed(item.price)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
               <div className="flex items-baseline justify-between mb-2">
                 <span className="text-xs uppercase tracking-wider text-text-secondary">Subtotal</span>
-                <span className="text-sm text-text-primary">{formatAed(totalPrice)}</span>
+                <span className="text-sm text-text-primary tabular-nums">{formatAed(totalPrice)}</span>
               </div>
               <div className="flex items-baseline justify-between mb-3 pb-3 border-b border-black/10">
                 <span className="text-xs uppercase tracking-wider text-text-secondary">VAT (5%)</span>
-                <span className="text-sm text-text-primary">{formatAed(vat)}</span>
+                <span className="text-sm text-text-primary tabular-nums">{formatAed(vat)}</span>
               </div>
               <div className="flex items-baseline justify-between mb-2">
                 <span className="text-xs uppercase tracking-wider text-text-primary font-medium">Total</span>
-                <span className="font-serif text-2xl text-text-primary">{formatAed(grandTotal)}</span>
+                <span className="font-serif text-2xl text-text-primary tabular-nums">{formatAed(grandTotal)}</span>
               </div>
               <div className="flex items-baseline justify-between mb-2">
                 <span className="text-xs uppercase tracking-wider text-text-secondary">Duration</span>
-                <span className="text-sm text-text-primary">{formatDuration(totalDuration)}</span>
+                <span className="text-sm text-text-primary tabular-nums">{formatDuration(totalDuration)}</span>
               </div>
               <p className="text-[10px] text-text-secondary leading-relaxed">
                 All prices in AED. Includes 5% VAT.

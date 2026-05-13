@@ -401,7 +401,7 @@ export function HeroSection() {
         </div>
 
         {/* Desktop Main Title + CTAs (per slide) */}
-        <div className="hidden lg:flex absolute inset-0 z-10 pointer-events-none flex-col items-center justify-center pb-32 px-6 xl:px-12">
+        <div className="hidden lg:flex absolute inset-0 z-10 pointer-events-none flex-col items-center justify-center pt-32 pb-32 px-6 xl:px-12">
           <AnimatePresence mode="wait">
             <motion.img
               key={slide.id + '-desktop-mark'}
@@ -411,7 +411,7 @@ export function HeroSection() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.92 }}
               transition={{ duration: 0.45, ease: 'easeOut' }}
-              className="w-28 h-28 object-contain mb-6 drop-shadow-[0_6px_24px_rgba(0,0,0,0.4)]"
+              className="w-28 h-28 object-contain mb-4 drop-shadow-[0_6px_24px_rgba(0,0,0,0.4)]"
             />
           </AnimatePresence>
 
@@ -424,7 +424,7 @@ export function HeroSection() {
               transition={{ duration: 0.45, ease: 'easeOut' }}
             >
               <div className="relative text-center mix-blend-difference text-white">
-                <h1 className="font-serif text-[4.5rem] xl:text-[5.5rem] 2xl:text-[6.5rem] leading-[1.05] tracking-tight pb-2 pr-[0.15em]">
+                <h1 className="font-serif text-[4.5rem] xl:text-[5.5rem] 2xl:text-[6.5rem] leading-[0.95] tracking-tight pb-2 pr-[0.15em]">
                   {slide.title}
                   <br />
                   <span className="italic">{slide.titleItalic}</span>
