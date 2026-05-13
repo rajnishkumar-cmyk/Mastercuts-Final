@@ -7,7 +7,7 @@ import {
   type MotionValue,
   type PanInfo,
 } from 'framer-motion';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type CSSProperties } from 'react';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/components/cart/CartProvider';
@@ -19,7 +19,25 @@ interface Slide {
   title: string;
   titleItalic: string;
   tagline: string;
-  media: { type: MediaType; src: string };
+  media: {
+    type: MediaType;
+    src: string;
+    position?:
+      | 'top'
+      | 'center'
+      | 'bottom'
+      | 'top-left'
+      | 'top-right'
+      | 'bottom-left'
+      | 'bottom-right'
+      | 'left'
+      | 'right';
+    /** Optional CSS transform on the media element (e.g. 'scale(1.25)') for
+     *  fine-grained zoom/crop control when object-position is not enough. */
+    transform?: string;
+    /** Origin for the transform above. Defaults to 'top left'. */
+    transformOrigin?: string;
+  };
   /** Brand mark shown at the top of the mobile slide. Defaults to the
    *  Mastercuts mark; Ra-branded slides use the Ra emblem. */
   topMark: string;
@@ -137,7 +155,10 @@ export function HeroSection() {
         'Sound, breath, body and mind — immersive sessions designed to slow the day and restore the self.',
       media: {
         type: 'image',
-        src: '/assets/Images/Massage%20Ladies%20final.jpg',
+        src: '/assets/Images/two-hairstylers-posing-standing-modern-spacy-beaty-salon.jpg',
+        position: 'top-left',
+        transform: 'scale(1.12)',
+        transformOrigin: 'top left',
       },
       topMark: '/assets/Logo/ra-emblem.png',
       primaryCta: { label: 'Explore Wellness Hub', onClick: () => navigate('/wellness-hub') },
@@ -147,6 +168,26 @@ export function HeroSection() {
 
   const total = slides.length;
   const slide = slides[activeSlide];
+  const mediaPosMap: Record<NonNullable<Slide['media']['position']>, string> = {
+    top: 'object-top',
+    center: 'object-center',
+    bottom: 'object-bottom',
+    left: 'object-left',
+    right: 'object-right',
+    'top-left': 'object-left-top',
+    'top-right': 'object-right-top',
+    'bottom-left': 'object-left-bottom',
+    'bottom-right': 'object-right-bottom',
+  };
+  const mediaPosClass = slide.media.position
+    ? mediaPosMap[slide.media.position]
+    : 'object-center';
+  const mediaStyle: CSSProperties = slide.media.transform
+    ? {
+        transform: slide.media.transform,
+        transformOrigin: slide.media.transformOrigin ?? 'top left',
+      }
+    : {};
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     const SWIPE_THRESHOLD = 60;
@@ -234,13 +275,15 @@ export function HeroSection() {
                     muted
                     loop
                     playsInline
-                    className="w-full h-full object-cover object-center"
+                    className={`w-full h-full object-cover ${mediaPosClass}`}
+                    style={mediaStyle}
                   />
                 ) : (
                   <img
                     src={slide.media.src}
                     alt=""
-                    className="w-full h-full object-cover object-center"
+                    className={`w-full h-full object-cover ${mediaPosClass}`}
+                    style={mediaStyle}
                   />
                 )}
               </motion.div>
@@ -351,13 +394,15 @@ export function HeroSection() {
                   muted
                   loop
                   playsInline
-                  className="w-full h-full object-cover object-center"
+                  className={`w-full h-full object-cover ${mediaPosClass}`}
+                  style={mediaStyle}
                 />
               ) : (
                 <img
                   src={slide.media.src}
                   alt=""
-                  className="w-full h-full object-cover object-center"
+                  className={`w-full h-full object-cover ${mediaPosClass}`}
+                  style={mediaStyle}
                 />
               )}
               <div className="absolute inset-0 bg-black/40" />
