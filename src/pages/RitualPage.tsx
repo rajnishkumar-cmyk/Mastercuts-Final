@@ -14,7 +14,7 @@ import { useCart, formatDuration } from '@/components/cart/CartProvider';
 import {
   getRitual,
   getServicesForRitual,
-  getStylistsForRitual,
+  getTherapistsForRitual,
   getPackagesForRitual,
   rituals,
 } from '@/lib/booking/catalog';
@@ -45,7 +45,7 @@ export function RitualPage() {
 
   const ritual = useMemo(() => (id ? getRitual(id) : undefined), [id]);
   const services = useMemo(() => (id ? getServicesForRitual(id) : []), [id]);
-  const stylists = useMemo(() => (id ? getStylistsForRitual(id) : []), [id]);
+  const therapists = useMemo(() => (id ? getTherapistsForRitual(id) : []), [id]);
   const ritualPackages = useMemo(() => (id ? getPackagesForRitual(id) : []), [id]);
   const otherRituals = useMemo(
     () => rituals.filter((r) => r.id !== id),
@@ -185,7 +185,7 @@ export function RitualPage() {
       </section>
 
       {/* ───────── Specialists ───────── */}
-      {stylists.length > 0 && (
+      {therapists.length > 0 && (
         <section className="py-24 lg:py-32 px-6 lg:px-16">
           <div className="max-w-5xl mx-auto">
             <div className="mb-14 lg:mb-20">
@@ -198,22 +198,22 @@ export function RitualPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-12">
-              {stylists.map((stylist) => (
-                <div key={stylist.id} className="group">
+              {therapists.map((therapist) => (
+                <div key={therapist.id} className="group">
                   <div className="aspect-[3/4] overflow-hidden mb-5">
                     <img
-                      src={stylist.image}
-                      alt={stylist.name}
+                      src={therapist.image}
+                      alt={therapist.name}
                       className="w-full h-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
                     />
                   </div>
                   <p className="text-[10px] uppercase tracking-[0.22em] text-white/50 mb-1">
-                    {stylist.title}
+                    {therapist.title}
                   </p>
-                  <h3 className="font-serif text-2xl text-white mb-3">{stylist.name}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed mb-3">{stylist.bio}</p>
+                  <h3 className="font-serif text-2xl text-white mb-3">{therapist.name}</h3>
+                  <p className="text-sm text-white/60 leading-relaxed mb-3">{therapist.bio}</p>
                   <p className="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                    {stylist.languages.join(' · ')}
+                    {therapist.languages.join(' · ')}
                   </p>
                 </div>
               ))}

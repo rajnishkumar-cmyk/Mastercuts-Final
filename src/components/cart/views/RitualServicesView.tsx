@@ -1,6 +1,6 @@
 import { ArrowLeft, X } from 'lucide-react';
 import { formatAed, formatDuration } from '../CartProvider';
-import { getRitual, getServicesForRitual, getStylistsForRitual } from '@/lib/booking/catalog';
+import { getRitual, getServicesForRitual, getTherapistsForRitual } from '@/lib/booking/catalog';
 import type { RitualId } from '@/lib/booking/types';
 import { AddToCartButton } from '../AddToCartButton';
 import { DrawerStickyFooter } from './DrawerStickyFooter';
@@ -14,7 +14,7 @@ interface Props {
 export function RitualServicesView({ ritualId, onClose, onBack }: Props) {
   const ritual = getRitual(ritualId);
   const services = getServicesForRitual(ritualId);
-  const stylistCount = getStylistsForRitual(ritualId).length;
+  const therapistCount = getTherapistsForRitual(ritualId).length;
 
   if (!ritual) return null;
 
@@ -57,7 +57,7 @@ export function RitualServicesView({ ritualId, onClose, onBack }: Props) {
             {ritual.description}
           </p>
           <p className="text-[11px] uppercase tracking-wider text-text-secondary mt-3">
-            {services.length} services · {stylistCount} {stylistCount === 1 ? 'specialist' : 'specialists'}
+            {services.length} services · {therapistCount} {therapistCount === 1 ? 'specialist' : 'specialists'}
           </p>
         </div>
 

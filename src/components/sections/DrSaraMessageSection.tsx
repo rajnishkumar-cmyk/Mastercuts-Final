@@ -18,7 +18,7 @@ export function DrSaraMessageSection() {
           >
             <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-circle-light">
               <img
-                src="/assets/Images/about-dr-sara.png"
+                src="/assets/Images/dr-sara-profile.png"
                 alt="Dr Sara"
                 className="w-full h-full object-cover"
                 loading="lazy"

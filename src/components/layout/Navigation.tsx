@@ -24,6 +24,9 @@ export function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === '/';
+  const isRaContext =
+    location.pathname.startsWith('/at-home') ||
+    location.pathname.startsWith('/wellness-hub');
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -153,15 +156,36 @@ export function Navigation() {
 
       <div className={`w-full px-6 lg:px-12 transition-[padding] duration-300 ${darkChrome ? 'py-4' : 'py-6'}`}>
         <nav className="flex items-center justify-between gap-6">
-          {/* Logo — Mastercuts wordmark, natural width */}
+          {/* Logo — Ra emblem + wordmark lockup on Ra contexts, Mastercuts wordmark elsewhere */}
           <Link to="/" className="flex items-center gap-3 group shrink-0">
-            <img
-              src="/assets/Logo/mastercut-wordmark.png"
-              alt="Mastercuts"
-              className={`h-7 lg:h-9 transition-all duration-300 group-hover:scale-105 object-contain ${
-                darkChrome ? 'brightness-0 invert' : ''
-              }`}
-            />
+            {isRaContext ? (
+              <>
+                <img
+                  src="/assets/Logo/ra-emblem.png"
+                  alt="Ra by Mastercuts"
+                  className="h-12 lg:h-14 transition-transform duration-300 group-hover:scale-105 object-contain"
+                />
+                <span
+                  className="flex flex-col leading-none"
+                  aria-hidden="true"
+                >
+                  <span className="font-serif text-xl lg:text-2xl text-white">
+                    Ra
+                  </span>
+                  <span className="mt-1 text-[9px] lg:text-[10px] uppercase tracking-[0.22em] text-white/60">
+                    by mastercuts
+                  </span>
+                </span>
+              </>
+            ) : (
+              <img
+                src="/assets/Logo/mastercut-wordmark.png"
+                alt="Mastercuts"
+                className={`h-7 lg:h-9 transition-all duration-300 group-hover:scale-105 object-contain ${
+                  darkChrome ? 'brightness-0 invert' : ''
+                }`}
+              />
+            )}
           </Link>
 
           {/* Desktop primary nav — 4 dedicated items, center-flexed */}
@@ -308,11 +332,30 @@ export function Navigation() {
               >
                 <div className="flex flex-col h-full px-8 pt-8 pb-10">
                   <div className="flex-shrink-0 flex items-center justify-between mb-8">
-                    <img
-                      src="/assets/Logo/mastercut-wordmark.png"
-                      alt="Mastercuts"
-                      className="h-7 object-contain brightness-0 invert"
-                    />
+                    {isRaContext ? (
+                      <div className="flex items-center gap-3">
+                        <img
+                          src="/assets/Logo/ra-emblem.png"
+                          alt="Ra by Mastercuts"
+                          className="h-12 object-contain"
+                        />
+                        <span
+                          className="flex flex-col leading-none"
+                          aria-hidden="true"
+                        >
+                          <span className="font-serif text-xl text-white">Ra</span>
+                          <span className="mt-1 text-[9px] uppercase tracking-[0.22em] text-white/60">
+                            by mastercuts
+                          </span>
+                        </span>
+                      </div>
+                    ) : (
+                      <img
+                        src="/assets/Logo/mastercut-wordmark.png"
+                        alt="Mastercuts"
+                        className="h-7 object-contain brightness-0 invert"
+                      />
+                    )}
                     <SheetClose className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors duration-200">
                       <X className="w-5 h-5" />
                     </SheetClose>
@@ -414,7 +457,7 @@ export function Navigation() {
                         setTimeout(() => goToSection('team'), 220);
                       }}
                     >
-                      Our Stylists
+                      Our Therapists
                     </button>
                     <button
                       type="button"

@@ -11,7 +11,7 @@ interface TeamMember {
 const teamMembers: TeamMember[] = [
   {
     name: 'Sarah Jenkins',
-    title: 'Master Stylist',
+    title: 'Master Therapist',
     description: 'Expert in creative coloring and styling, known for precision, empathy, and artistry. Creates natural, camera-ready looks through advanced balayage and extensions.',
     image: '/assets/Images/headshot_1.png'
   },

@@ -14,7 +14,7 @@ import {
   getRitual,
   getService,
   getServicesForRitual,
-  getStylistsForRitual,
+  getTherapistsForRitual,
 } from '@/lib/booking/catalog';
 import { cn } from '@/lib/utils';
 
@@ -38,8 +38,8 @@ export function ServiceDetailSheet() {
     () => (serviceDetail ? getRitual(serviceDetail.ritualId) : undefined),
     [serviceDetail]
   );
-  const stylists = useMemo(
-    () => (serviceDetail ? getStylistsForRitual(serviceDetail.ritualId) : []),
+  const therapists = useMemo(
+    () => (serviceDetail ? getTherapistsForRitual(serviceDetail.ritualId) : []),
     [serviceDetail]
   );
   const relatedServices = useMemo(() => {
@@ -329,7 +329,7 @@ export function ServiceDetailSheet() {
               </section>
 
               {/* Specialists */}
-              {stylists.length > 0 && (
+              {therapists.length > 0 && (
                 <section className="pt-10 border-t border-white/5">
                   <p className="text-[10px] uppercase tracking-[0.22em] text-white/50 mb-3">
                     The hands
@@ -338,19 +338,19 @@ export function ServiceDetailSheet() {
                     Performed by your <span className="italic">specialists</span>
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
-                    {stylists.map((stylist) => (
-                      <div key={stylist.id}>
+                    {therapists.map((therapist) => (
+                      <div key={therapist.id}>
                         <div className="aspect-[3/4] overflow-hidden mb-3">
                           <img
-                            src={stylist.image}
-                            alt={stylist.name}
+                            src={therapist.image}
+                            alt={therapist.name}
                             className="w-full h-full object-cover"
                           />
                         </div>
                         <p className="text-[10px] uppercase tracking-[0.22em] text-white/50 mb-1">
-                          {stylist.title}
+                          {therapist.title}
                         </p>
-                        <h3 className="font-serif text-lg text-white">{stylist.name}</h3>
+                        <h3 className="font-serif text-lg text-white">{therapist.name}</h3>
                       </div>
                     ))}
                   </div>

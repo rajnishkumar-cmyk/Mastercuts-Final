@@ -63,7 +63,7 @@ const BENEFITS = [
   {
     icon: CalendarHeart,
     title: 'Concierge booking',
-    body: 'A dedicated coordinator to plan your visits, your stylists, and your travel weeks.',
+    body: 'A dedicated coordinator to plan your visits, your therapists, and your travel weeks.',
   },
   {
     icon: Wind,

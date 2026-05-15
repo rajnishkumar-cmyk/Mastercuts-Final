@@ -51,7 +51,7 @@ export interface Service {
   variants?: ServiceVariant[];
 }
 
-export interface Stylist {
+export interface Therapist {
   id: string;
   name: string;
   title: string;
@@ -82,7 +82,7 @@ export interface CartItem {
   durationMin: number;
   price: number;
   image: string;
-  stylistPref: string | 'any';
+  therapistPref: string | 'any';
   addedAt: number;
   variantId?: string;
   variantLabel?: string;
@@ -90,6 +90,20 @@ export interface CartItem {
   // Journey bundle — present when this line item represents a curated journey
   journeyId?: string;
   journeyServiceIds?: string[];
+  // Which saved guest this service is for. Defaults to the self profile
+  // when omitted (e.g. items added pre-login).
+  forGuestId?: string;
+}
+
+export interface GuestProfile {
+  id: string;
+  name: string;
+  phone?: string;
+  relation?: string;
+  notes?: string;
+  // True for the auto-created profile derived from the account holder.
+  // Always pinned to the top of the picker list.
+  isSelf?: boolean;
 }
 
 export interface ServiceAddress {
@@ -117,6 +131,7 @@ export interface Cart {
   items: CartItem[];
   updatedAt: number;
   draftCheckout?: DraftCheckout;
+  pendingOfferId?: string;
 }
 
 export interface LightAccount {
@@ -138,4 +153,14 @@ export interface BookingRecord {
   status: 'confirmed' | 'cancelled';
   serviceLocation: 'at-home';
   paymentMethod: 'cash' | 'card';
+  offer?: {
+    id: string;
+    name: string;
+    discountPercent: number;
+    discountAmount: number;
+  };
+  // Snapshot of every guest profile referenced by items at booking time.
+  // Preserved here so the confirmation/profile view renders correct names
+  // even if a guest is later renamed or removed.
+  guests?: GuestProfile[];
 }

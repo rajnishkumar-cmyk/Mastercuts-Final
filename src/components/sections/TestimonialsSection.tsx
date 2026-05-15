@@ -11,7 +11,7 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
   {
     id: 1,
-    quote: "I had an excellent experience at Mastercuts with Sarah for my new look. The stylist was thorough, explained the process clearly, and made me feel completely at ease. The staff was friendly, and the salon was clean and welcoming. My hair feels amazing, and I'm already looking forward to my next visit. Highly recommend this salon for top-notch care.",
+    quote: "I had an excellent experience at Mastercuts with Sarah for my new look. The therapist was thorough, explained the process clearly, and made me feel completely at ease. The staff was friendly, and the salon was clean and welcoming. My hair feels amazing, and I'm already looking forward to my next visit. Highly recommend this salon for top-notch care.",
     author: "Alessandro B.",
     service: "Signature Cut & Style"
   },

@@ -154,7 +154,7 @@ export function DesktopMenu({ open, onClose }: DesktopMenuProps) {
                       onClick={() => goToSection('team')}
                       className="text-left font-serif text-4xl xl:text-5xl text-white hover:opacity-60 transition-opacity"
                     >
-                      Our Stylists
+                      Our Therapists
                     </motion.button>
                     <motion.button
                       variants={itemVariants}

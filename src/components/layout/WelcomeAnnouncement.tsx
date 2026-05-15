@@ -112,7 +112,7 @@ export function WelcomeAnnouncement() {
                 <DialogDescription asChild>
                   <p className="text-sm text-text-secondary leading-relaxed mb-6 max-w-prose">
                     Select at-home services are available now while the new
-                    studio takes shape on Imperial Avenue, Downtown Dubai.
+                    studio takes shape at Imperial Avenue, Downtown Dubai.
                   </p>
                 </DialogDescription>
 

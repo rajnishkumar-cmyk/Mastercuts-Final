@@ -230,6 +230,10 @@ export function RaAtHomeSection() {
         <h2 className="font-serif text-4xl lg:text-6xl text-white leading-[1.05]">
           Care, at your <span className="italic">door</span>.
         </h2>
+        <p className="mt-4 text-sm lg:text-base text-white/60 italic max-w-prose">
+          Currently available exclusively to residents of Imperial Avenue
+          Residences.
+        </p>
       </div>
 
       {/* ─────────────────────────────────────────────

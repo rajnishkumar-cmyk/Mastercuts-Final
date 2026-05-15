@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { X, ArrowRight, ArrowUpRight, ChevronDown, Pencil, User, MapPin, Clock, Banknote, CreditCard } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { X, ArrowRight, ArrowUpRight, ChevronDown, ChevronRight, Pencil, User, MapPin, Clock, Banknote, CreditCard, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart, useCartTotals, formatAed, formatDuration } from '../CartProvider';
 import { CartItemRow } from '../CartItemRow';
 import { FrequentlyAddedSection } from '../FrequentlyAddedSection';
+import { OffersSheet } from '../OffersSheet';
+import { OfferCelebration } from '../OfferCelebration';
 import { cn } from '@/lib/utils';
 
 function formatDateLabel(key: string): string {
@@ -38,21 +41,27 @@ export function BasketView({ onClose, onContinue }: Props) {
     paymentMethod,
     openPaymentMethod,
     openContactEdit,
+    appliedOffer,
+    clearPendingOffer,
+    celebrationTriggerAt,
   } = useCart();
-  const { totalPrice, totalDuration, count } = useCartTotals();
+  const reduce = useReducedMotion();
+  const { totalPrice, totalDuration, count, discount, subtotalAfterDiscount } =
+    useCartTotals();
   const navigate = useNavigate();
   const isEmpty = count === 0;
 
   const [policyAccepted, setPolicyAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [offersSheetOpen, setOffersSheetOpen] = useState(false);
 
   const selectedAddress = getSelectedAddress();
   const hasAddress = !!selectedAddress;
   const hasTimeSlot = !!(cart.draftCheckout?.date && cart.draftCheckout?.time);
   const isFinalState = hasAddress && hasTimeSlot;
 
-  const vat = Math.round(totalPrice * 0.05);
-  const grandTotal = totalPrice + vat;
+  const vat = Math.round(subtotalAfterDiscount * 0.05);
+  const grandTotal = subtotalAfterDiscount + vat;
   const canPay = isFinalState && policyAccepted && !submitting;
 
   const handlePay = async () => {
@@ -134,6 +143,8 @@ export function BasketView({ onClose, onContinue }: Props) {
               </div>
             )}
 
+            <OfferCelebration />
+
             {cart.items.map((item) => (
               <CartItemRow key={item.id} item={item} />
             ))}
@@ -159,6 +170,65 @@ export function BasketView({ onClose, onContinue }: Props) {
                 <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </span>
             </button>
+
+            {/* Offers row — opens the bottom sheet to pick or clear an offer.
+                Sits above the client/guest details section per the cart
+                hierarchy. Pulses a soft gold halo once whenever an offer is
+                freshly applied (driven by celebrationTriggerAt). */}
+            <motion.div
+              key={celebrationTriggerAt ?? 'idle'}
+              initial={false}
+              animate={
+                celebrationTriggerAt && !reduce
+                  ? {
+                      scale: [1, 1.02, 1],
+                      boxShadow: [
+                        '0 0 0 0 rgba(232,132,43,0)',
+                        '0 0 0 8px rgba(232,132,43,0.18)',
+                        '0 0 0 0 rgba(232,132,43,0)',
+                      ],
+                    }
+                  : { scale: 1, boxShadow: '0 0 0 0 rgba(232,132,43,0)' }
+              }
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+              className="flex items-stretch justify-between gap-3 py-4 px-2 -mx-2 rounded-lg border-b border-black/10"
+            >
+              <button
+                type="button"
+                onClick={() => setOffersSheetOpen(true)}
+                className="group flex items-center gap-3 min-w-0 flex-1 text-left"
+              >
+                <span className="w-10 h-10 rounded-full bg-circle-light flex items-center justify-center text-accent-gold shrink-0">
+                  <Gift className="w-4 h-4" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[10px] uppercase tracking-[0.18em] text-text-secondary mb-0.5">
+                    Offers
+                  </span>
+                  <span className="flex items-baseline gap-2 min-w-0">
+                    <span className="text-sm text-text-primary truncate">
+                      {appliedOffer ? appliedOffer.name : 'None selected'}
+                    </span>
+                    {appliedOffer && (
+                      <span className="shrink-0 text-[11px] font-medium text-accent-gold tabular-nums">
+                        {appliedOffer.discountPercent}% OFF
+                      </span>
+                    )}
+                  </span>
+                </span>
+                <ChevronRight className="w-4 h-4 text-text-secondary group-hover:text-text-primary transition-colors shrink-0" />
+              </button>
+              {appliedOffer && (
+                <button
+                  type="button"
+                  onClick={clearPendingOffer}
+                  aria-label="Remove offer"
+                  className="shrink-0 self-center w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-text-secondary hover:bg-black/10 hover:text-text-primary transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </motion.div>
 
             {/* Edit your details — only when logged in. Just above the payment
                 breakdown. Opens the same EditContactOverlay used by the
@@ -219,6 +289,19 @@ export function BasketView({ onClose, onContinue }: Props) {
                 <span className="text-xs uppercase tracking-wider text-text-secondary">Subtotal</span>
                 <span className="text-sm text-text-primary tabular-nums">{formatAed(totalPrice)}</span>
               </div>
+              {appliedOffer && discount > 0 && (
+                <div
+                  className="flex items-baseline justify-between mb-2"
+                  aria-live="polite"
+                >
+                  <span className="text-xs uppercase tracking-wider text-accent-gold">
+                    {appliedOffer.name} ({appliedOffer.discountPercent}%)
+                  </span>
+                  <span className="text-sm text-accent-gold tabular-nums">
+                    −{formatAed(discount)}
+                  </span>
+                </div>
+              )}
               <div className="flex items-baseline justify-between mb-3 pb-3 border-b border-black/10">
                 <span className="text-xs uppercase tracking-wider text-text-secondary">VAT (5%)</span>
                 <span className="text-sm text-text-primary tabular-nums">{formatAed(vat)}</span>
@@ -362,6 +445,8 @@ export function BasketView({ onClose, onContinue }: Props) {
           )}
         </div>
       )}
+
+      <OffersSheet open={offersSheetOpen} onClose={() => setOffersSheetOpen(false)} />
     </div>
   );
 }

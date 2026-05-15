@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { useReducedMotion } from 'framer-motion';
 import { Calendar } from '@/components/ui/calendar';
 import { useCart, useCartTotals, formatDuration } from '@/components/cart/CartProvider';
 import {
@@ -17,6 +18,8 @@ interface Props {
 export function Step1DateTime({ onContinue }: Props) {
   const { cart, updateDraftCheckout } = useCart();
   const { totalDuration } = useCartTotals();
+  const reduce = useReducedMotion();
+  const slotsHeadingRef = useRef<HTMLParagraphElement | null>(null);
 
   const initialDate = cart.draftCheckout?.date
     ? new Date(cart.draftCheckout.date)
@@ -38,6 +41,26 @@ export function Step1DateTime({ onContinue }: Props) {
     setDate(d);
     setSelectedTime(undefined);
     updateDraftCheckout({ date: toDateKey(d), time: undefined });
+
+    // After the slot section renders, scroll its heading into view so the
+    // user knows the next step lives below the calendar. Skips the scroll
+    // if the heading is already fully visible (e.g. on tall viewports).
+    // rAF ensures the slots DOM has committed before we measure.
+    requestAnimationFrame(() => {
+      const el = slotsHeadingRef.current;
+      if (!el) return;
+      const scroller = el.closest('.overflow-y-auto') as HTMLElement | null;
+      if (!scroller) return;
+      const elRect = el.getBoundingClientRect();
+      const scrRect = scroller.getBoundingClientRect();
+      const alreadyVisible =
+        elRect.top >= scrRect.top && elRect.bottom <= scrRect.bottom;
+      if (alreadyVisible) return;
+      el.scrollIntoView({
+        behavior: reduce ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    });
   };
 
   const onPickTime = (time: string) => {
@@ -80,8 +103,18 @@ export function Step1DateTime({ onContinue }: Props) {
       </div>
 
       {date && (
+        <p className="px-6 mt-1 mb-1 text-[11px] uppercase tracking-[0.18em] text-text-secondary flex items-center gap-1.5">
+          <span aria-hidden="true">↓</span>
+          Pick your time below
+        </p>
+      )}
+
+      {date && (
         <div className="px-6 pb-4 pt-2">
-          <p className="text-[10px] uppercase tracking-[0.18em] text-text-secondary mb-4">
+          <p
+            ref={slotsHeadingRef}
+            className="text-[10px] uppercase tracking-[0.18em] text-text-secondary mb-4 scroll-mt-4"
+          >
             Available slots
           </p>
           {sections.every(([, items]) => items.length === 0) ? (

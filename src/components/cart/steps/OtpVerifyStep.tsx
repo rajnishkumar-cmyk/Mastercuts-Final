@@ -66,7 +66,8 @@ export function OtpVerifyStep() {
         </h2>
         <p className="text-sm text-text-secondary mb-8">
           We sent a 6-digit code to{' '}
-          <span className="text-text-primary">{phone}</span>
+          <span className="text-text-primary">{phone}</span>. Check your
+          WhatsApp messages.
         </p>
 
         <div className="flex justify-center mb-6">

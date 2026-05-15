@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 
 const STATS = [
-  { value: '4', label: 'Senior stylists' },
-  { value: '6', label: 'Junior stylists' },
-  { value: '100+', label: 'Years combined experience' },
+  { value: '4', label: 'Senior therapists' },
+  { value: '6', label: 'Junior therapists' },
+  { value: '5+', label: 'Years min experience, per therapist' },
 ];
 
 export function StatsTeamSection() {
@@ -15,8 +15,8 @@ export function StatsTeamSection() {
             Our team
           </p>
           <h2 className="font-serif text-4xl lg:text-6xl text-text-primary leading-[1.02]">
-            Senior and junior stylists, trained in the{' '}
-            <span className="italic">Mastercuts method</span>.
+            Senior and junior therapists, all{' '}
+            <span className="italic">DHA-certified</span>.
           </h2>
         </div>
 
@@ -41,10 +41,12 @@ export function StatsTeamSection() {
         </div>
 
         <p className="text-sm lg:text-base text-text-secondary leading-relaxed max-w-prose">
-          Every stylist on the Mastercuts team is trained internally in our method —
-          a slow consultation, intentional cutting, and finishing techniques
-          you can recreate at home. Our junior stylists shadow senior team
-          members for a full year before they take a chair of their own.
+          Beyond credentials, every therapist brings a minimum of five years
+          of hands-on experience — paired with training in our methodology of
+          slow consultation, intentional technique, and an unhurried finish.
+          Junior therapists shadow senior team members for a full year before
+          they take a chair of their own, so every treatment carries the same
+          considered care.
         </p>
       </div>
     </section>

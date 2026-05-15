@@ -181,26 +181,38 @@ export function AddressStep() {
           Our team will come to you. Please provide your address in Dubai.
         </p>
 
-        {/* Map placeholder */}
-        <div className="rounded-2xl bg-black/[0.04] border border-black/10 h-40 flex flex-col items-center justify-center mb-5">
-          <MapPin className="w-6 h-6 text-text-secondary mb-2" />
-          <p className="text-xs text-text-secondary">Map coming soon</p>
+        {/* Studio map — for orientation. The therapist comes to the address
+            entered below; this just shows where the Ra studio is located. */}
+        <div className="rounded-2xl overflow-hidden border border-black/10 mb-3 aspect-[4/3] sm:aspect-[16/9]">
+          <iframe
+            title="Map of Ra by Mastercuts, Imperial Avenue, Downtown Dubai"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3610.439726790797!2d55.27167767538154!3d25.188389277716638!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x672b374be124f7d5%3A0xefae5da9eed44c44!2sImperial%20Avenue%2C%20Downtown%20Dubai!5e0!3m2!1sen!2sin!4v1778785289318!5m2!1sen!2sin"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
+          />
         </div>
 
-        {/* Pin location details */}
-        <div className="flex items-center justify-between bg-black/[0.03] rounded-xl p-3 mb-6">
+        {/* Studio address — hyperlinked so users can open in their native Maps app */}
+        <a
+          href="https://maps.app.goo.gl/Fz9w2aCrn2VStaxi7"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center justify-between bg-black/[0.03] hover:bg-black/[0.06] rounded-xl p-3 mb-6 transition-colors"
+        >
           <div className="flex items-center gap-2 min-w-0">
             <MapPin className="w-4 h-4 text-text-secondary shrink-0" />
-            <p className="text-sm text-text-primary truncate">Dubai Marina, Dubai</p>
+            <p className="text-sm text-text-primary truncate">
+              Imperial Avenue, Downtown Dubai
+            </p>
           </div>
-          <button
-            type="button"
-            disabled
-            className="text-[11px] text-text-secondary shrink-0 opacity-50 cursor-not-allowed"
-          >
-            Change
-          </button>
-        </div>
+          <span className="text-[11px] text-text-secondary group-hover:text-text-primary transition-colors shrink-0">
+            Open in Maps →
+          </span>
+        </a>
 
         <div className="space-y-5">
           <div>

@@ -1,8 +1,9 @@
-import type { Cart, LightAccount, BookingRecord } from './types';
+import type { Cart, LightAccount, BookingRecord, GuestProfile } from './types';
 
-const CART_KEY = 'ra-cart-v1';
+const CART_KEY = 'ra-cart-v2';
 const ACCOUNT_KEY = 'ra-account-v1';
 const BOOKINGS_KEY = 'ra-bookings-v1';
+const GUESTS_KEY = 'ra-guests-v1';
 
 const CART_TTL_MS = 24 * 60 * 60 * 1000; // 24h
 
@@ -106,4 +107,21 @@ export function clearBookings(): void {
   window.localStorage.removeItem(BOOKINGS_KEY);
 }
 
-export { CART_KEY, ACCOUNT_KEY, BOOKINGS_KEY, storageAvailable };
+// ---------- GUEST PROFILES ----------
+
+export function loadGuests(): GuestProfile[] {
+  if (!storageAvailable) return [];
+  return safeParse<GuestProfile[]>(window.localStorage.getItem(GUESTS_KEY)) ?? [];
+}
+
+export function saveGuests(guests: GuestProfile[]): void {
+  if (!storageAvailable) return;
+  window.localStorage.setItem(GUESTS_KEY, JSON.stringify(guests));
+}
+
+export function clearGuests(): void {
+  if (!storageAvailable) return;
+  window.localStorage.removeItem(GUESTS_KEY);
+}
+
+export { CART_KEY, ACCOUNT_KEY, BOOKINGS_KEY, GUESTS_KEY, storageAvailable };

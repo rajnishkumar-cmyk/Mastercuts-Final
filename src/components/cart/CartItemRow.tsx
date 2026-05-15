@@ -1,7 +1,9 @@
-import { X, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronDown, User as UserIcon, X, Sparkles } from 'lucide-react';
 import type { CartItem } from '@/lib/booking/types';
 import { useCart, formatAed, formatDuration } from './CartProvider';
-import { getStylistsForRitual, getStylist, getService } from '@/lib/booking/catalog';
+import { getTherapistsForRitual, getTherapist, getService } from '@/lib/booking/catalog';
+import { GuestPickerSheet } from './GuestPickerSheet';
 import {
   Select,
   SelectContent,
@@ -15,8 +17,16 @@ interface Props {
 }
 
 export function CartItemRow({ item }: Props) {
-  const { removeItem, updateStylistPref, openServiceDetail } = useCart();
+  const {
+    removeItem,
+    updateTherapistPref,
+    openServiceDetail,
+    getGuestForItem,
+    account,
+  } = useCart();
   const isJourney = !!item.journeyId;
+  const [guestPickerOpen, setGuestPickerOpen] = useState(false);
+  const assignedGuest = getGuestForItem(item);
 
   if (isJourney) {
     const constituentServices = (item.journeyServiceIds ?? [])
@@ -70,8 +80,8 @@ export function CartItemRow({ item }: Props) {
     );
   }
 
-  const eligibleStylists = getStylistsForRitual(item.ritualId);
-  const currentStylist = item.stylistPref !== 'any' ? getStylist(item.stylistPref) : null;
+  const eligibleTherapists = getTherapistsForRitual(item.ritualId);
+  const currentTherapist = item.therapistPref !== 'any' ? getTherapist(item.therapistPref) : null;
 
   return (
     <div className="flex gap-4 py-5 border-b border-black/10">
@@ -113,30 +123,57 @@ export function CartItemRow({ item }: Props) {
           </button>
         </div>
 
-        <div className="mt-3">
+        <div className="mt-3 space-y-2">
           <Select
-            value={item.stylistPref}
-            onValueChange={(v) => updateStylistPref(item.id, v)}
+            value={item.therapistPref}
+            onValueChange={(v) => updateTherapistPref(item.id, v)}
           >
             <SelectTrigger className="h-9 w-full border-black/15 bg-transparent text-xs text-text-primary rounded-full px-4 [&>svg]:opacity-50">
               <SelectValue>
                 <span className="flex items-center gap-2">
-                  <span className="text-text-secondary">Stylist:</span>
-                  <span>{currentStylist ? currentStylist.name : 'Any available'}</span>
+                  <span className="text-text-secondary">Therapist:</span>
+                  <span>{currentTherapist ? currentTherapist.name : 'Any available'}</span>
                 </span>
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="any">Any available (recommended)</SelectItem>
-              {eligibleStylists.map((s) => (
+              {eligibleTherapists.map((s) => (
                 <SelectItem key={s.id} value={s.id}>
                   {s.name} — {s.title}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+
+          {/* Guest picker — only meaningful once an account exists (then a
+              "self" profile is auto-created). Hidden pre-login. */}
+          {account && (
+            <button
+              type="button"
+              onClick={() => setGuestPickerOpen(true)}
+              aria-label="Choose who this service is for"
+              className="h-9 w-full flex items-center gap-2 rounded-full border border-black/15 bg-transparent px-4 text-xs text-text-primary hover:bg-black/[0.03] transition-colors"
+            >
+              <UserIcon className="w-3.5 h-3.5 text-text-secondary shrink-0" />
+              <span className="text-text-secondary">For:</span>
+              <span className="flex-1 text-left truncate">
+                {assignedGuest?.name ?? 'You'}
+                {assignedGuest?.isSelf && (
+                  <span className="text-text-secondary"> (you)</span>
+                )}
+              </span>
+              <ChevronDown className="w-3.5 h-3.5 text-text-secondary shrink-0" />
+            </button>
+          )}
         </div>
       </div>
+
+      <GuestPickerSheet
+        open={guestPickerOpen}
+        onClose={() => setGuestPickerOpen(false)}
+        itemId={item.id}
+      />
     </div>
   );
 }

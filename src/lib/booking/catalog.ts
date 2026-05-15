@@ -1,4 +1,4 @@
-import type { Ritual, Service, ServiceAudience, Stylist, Package } from './types';
+import type { Ritual, Service, ServiceAudience, Therapist, Package } from './types';
 
 export const rituals: Ritual[] = [
   {
@@ -26,7 +26,7 @@ export const rituals: Ritual[] = [
       },
       {
         q: 'Can I bring reference images?',
-        a: 'Absolutely. References help the conversation, though your stylist will guide you toward what your hair and face shape will hold best.',
+        a: 'Absolutely. References help the conversation, though your therapist will guide you toward what your hair and face shape will hold best.',
       },
     ],
     image: '/assets/Images/H-03.png',
@@ -226,7 +226,7 @@ export const services: Service[] = [
       'Natural-bristle finish you can recreate',
     ],
     detail:
-      "Every Signature Cut begins with a slow consultation: how you wear your hair on a normal Tuesday, what you wish it did, what you have stopped trying to make it do. Your stylist studies the way the hair falls, the cowlicks, the natural part. The cut is built from there — not from a reference, but from your hair's own logic.\n\nWashing happens at a reclined basin with a long scalp massage. The cut is dry, then wet, then dry again — a layered approach that catches what each state reveals. We finish with a hand-blown silhouette using only natural-bristle brushes. You leave knowing how to recreate it.",
+      "Every Signature Cut begins with a slow consultation: how you wear your hair on a normal Tuesday, what you wish it did, what you have stopped trying to make it do. Your therapist studies the way the hair falls, the cowlicks, the natural part. The cut is built from there — not from a reference, but from your hair's own logic.\n\nWashing happens at a reclined basin with a long scalp massage. The cut is dry, then wet, then dry again — a layered approach that catches what each state reveals. We finish with a hand-blown silhouette using only natural-bristle brushes. You leave knowing how to recreate it.",
     durationMin: 60,
     price: 350,
     image: '/assets/Images/H-03.png',
@@ -786,15 +786,15 @@ export const services: Service[] = [
   },
 ];
 
-export const stylists: Stylist[] = [
+export const therapists: Therapist[] = [
   {
     id: 'sarah-jenkins',
     name: 'Sarah Jenkins',
-    title: 'Master Stylist',
+    title: 'Master Therapist',
     ritualIds: ['atelier'],
     languages: ['English'],
     image: '/assets/Images/headshot_1.png',
-    bio: "A London-trained master stylist known for editorial cuts and dimensional colour. Sarah's work lives in the quiet precision of a perfect fringe, a weightless long layer, a colour that looks like it was always yours. Fifteen years at the chair have taught her that listening is half the job.",
+    bio: "A London-trained master therapist known for editorial cuts and dimensional colour. Sarah's work lives in the quiet precision of a perfect fringe, a weightless long layer, a colour that looks like it was always yours. Fifteen years at the chair have taught her that listening is half the job.",
   },
   {
     id: 'david-cortez',
@@ -992,12 +992,12 @@ export function getRitual(id: string): Ritual | undefined {
   return rituals.find((r) => r.id === id);
 }
 
-export function getStylist(id: string): Stylist | undefined {
-  return stylists.find((s) => s.id === id);
+export function getTherapist(id: string): Therapist | undefined {
+  return therapists.find((s) => s.id === id);
 }
 
-export function getStylistsForRitual(ritualId: string): Stylist[] {
-  return stylists.filter((s) => s.ritualIds.includes(ritualId as never));
+export function getTherapistsForRitual(ritualId: string): Therapist[] {
+  return therapists.filter((s) => s.ritualIds.includes(ritualId as never));
 }
 
 export function getServicesForRitual(

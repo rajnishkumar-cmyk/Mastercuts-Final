@@ -1,4 +1,4 @@
-import { X, LogOut, User as UserIcon } from 'lucide-react';
+import { X, LogOut, User as UserIcon, Users } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -14,7 +14,7 @@ function formatDateLabel(key: string): string {
 }
 
 export function ProfileDrawer() {
-  const { surface, closeAll, account, bookings, openCart, signOut, openLogin } = useCart();
+  const { surface, closeAll, account, bookings, openCart, signOut, openLogin, guestProfiles } = useCart();
   const isMobile = useIsMobile();
   const open = surface === 'profile';
   const side = isMobile ? 'bottom' : 'right';
@@ -97,6 +97,41 @@ export function ProfileDrawer() {
                   <p className="text-text-secondary">{account.phone}</p>
                 </div>
               </section>
+
+              {/* My Guests — read-only list. Add/edit happens in the cart's
+                  per-item guest picker, which is contextual to the booking. */}
+              {guestProfiles.filter((g) => !g.isSelf).length > 0 && (
+                <section>
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-text-secondary mb-3 flex items-center gap-2">
+                    <Users className="w-3 h-3" strokeWidth={1.5} />
+                    My guests
+                  </p>
+                  <ul className="space-y-2">
+                    {guestProfiles
+                      .filter((g) => !g.isSelf)
+                      .map((g) => (
+                        <li
+                          key={g.id}
+                          className="flex items-center justify-between gap-3 py-2 border-b border-black/5"
+                        >
+                          <div className="min-w-0">
+                            <p className="text-sm text-text-primary truncate">
+                              {g.name}
+                            </p>
+                            {g.phone && (
+                              <p className="text-xs text-text-secondary truncate">
+                                {g.phone}
+                              </p>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                  </ul>
+                  <p className="mt-3 text-[11px] text-text-secondary">
+                    Add or pick a guest from any cart item.
+                  </p>
+                </section>
+              )}
 
               {/* Upcoming */}
               <section>

@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import type { Cart, CartItem, DraftCheckout, GuestDetails, LightAccount, BookingRecord, RitualId, ServiceAddress } from '@/lib/booking/types';
+import type { Cart, CartItem, DraftCheckout, GuestDetails, GuestProfile, LightAccount, BookingRecord, RitualId, ServiceAddress } from '@/lib/booking/types';
 import { getService, getJourney, getJourneyTotals } from '@/lib/booking/catalog';
 import {
   CART_KEY,
@@ -13,7 +13,13 @@ import {
   loadBookings,
   addBooking,
   cartWasExpired,
+  loadGuests,
+  saveGuests,
+  clearGuests,
 } from '@/lib/booking/storage';
+import { getOffer, isOfferActive, calculateDiscount, type Offer } from '@/lib/offers';
+
+const SELF_GUEST_ID = 'self';
 
 type Surface =
   | 'none'
@@ -84,11 +90,29 @@ interface CartContextValue {
   popDrawerView: () => void;
 
   // cart actions
-  addToCart: (serviceId: string, stylistPref?: string | 'any', variantId?: string) => boolean;
+  addToCart: (serviceId: string, therapistPref?: string | 'any', variantId?: string) => boolean;
   addJourneyToCart: (journeyId: string) => boolean;
   removeItem: (itemId: string) => void;
-  updateStylistPref: (itemId: string, stylistPref: string | 'any') => void;
+  updateTherapistPref: (itemId: string, therapistPref: string | 'any') => void;
   clearAll: () => void;
+
+  // offers
+  appliedOffer: Offer | undefined;
+  setPendingOffer: (offerId: string) => void;
+  clearPendingOffer: () => void;
+  // Ephemeral timestamp set when an offer is freshly applied while the cart
+  // already has items. Drives the in-cart celebration animation. Not
+  // persisted — won't fire on reload.
+  celebrationTriggerAt: number | null;
+
+  // guest profiles — saved name/phone records for booking on behalf of others.
+  // The "self" profile is auto-derived from the LightAccount and pinned.
+  guestProfiles: GuestProfile[];
+  addGuestProfile: (input: { name: string; phone?: string; relation?: string; notes?: string }) => string;
+  updateGuestProfile: (id: string, patch: Partial<Omit<GuestProfile, 'id' | 'isSelf'>>) => void;
+  removeGuestProfile: (id: string) => void;
+  setItemGuest: (itemId: string, guestId: string) => void;
+  getGuestForItem: (item: CartItem) => GuestProfile | undefined;
 
   // checkout state
   updateDraftCheckout: (draft: Partial<DraftCheckout>) => void;
@@ -126,7 +150,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [drawerStack, setDrawerStack] = useState<DrawerView[]>([]);
   const [serviceDetail, setServiceDetail] = useState<ServiceDetailContext | null>(null);
   const [audiencePickerDestination, setAudiencePickerDestination] = useState<string>('/explore');
+  const [celebrationTriggerAt, setCelebrationTriggerAt] = useState<number | null>(null);
+  const [guestProfiles, setGuestProfiles] = useState<GuestProfile[]>([]);
   const hydratedRef = useRef(false);
+  const guestsHydratedRef = useRef(false);
   const cartItemCountRef = useRef(0);
 
   cartItemCountRef.current = cart.items.length;
@@ -142,7 +169,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
     setAccount(loadAccount());
     setBookings(loadBookings());
+    setGuestProfiles(loadGuests());
     hydratedRef.current = true;
+    guestsHydratedRef.current = true;
   }, []);
 
   // Persist cart whenever it changes (but not on the initial hydration pass)
@@ -180,7 +209,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [surface]);
 
   const addToCart = useCallback<CartContextValue['addToCart']>(
-    (serviceId, stylistPref = 'any', variantId) => {
+    (serviceId, therapistPref = 'any', variantId) => {
       const service = getService(serviceId);
       if (!service) {
         toast.error('Service not found');
@@ -210,7 +239,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           durationMin: effectiveDuration,
           price: effectivePrice,
           image: service.image,
-          stylistPref,
+          therapistPref,
           variantId: effectiveVariantId,
           variantLabel: effectiveVariantLabel,
           addedAt: Date.now(),
@@ -263,7 +292,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           durationMin: totals.totalDuration,
           price: totals.totalPriceDiscounted,
           image: journey.image,
-          stylistPref: 'any',
+          therapistPref: 'any',
           journeyId: journey.id,
           journeyServiceIds: journey.serviceIds,
           addedAt: Date.now(),
@@ -285,10 +314,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
-  const updateStylistPref = useCallback((itemId: string, stylistPref: string | 'any') => {
+  const updateTherapistPref = useCallback((itemId: string, therapistPref: string | 'any') => {
     setCart((prev) => ({
       ...prev,
-      items: prev.items.map((i) => (i.id === itemId ? { ...i, stylistPref } : i)),
+      items: prev.items.map((i) => (i.id === itemId ? { ...i, therapistPref } : i)),
       updatedAt: Date.now(),
     }));
   }, []);
@@ -296,6 +325,134 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const clearAll = useCallback(() => {
     setCart({ items: [], updatedAt: Date.now() });
   }, []);
+
+  const setPendingOffer = useCallback((offerId: string) => {
+    setCart((prev) => {
+      // Celebrate only on a *new* application against a cart that already
+      // has items. Same-offer reselection and empty-cart "Avail now" stay
+      // silent. Defer the trigger to a microtask so we don't call setState
+      // from within another setState.
+      if (prev.pendingOfferId !== offerId && prev.items.length > 0) {
+        queueMicrotask(() => setCelebrationTriggerAt(Date.now()));
+      }
+      return {
+        ...prev,
+        pendingOfferId: offerId,
+        updatedAt: Date.now(),
+      };
+    });
+  }, []);
+
+  const clearPendingOffer = useCallback(() => {
+    setCart((prev) => {
+      if (!prev.pendingOfferId) return prev;
+      const { pendingOfferId: _omit, ...rest } = prev;
+      void _omit;
+      return { ...rest, updatedAt: Date.now() };
+    });
+  }, []);
+
+  // Auto-clear an expired offer the moment it lapses (e.g. user lingered on
+  // the cart past validUntil). Re-evaluated whenever the cart updates.
+  const appliedOffer = useMemo(() => {
+    const offer = getOffer(cart.pendingOfferId);
+    if (!offer) return undefined;
+    if (!isOfferActive(offer)) return undefined;
+    return offer;
+  }, [cart.pendingOfferId]);
+
+  useEffect(() => {
+    if (!cart.pendingOfferId) return;
+    const offer = getOffer(cart.pendingOfferId);
+    if (offer && !isOfferActive(offer)) {
+      toast.info(`Sorry, "${offer.name}" just expired.`);
+      clearPendingOffer();
+    }
+  }, [cart.pendingOfferId, clearPendingOffer]);
+
+  // Persist guest profiles after hydration.
+  useEffect(() => {
+    if (!guestsHydratedRef.current) return;
+    if (guestProfiles.length === 0) {
+      clearGuests();
+    } else {
+      saveGuests(guestProfiles);
+    }
+  }, [guestProfiles]);
+
+  // Mirror the account holder into a pinned "self" guest profile. Created
+  // on first login and kept in sync if the user edits their name/phone.
+  useEffect(() => {
+    if (!account) return;
+    setGuestProfiles((prev) => {
+      const idx = prev.findIndex((g) => g.isSelf);
+      const selfDraft: GuestProfile = {
+        id: SELF_GUEST_ID,
+        name: account.name?.trim() || 'You',
+        phone: account.phone,
+        isSelf: true,
+      };
+      if (idx === -1) return [selfDraft, ...prev];
+      const existing = prev[idx];
+      if (existing.name === selfDraft.name && existing.phone === selfDraft.phone) {
+        return prev;
+      }
+      return prev.map((g, i) => (i === idx ? { ...g, ...selfDraft } : g));
+    });
+  }, [account]);
+
+  const addGuestProfile = useCallback<CartContextValue['addGuestProfile']>(
+    ({ name, phone, relation, notes }) => {
+      const id = crypto.randomUUID();
+      setGuestProfiles((prev) => [
+        ...prev,
+        { id, name: name.trim(), phone: phone?.trim(), relation, notes },
+      ]);
+      return id;
+    },
+    []
+  );
+
+  const updateGuestProfile = useCallback<CartContextValue['updateGuestProfile']>(
+    (id, patch) => {
+      setGuestProfiles((prev) =>
+        prev.map((g) => (g.id === id ? { ...g, ...patch } : g))
+      );
+    },
+    []
+  );
+
+  const removeGuestProfile = useCallback((id: string) => {
+    if (id === SELF_GUEST_ID) return; // self profile is not removable
+    setGuestProfiles((prev) => prev.filter((g) => g.id !== id));
+    // Clear forGuestId on any cart items pointing at this guest — they
+    // fall back to the self default.
+    setCart((prev) => ({
+      ...prev,
+      items: prev.items.map((i) =>
+        i.forGuestId === id ? { ...i, forGuestId: undefined } : i
+      ),
+      updatedAt: Date.now(),
+    }));
+  }, []);
+
+  const setItemGuest = useCallback((itemId: string, guestId: string) => {
+    setCart((prev) => ({
+      ...prev,
+      items: prev.items.map((i) =>
+        i.id === itemId ? { ...i, forGuestId: guestId } : i
+      ),
+      updatedAt: Date.now(),
+    }));
+  }, []);
+
+  const getGuestForItem = useCallback(
+    (item: CartItem): GuestProfile | undefined => {
+      const targetId = item.forGuestId ?? SELF_GUEST_ID;
+      return guestProfiles.find((g) => g.id === targetId);
+    },
+    [guestProfiles]
+  );
 
   const updateDraftCheckout = useCallback((draft: Partial<DraftCheckout>) => {
     setCart((prev) => ({
@@ -334,25 +491,47 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       address: address ?? undefined,
     };
 
+    const subtotal = items.reduce((s, i) => s + i.price, 0);
+    const offerSnapshot = appliedOffer
+      ? {
+          id: appliedOffer.id,
+          name: appliedOffer.name,
+          discountPercent: appliedOffer.discountPercent,
+          discountAmount: calculateDiscount(subtotal, appliedOffer),
+        }
+      : undefined;
+
+    // Snapshot the set of guest profiles actually referenced by items in
+    // this booking — keeps the confirmation/profile view correct even if
+    // the user later renames or removes a guest.
+    const referencedGuestIds = new Set(
+      items.map((i) => i.forGuestId ?? SELF_GUEST_ID)
+    );
+    const guestSnapshot = guestProfiles.filter((g) =>
+      referencedGuestIds.has(g.id)
+    );
+
     const booking: BookingRecord = {
       reference: makeRef(),
       items,
       date,
       time,
       totalDuration: items.reduce((s, i) => s + i.durationMin, 0),
-      totalPrice: items.reduce((s, i) => s + i.price, 0),
+      totalPrice: subtotal - (offerSnapshot?.discountAmount ?? 0),
       guest,
       createdAt: Date.now(),
       status: 'confirmed',
       serviceLocation: 'at-home',
       paymentMethod,
+      offer: offerSnapshot,
+      guests: guestSnapshot.length > 0 ? guestSnapshot : undefined,
     };
     addBooking(booking);
     setBookings(loadBookings());
     setCart({ items: [], updatedAt: Date.now() });
     setBookingResult(booking);
     return booking;
-  }, [cart, account, paymentMethod, getSelectedAddress]);
+  }, [cart, account, paymentMethod, getSelectedAddress, appliedOffer, guestProfiles]);
 
   const saveLightAccount = useCallback((next: LightAccount) => {
     saveAccount(next);
@@ -362,6 +541,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(() => {
     clearAccount();
     setAccount(null);
+    setGuestProfiles([]);
+    clearGuests();
   }, []);
 
   // openCart picks a sensible default based on cart state, and when opening
@@ -495,8 +676,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     addToCart,
     addJourneyToCart,
     removeItem,
-    updateStylistPref,
+    updateTherapistPref,
     clearAll,
+    appliedOffer,
+    setPendingOffer,
+    clearPendingOffer,
+    celebrationTriggerAt,
+    guestProfiles,
+    addGuestProfile,
+    updateGuestProfile,
+    removeGuestProfile,
+    setItemGuest,
+    getGuestForItem,
     updateDraftCheckout,
     confirmBooking,
     getSelectedAddress,
@@ -514,12 +705,19 @@ export function useCart(): CartContextValue {
 }
 
 export function useCartTotals() {
-  const { cart } = useCart();
+  const { cart, appliedOffer } = useCart();
   return useMemo(() => {
     const totalPrice = cart.items.reduce((s, i) => s + i.price, 0);
     const totalDuration = cart.items.reduce((s, i) => s + i.durationMin, 0);
-    return { totalPrice, totalDuration, count: cart.items.length };
-  }, [cart]);
+    const discount = calculateDiscount(totalPrice, appliedOffer);
+    return {
+      totalPrice,
+      totalDuration,
+      count: cart.items.length,
+      discount,
+      subtotalAfterDiscount: totalPrice - discount,
+    };
+  }, [cart, appliedOffer]);
 }
 
 export function formatAed(value: number): string {

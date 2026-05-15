@@ -193,8 +193,19 @@ export function AtHomePage() {
       className="min-h-screen bg-bg-dark text-white pb-28 lg:pb-16"
       style={{ paddingTop: 'var(--nav-offset, 0px)' }}
     >
-      {/* Sticky filter bar — back link, audience toggle, category chips. No
-          intro block above; the bar is the top of the page after global nav. */}
+      {/* Exclusivity strapline — scrolls away as users move into the filter
+          bar and service list. */}
+      <div className="px-6 lg:px-16 pt-5 pb-4">
+        <p className="text-[11px] uppercase tracking-[0.2em] text-accent-gold mb-1">
+          Ra at Home
+        </p>
+        <p className="text-sm lg:text-base text-white/70 italic max-w-prose">
+          Currently available exclusively to residents of Imperial Avenue
+          Residences.
+        </p>
+      </div>
+
+      {/* Sticky filter bar — back link, audience toggle, category chips. */}
       <div
         ref={filterRef}
         className="sticky z-30 bg-bg-dark/95 backdrop-blur-md border-b border-white/5 pt-4 pb-4"
