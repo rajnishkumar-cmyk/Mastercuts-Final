@@ -6,6 +6,7 @@ import { JourneyPage } from './pages/JourneyPage';
 import { ExplorePage } from './pages/ExplorePage';
 import { AtHomePage } from './pages/AtHomePage';
 import { WellnessHubPage } from './pages/WellnessHubPage';
+import { TermsPage } from './pages/TermsPage';
 import { CartProvider } from './components/cart/CartProvider';
 import { CartDrawer } from './components/cart/CartDrawer';
 import { CartCheckoutOverlay } from './components/cart/CartCheckoutOverlay';
@@ -33,6 +34,7 @@ function App() {
             <Route path="/at-home" element={<AtHomePage />} />
             <Route path="/wellness-hub" element={<WellnessHubPage />} />
             <Route path="/journeys/:id" element={<JourneyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
           </Routes>
 
           {/* Global surfaces */}

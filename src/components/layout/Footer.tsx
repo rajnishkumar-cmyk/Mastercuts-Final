@@ -1,25 +1,18 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Instagram, Linkedin } from 'lucide-react';
+import { Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 import { useCart } from '@/components/cart/CartProvider';
 import { useAudience } from '@/components/services/useAudience';
 
-interface Location {
-  name: string;
-  address: string;
-  phone: string;
-  hours: string;
-}
-
-const locations: Location[] = [
-  {
-    name: 'Downtown',
-    address: '100 Main Street Suite 101, City Center, FL 33180',
-    phone: '(305) 555-0100',
-    hours: 'Mo-Th 8:30 am - 7:00 pm\nFriday 8:30 am - 8:00 pm'
-  }
-];
+const STUDIO_ADDRESS = 'R05 Imperial Avenue, Burj Khalifa Street, Downtown Dubai';
+const STUDIO_PHONE = '+971 56 466 7165';
+const STUDIO_PHONE_HREF = '+971564667165';
+const STUDIO_EMAIL = 'ask@mastercuts.ae';
+const STUDIO_HOURS = '10:00 AM – 10:00 PM · Monday – Sunday';
+const AT_HOME_HOURS = '10:00 AM – 8:00 PM · Monday – Sunday';
+const STORE_MAP_SRC =
+  'https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3610.4484125620006!2d55.2738043!3d25.1880962!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f690dc8f8025d%3A0xb76a5aca87edadd3!2sMastercuts%20Beauty%20Salon!5e0!3m2!1sen!2sin!4v1779082369113!5m2!1sen!2sin';
 
 export function Footer() {
   const ref = useRef(null);
@@ -200,26 +193,81 @@ export function Footer() {
             </div>
           </motion.div>
 
-          {/* Location */}
+          {/* Contact */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.7 }}
             className="lg:col-span-1"
           >
-            <p className="text-white/50 text-sm mb-6">Location</p>
-            <div className="space-y-6">
-              {locations.map((location) => (
-                <div key={location.name} className="border-l border-white/20 pl-4">
-                  <p className="text-white font-medium mb-1">{location.name}</p>
-                  <p className="text-white/50 text-sm mb-1">{location.address}</p>
-                  <p className="text-white text-sm">{location.phone}</p>
-                  <p className="text-white/50 text-xs whitespace-pre-line mt-1">{location.hours}</p>
-                </div>
-              ))}
+            <p className="text-white/50 text-sm mb-6">Contact</p>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <MapPin className="w-4 h-4 text-accent-gold shrink-0 mt-1" />
+                <p className="text-white text-sm leading-relaxed">
+                  {STUDIO_ADDRESS}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Phone className="w-4 h-4 text-accent-gold shrink-0" />
+                <a
+                  href={`tel:${STUDIO_PHONE_HREF}`}
+                  className="text-white text-sm hover:text-white/70 transition-colors"
+                >
+                  {STUDIO_PHONE}
+                </a>
+              </div>
+              <div className="flex items-center gap-3">
+                <Mail className="w-4 h-4 text-accent-gold shrink-0" />
+                <a
+                  href={`mailto:${STUDIO_EMAIL}`}
+                  className="text-white text-sm hover:text-white/70 transition-colors"
+                >
+                  {STUDIO_EMAIL}
+                </a>
+              </div>
+              <div className="pt-2 border-t border-white/10 space-y-1">
+                <p className="text-[10px] uppercase tracking-[0.18em] text-white/40">
+                  Studio hours
+                </p>
+                <p className="text-white/80 text-xs leading-snug">{STUDIO_HOURS}</p>
+                <p className="text-[10px] uppercase tracking-[0.18em] text-white/40 pt-2">
+                  At-home hours (transition)
+                </p>
+                <p className="text-white/80 text-xs leading-snug">{AT_HOME_HOURS}</p>
+              </div>
             </div>
           </motion.div>
         </div>
+
+        {/* Studio map — the actual store currently being revamped. The
+            Imperial Avenue location is for at-home services delivery only
+            during the transition period. */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="mt-12 pt-12 border-t border-white/10"
+        >
+          <div className="flex items-baseline justify-between gap-4 mb-4 flex-wrap">
+            <p className="text-white/50 text-sm">Visit the studio</p>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold">
+              Currently being revamped · Opening soon
+            </p>
+          </div>
+          <div className="rounded-2xl overflow-hidden border border-white/10 aspect-[16/9] md:aspect-[21/9]">
+            <iframe
+              title="Map of Mastercuts Beauty Salon"
+              src={STORE_MAP_SRC}
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </div>
+        </motion.div>
 
         {/* Copyright */}
         <motion.div
@@ -234,15 +282,20 @@ export function Footer() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 text-sm items-center sm:items-start">
-            <a href="#" className="text-white/50 hover:text-white transition-colors duration-200">
+            <button
+              type="button"
+              onClick={() => navigate('/terms')}
+              className="text-white/50 hover:text-white transition-colors duration-200"
+            >
+              Terms &amp; Conditions
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/terms')}
+              className="text-white/50 hover:text-white transition-colors duration-200"
+            >
               Privacy Policy
-            </a>
-            <a href="#" className="text-white/50 hover:text-white transition-colors duration-200">
-              Accessibility Statement
-            </a>
-            <a href="#" className="text-white/50 hover:text-white transition-colors duration-200">
-              Terms & Conditions
-            </a>
+            </button>
           </div>
 
           <p className="text-white/50 text-sm">

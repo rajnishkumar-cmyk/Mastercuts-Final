@@ -10,7 +10,7 @@ import {
 import { cn } from '@/lib/utils';
 
 const STORAGE_KEY = 'ra-membership-requests';
-const WHATSAPP_PHONE = '97145550100';
+const WHATSAPP_PHONE = '971564667165';
 
 const PHONE_REGEX = /^\+971\s?\d{2}\s?\d{3}\s?\d{4}$|^05\d\s?\d{3}\s?\d{4}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -190,7 +190,7 @@ export function WellnessHubPage() {
               <p className="text-sm text-text-secondary leading-relaxed max-w-md mx-auto mb-8">
                 Our concierge team will reach out within 24 hours to walk you
                 through the Hub. If WhatsApp didn't open automatically, you can
-                also message us directly at +971 4 555 0100.
+                also message us directly at +971 56 466 7165.
               </p>
               <button
                 type="button"

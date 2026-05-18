@@ -1,9 +1,10 @@
-import type { Cart, LightAccount, BookingRecord, GuestProfile } from './types';
+import type { Cart, LightAccount, BookingRecord, GuestProfile, WaitlistRequest } from './types';
 
 const CART_KEY = 'ra-cart-v2';
 const ACCOUNT_KEY = 'ra-account-v1';
 const BOOKINGS_KEY = 'ra-bookings-v1';
 const GUESTS_KEY = 'ra-guests-v1';
+const WAITLIST_KEY = 'ra-waitlist-v1';
 
 const CART_TTL_MS = 24 * 60 * 60 * 1000; // 24h
 
@@ -124,4 +125,21 @@ export function clearGuests(): void {
   window.localStorage.removeItem(GUESTS_KEY);
 }
 
-export { CART_KEY, ACCOUNT_KEY, BOOKINGS_KEY, GUESTS_KEY, storageAvailable };
+// ---------- WAITLIST ----------
+
+export function loadWaitlist(): WaitlistRequest[] {
+  if (!storageAvailable) return [];
+  return safeParse<WaitlistRequest[]>(window.localStorage.getItem(WAITLIST_KEY)) ?? [];
+}
+
+export function saveWaitlist(list: WaitlistRequest[]): void {
+  if (!storageAvailable) return;
+  window.localStorage.setItem(WAITLIST_KEY, JSON.stringify(list));
+}
+
+export function clearWaitlist(): void {
+  if (!storageAvailable) return;
+  window.localStorage.removeItem(WAITLIST_KEY);
+}
+
+export { CART_KEY, ACCOUNT_KEY, BOOKINGS_KEY, GUESTS_KEY, WAITLIST_KEY, storageAvailable };

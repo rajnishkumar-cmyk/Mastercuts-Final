@@ -184,40 +184,34 @@ export function RitualPage() {
         </div>
       </section>
 
-      {/* ───────── Specialists ───────── */}
+      {/* ───────── Therapists — name + designation only, per client direction. */}
       {therapists.length > 0 && (
         <section className="py-24 lg:py-32 px-6 lg:px-16">
           <div className="max-w-5xl mx-auto">
-            <div className="mb-14 lg:mb-20">
+            <div className="mb-12 lg:mb-16">
               <p className="text-[11px] uppercase tracking-[0.22em] text-white/50 mb-3">
                 The hands
               </p>
               <h2 className="font-serif text-4xl lg:text-6xl leading-none">
-                Meet your <span className="italic">specialists</span>
+                Performed by your <span className="italic">therapists</span>
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-12">
+            <ul className="divide-y divide-white/10 border-y border-white/10">
               {therapists.map((therapist) => (
-                <div key={therapist.id} className="group">
-                  <div className="aspect-[3/4] overflow-hidden mb-5">
-                    <img
-                      src={therapist.image}
-                      alt={therapist.name}
-                      className="w-full h-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
-                    />
-                  </div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-white/50 mb-1">
+                <li
+                  key={therapist.id}
+                  className="flex items-baseline justify-between gap-6 py-5"
+                >
+                  <h3 className="font-serif text-2xl lg:text-3xl text-white leading-tight">
+                    {therapist.name}
+                  </h3>
+                  <p className="shrink-0 text-[11px] lg:text-xs uppercase tracking-[0.22em] text-white/60 text-right">
                     {therapist.title}
                   </p>
-                  <h3 className="font-serif text-2xl text-white mb-3">{therapist.name}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed mb-3">{therapist.bio}</p>
-                  <p className="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                    {therapist.languages.join(' · ')}
-                  </p>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </section>
       )}

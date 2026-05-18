@@ -14,6 +14,18 @@ function hashString(s: string): number {
   return Math.abs(h);
 }
 
+// QA override — when `?qa=full` is present in the URL, every slot is marked
+// unavailable and every therapist is flagged busy. Used to demo and verify
+// the waitlist flow without hunting for a naturally-full date.
+function isQaFullMode(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return new URLSearchParams(window.location.search).get('qa') === 'full';
+  } catch {
+    return false;
+  }
+}
+
 export function toDateKey(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -43,6 +55,7 @@ function formatTime(hour: number, min: number): { time: string; label: string } 
 export function getSlotsForDate(dateKey: string, totalDurationMin: number): TimeSlot[] {
   const slots: TimeSlot[] = [];
   const seed = hashString(dateKey);
+  const qaFull = isQaFullMode();
 
   const now = new Date();
   const todayKey = toDateKey(now);
@@ -55,9 +68,10 @@ export function getSlotsForDate(dateKey: string, totalDurationMin: number): Time
       const minutesUntilClose = (CLOSE_HOUR - OPEN_HOUR) * 60 - minutesFromOpen;
       if (minutesUntilClose < totalDurationMin) continue;
 
-      // Deterministic "busy" pattern — ~30% of slots unavailable
+      // Deterministic "busy" pattern — ~30% of slots unavailable.
+      // QA override forces every slot to unavailable.
       const slotSeed = (seed + minutesFromOpen * 17) % 100;
-      let available = slotSeed > 30;
+      let available = qaFull ? false : slotSeed > 30;
 
       if (isToday) {
         const [Y, M, D] = dateKey.split('-').map(Number);
@@ -102,4 +116,17 @@ export function isDatePast(d: Date): boolean {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return d.getTime() < today.getTime();
+}
+
+// Mock per-therapist day-busy lookup. Deterministic across reloads so the
+// demo is stable. ~25% of (therapist, date) combinations are flagged "busy".
+// Real per-therapist scheduling lives on the backend later.
+// `?qa=full` forces every therapist to read as busy regardless of date.
+export function isTherapistBusyOnDate(
+  therapistId: string,
+  dateKey: string
+): boolean {
+  if (isQaFullMode()) return true;
+  const h = hashString(`${therapistId}::${dateKey}`);
+  return h % 100 < 25;
 }

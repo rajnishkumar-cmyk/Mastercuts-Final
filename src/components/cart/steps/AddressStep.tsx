@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { MapPin, Pencil, Home, Building, Plus, Check } from 'lucide-react';
+import { Pencil, Home, Building, Plus, Check } from 'lucide-react';
 import { useCart } from '../CartProvider';
 import { cn } from '@/lib/utils';
 import type { ServiceAddress } from '@/lib/booking/types';
@@ -31,10 +31,14 @@ export function AddressStep() {
     savedAddresses[0]?.id ?? ''
   );
   const [label, setLabel] = useState<'home' | 'other'>('home');
+  // When set, the form is editing an existing saved address rather than
+  // creating a new one. Reset to null on cancel/return-to-select.
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isValid },
   } = useForm<AddressFormValues>({
     resolver: zodResolver(addressSchema),
@@ -45,15 +49,45 @@ export function AddressStep() {
     mode: 'onChange',
   });
 
+  const startEdit = (addr: ServiceAddress) => {
+    setEditingAddressId(addr.id);
+    setLabel(addr.label);
+    setValue('flatVilla', addr.flatVilla, { shouldValidate: true });
+    setValue('landmark', addr.landmark ?? '');
+    setMode('new');
+  };
+
   const onSubmitNew = handleSubmit((values) => {
     if (!account) return;
+
+    if (editingAddressId) {
+      // Update an existing saved address in place.
+      const updatedAccount = {
+        ...account,
+        addresses: account.addresses.map((a) =>
+          a.id === editingAddressId
+            ? {
+                ...a,
+                flatVilla: values.flatVilla,
+                landmark: values.landmark || undefined,
+                label,
+              }
+            : a
+        ),
+      };
+      saveLightAccount(updatedAccount);
+      updateDraftCheckout({ addressId: editingAddressId });
+      setEditingAddressId(null);
+      setCheckoutStep('date-time');
+      return;
+    }
 
     const newAddress: ServiceAddress = {
       id: crypto.randomUUID(),
       flatVilla: values.flatVilla,
       landmark: values.landmark || undefined,
       label,
-      displayAddress: 'Dubai Marina, Dubai',
+      displayAddress: 'Imperial Avenue Residences, Downtown Dubai',
     };
 
     // Save address to account
@@ -90,48 +124,64 @@ export function AddressStep() {
           </p>
 
           <div className="space-y-3">
-            {savedAddresses.map((addr) => (
-              <button
-                key={addr.id}
-                type="button"
-                onClick={() => setSelectedAddressId(addr.id)}
-                className={cn(
-                  'w-full flex items-center gap-3 p-4 rounded-xl border transition-colors text-left',
-                  selectedAddressId === addr.id
-                    ? 'border-bg-dark bg-bg-dark/5'
-                    : 'border-black/10 hover:border-black/20'
-                )}
-              >
+            {savedAddresses.map((addr) => {
+              const isSelected = selectedAddressId === addr.id;
+              return (
                 <div
+                  key={addr.id}
                   className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
-                    selectedAddressId === addr.id
-                      ? 'bg-bg-dark text-white'
-                      : 'bg-black/5 text-text-secondary'
+                    'flex items-stretch gap-2 rounded-xl border transition-colors',
+                    isSelected
+                      ? 'border-bg-dark bg-bg-dark/5'
+                      : 'border-black/10 hover:border-black/20'
                   )}
                 >
-                  {addr.label === 'home' ? (
-                    <Home className="w-4 h-4" />
-                  ) : (
-                    <Building className="w-4 h-4" />
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedAddressId(addr.id)}
+                    aria-pressed={isSelected}
+                    className="flex-1 flex items-center gap-3 p-4 text-left min-w-0"
+                  >
+                    <div
+                      className={cn(
+                        'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
+                        isSelected
+                          ? 'bg-bg-dark text-white'
+                          : 'bg-black/5 text-text-secondary'
+                      )}
+                    >
+                      {addr.label === 'home' ? (
+                        <Home className="w-4 h-4" />
+                      ) : (
+                        <Building className="w-4 h-4" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-text-primary capitalize">
+                        {addr.label}
+                      </p>
+                      <p className="text-xs text-text-secondary truncate">
+                        {addr.displayAddress}
+                        {addr.flatVilla ? ` · Flat ${addr.flatVilla}` : ''}
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <div className="w-5 h-5 rounded-full bg-bg-dark flex items-center justify-center shrink-0">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => startEdit(addr)}
+                    aria-label={`Edit ${addr.label} address`}
+                    className="shrink-0 self-stretch px-3 flex items-center justify-center text-text-secondary hover:text-text-primary border-l border-black/10 hover:bg-black/[0.03] transition-colors"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-text-primary capitalize">
-                    {addr.label}
-                  </p>
-                  <p className="text-xs text-text-secondary truncate">
-                    {addr.displayAddress}
-                    {addr.flatVilla ? ` · Flat ${addr.flatVilla}` : ''}
-                  </p>
-                </div>
-                {selectedAddressId === addr.id && (
-                  <div className="w-5 h-5 rounded-full bg-bg-dark flex items-center justify-center shrink-0">
-                    <Check className="w-3 h-3 text-white" />
-                  </div>
-                )}
-              </button>
-            ))}
+              );
+            })}
 
             {/* Add new address */}
             <button
@@ -167,23 +217,28 @@ export function AddressStep() {
     );
   }
 
-  // Mode A: New address form
+  // Mode A: New / Edit address form
+  const isEditing = !!editingAddressId;
   return (
     <form onSubmit={onSubmitNew} className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4">
         <p className="text-[10px] uppercase tracking-[0.2em] text-text-secondary mb-3">
-          Service address
+          {isEditing ? 'Edit address' : 'Service address'}
         </p>
         <h2 className="font-serif text-3xl text-text-primary leading-[1.05] mb-1">
-          Where should <span className="italic">we come?</span>
+          {isEditing ? (
+            <>Update your <span className="italic">address</span></>
+          ) : (
+            <>Where should <span className="italic">we come?</span></>
+          )}
         </h2>
         <p className="text-sm text-text-secondary mb-6">
-          Our team will come to you. Please provide your address in Dubai.
+          Our therapist will come to you at Imperial Avenue Residences.
         </p>
 
         {/* Studio map — for orientation. The therapist comes to the address
             entered below; this just shows where the Ra studio is located. */}
-        <div className="rounded-2xl overflow-hidden border border-black/10 mb-3 aspect-[4/3] sm:aspect-[16/9]">
+        <div className="rounded-2xl overflow-hidden border border-black/10 mb-6 aspect-[4/3] sm:aspect-[16/9]">
           <iframe
             title="Map of Ra by Mastercuts, Imperial Avenue, Downtown Dubai"
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3610.439726790797!2d55.27167767538154!3d25.188389277716638!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x672b374be124f7d5%3A0xefae5da9eed44c44!2sImperial%20Avenue%2C%20Downtown%20Dubai!5e0!3m2!1sen!2sin!4v1778785289318!5m2!1sen!2sin"
@@ -196,35 +251,24 @@ export function AddressStep() {
           />
         </div>
 
-        {/* Studio address — hyperlinked so users can open in their native Maps app */}
-        <a
-          href="https://maps.app.goo.gl/Fz9w2aCrn2VStaxi7"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group flex items-center justify-between bg-black/[0.03] hover:bg-black/[0.06] rounded-xl p-3 mb-6 transition-colors"
-        >
-          <div className="flex items-center gap-2 min-w-0">
-            <MapPin className="w-4 h-4 text-text-secondary shrink-0" />
-            <p className="text-sm text-text-primary truncate">
-              Imperial Avenue, Downtown Dubai
-            </p>
-          </div>
-          <span className="text-[11px] text-text-secondary group-hover:text-text-primary transition-colors shrink-0">
-            Open in Maps →
-          </span>
-        </a>
-
         <div className="space-y-5">
           <div>
             <label className="block text-xs uppercase tracking-wider text-text-secondary mb-2">
-              House / flat number
+              Flat number{' '}
+              <span className="text-accent-gold normal-case tracking-normal">
+                (Imperial Avenue Residences)
+              </span>
             </label>
             <input
               {...register('flatVilla')}
-              placeholder="e.g. 2401"
+              placeholder="e.g. R05-1502"
               autoFocus
               className="w-full bg-transparent border-b border-black/15 py-2.5 text-text-primary focus:border-text-primary outline-none transition-colors"
             />
+            <p className="mt-2 text-[11px] text-text-secondary">
+              Ra at Home is available exclusively to residents of Imperial
+              Avenue Residences during this transition period.
+            </p>
             {errors.flatVilla && (
               <p className="text-xs text-red-600 mt-1">{errors.flatVilla.message}</p>
             )}
@@ -317,7 +361,7 @@ export function AddressStep() {
               : 'bg-black/10 text-text-muted cursor-not-allowed'
           )}
         >
-          Save and proceed to slots
+          {isEditing ? 'Save changes and continue' : 'Save and proceed to slots'}
         </button>
       </div>
     </form>

@@ -169,11 +169,11 @@ export function DesktopMenu({ open, onClose }: DesktopMenuProps) {
 
                 <motion.div variants={itemVariants} className="space-y-6 mt-12">
                   <a
-                    href="tel:+97145550100"
+                    href="tel:+971564667165"
                     className="flex items-center gap-3 text-white/70 hover:text-white transition-colors"
                   >
                     <Phone className="w-4 h-4" />
-                    <span className="text-sm font-medium">+971 4 555 0100</span>
+                    <span className="text-sm font-medium">+971 56 466 7165</span>
                     <span className="text-xs text-white/40">Dubai</span>
                   </a>
                 </motion.div>

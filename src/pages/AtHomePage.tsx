@@ -25,28 +25,29 @@ interface Group {
 const GROUPS: Group[] = [
   {
     id: 'massage',
-    title: 'Massage',
-    italic: '& Recovery',
-    tagline: 'Somatic',
-    description: 'Signature, hot stone, lymphatic, and prenatal — brought into your home.',
+    title: 'Body Rituals',
+    italic: 'Massages',
+    tagline: 'Wellness',
+    description:
+      'Signature, deep tissue, Balinese, Swedish and aromatherapy — brought into your home.',
     icon: Sparkles,
     matches: (id) => id.startsWith('somatic-'),
   },
   {
     id: 'nails',
-    title: 'Nail',
-    italic: 'Care',
-    tagline: 'Alchemic',
-    description: 'Manicure, pedicure, nail art, and warm paraffin — meticulous and unhurried.',
+    title: 'Hand & Feet',
+    italic: 'Rituals',
+    tagline: 'Coming soon',
+    description: 'Manicure, pedicure and care rituals — launching ahead of full studio opening.',
     icon: Wand2,
     matches: (id) => id.startsWith('alchemic-'),
   },
   {
     id: 'threading',
     title: 'Threading',
-    italic: '',
-    tagline: 'Velvet',
-    description: 'Precise brow, lip, and full-face shaping using cotton thread.',
+    italic: 'Rituals',
+    tagline: 'Coming soon',
+    description: 'Precise brow, lip and full-face shaping — launching ahead of full studio opening.',
     icon: Feather,
     matches: (id) => id.startsWith('velvet-threading-'),
   },
@@ -117,7 +118,13 @@ export function AtHomePage() {
         ? allItems.filter((s) => matchesQuery(s.name) || matchesQuery(s.description))
         : allItems;
       return { group: g, items };
-    }).filter((g) => g.items.length > 0);
+    }).filter((g) => {
+      // When a search query is active, hide groups with zero matches so the
+      // results list isn't padded with empty cards. With no query, show all
+      // groups so coming-soon categories stay visible with their chip + a
+      // "Coming soon" placeholder inside the section.
+      return debouncedQuery ? g.items.length > 0 : true;
+    });
   }, [services, debouncedQuery]);
 
   useLayoutEffect(() => {
@@ -349,9 +356,20 @@ export function AtHomePage() {
                 </p>
               </div>
               <div className="space-y-4">
-                {items.map((svc) => (
-                  <ServiceCard key={svc.id} service={svc} />
-                ))}
+                {items.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-10 text-center">
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold mb-3">
+                      Coming soon
+                    </p>
+                    <p className="text-white/70 text-sm leading-relaxed max-w-sm mx-auto">
+                      We're finalising this menu. {group.title} {group.italic} will be available shortly — check back ahead of the full studio opening.
+                    </p>
+                  </div>
+                ) : (
+                  items.map((svc) => (
+                    <ServiceCard key={svc.id} service={svc} />
+                  ))
+                )}
               </div>
             </div>
           </section>

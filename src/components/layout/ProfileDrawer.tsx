@@ -1,4 +1,4 @@
-import { X, LogOut, User as UserIcon, Users } from 'lucide-react';
+import { Bell, X, LogOut, User as UserIcon, Users } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -14,7 +14,18 @@ function formatDateLabel(key: string): string {
 }
 
 export function ProfileDrawer() {
-  const { surface, closeAll, account, bookings, openCart, signOut, openLogin, guestProfiles } = useCart();
+  const {
+    surface,
+    closeAll,
+    account,
+    bookings,
+    openCart,
+    signOut,
+    openLogin,
+    guestProfiles,
+    waitlistRequests,
+    removeWaitlistRequest,
+  } = useCart();
   const isMobile = useIsMobile();
   const open = surface === 'profile';
   const side = isMobile ? 'bottom' : 'right';
@@ -130,6 +141,44 @@ export function ProfileDrawer() {
                   <p className="mt-3 text-[11px] text-text-secondary">
                     Add or pick a guest from any cart item.
                   </p>
+                </section>
+              )}
+
+              {/* On the waitlist — pending notify-me requests */}
+              {waitlistRequests.length > 0 && (
+                <section>
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-text-secondary mb-3 flex items-center gap-2">
+                    <Bell className="w-3 h-3" strokeWidth={1.5} />
+                    On the waitlist
+                  </p>
+                  <ul className="space-y-2">
+                    {waitlistRequests.map((r) => (
+                      <li
+                        key={r.id}
+                        className="flex items-center gap-3 py-2 border-b border-black/5"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm text-text-primary truncate">
+                            {formatDateLabel(r.preferredDate)}
+                          </p>
+                          <p className="text-xs text-text-secondary truncate">
+                            {r.preferredTherapistName ?? 'Any therapist'}
+                            {r.preferredTimeOfDay && r.preferredTimeOfDay !== 'any'
+                              ? ` · ${r.preferredTimeOfDay}`
+                              : ''}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeWaitlistRequest(r.id)}
+                          aria-label="Remove waitlist entry"
+                          className="shrink-0 w-7 h-7 rounded-full bg-black/5 flex items-center justify-center text-text-secondary hover:bg-black/10 hover:text-text-primary transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
                 </section>
               )}
 

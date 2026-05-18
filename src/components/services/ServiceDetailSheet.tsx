@@ -328,32 +328,30 @@ export function ServiceDetailSheet() {
                 </div>
               </section>
 
-              {/* Specialists */}
+              {/* Therapists — name + designation only, no photos per client. */}
               {therapists.length > 0 && (
                 <section className="pt-10 border-t border-white/5">
                   <p className="text-[10px] uppercase tracking-[0.22em] text-white/50 mb-3">
                     The hands
                   </p>
-                  <h2 className="font-serif text-3xl lg:text-4xl leading-tight mb-8">
-                    Performed by your <span className="italic">specialists</span>
+                  <h2 className="font-serif text-3xl lg:text-4xl leading-tight mb-6">
+                    Performed by your <span className="italic">therapists</span>
                   </h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                  <ul className="divide-y divide-white/10 border-y border-white/10">
                     {therapists.map((therapist) => (
-                      <div key={therapist.id}>
-                        <div className="aspect-[3/4] overflow-hidden mb-3">
-                          <img
-                            src={therapist.image}
-                            alt={therapist.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <p className="text-[10px] uppercase tracking-[0.22em] text-white/50 mb-1">
+                      <li
+                        key={therapist.id}
+                        className="flex items-baseline justify-between gap-4 py-4"
+                      >
+                        <h3 className="font-serif text-lg lg:text-xl text-white leading-tight">
+                          {therapist.name}
+                        </h3>
+                        <p className="shrink-0 text-[10px] uppercase tracking-[0.22em] text-white/60 text-right">
                           {therapist.title}
                         </p>
-                        <h3 className="font-serif text-lg text-white">{therapist.name}</h3>
-                      </div>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </section>
               )}
 

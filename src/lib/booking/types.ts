@@ -57,8 +57,8 @@ export interface Therapist {
   title: string;
   ritualIds: RitualId[];
   languages: string[];
-  image: string;
-  bio: string;
+  image?: string;
+  bio?: string;
 }
 
 export interface Package {
@@ -104,6 +104,23 @@ export interface GuestProfile {
   // True for the auto-created profile derived from the account holder.
   // Always pinned to the top of the picker list.
   isSelf?: boolean;
+}
+
+export type WaitlistSource = 'date-full' | 'therapist-unavailable';
+export type WaitlistTimeOfDay = 'morning' | 'afternoon' | 'evening' | 'any';
+
+export interface WaitlistRequest {
+  id: string;
+  createdAt: number;
+  guestName: string;
+  guestPhone: string;
+  preferredDate: string; // YYYY-MM-DD
+  preferredTimeOfDay?: WaitlistTimeOfDay;
+  preferredTherapistId?: string;
+  // Snapshot in case the therapist is renamed later.
+  preferredTherapistName?: string;
+  notes?: string;
+  source: WaitlistSource;
 }
 
 export interface ServiceAddress {
@@ -152,7 +169,7 @@ export interface BookingRecord {
   createdAt: number;
   status: 'confirmed' | 'cancelled';
   serviceLocation: 'at-home';
-  paymentMethod: 'cash' | 'card';
+  paymentMethod: 'card' | 'apple-pay';
   offer?: {
     id: string;
     name: string;

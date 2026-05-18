@@ -1,13 +1,15 @@
-import { Banknote, Check, CreditCard, X } from 'lucide-react';
+import { Check, CreditCard, Smartphone, X } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useCart } from '@/components/cart/CartProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
+type PaymentMethod = 'card' | 'apple-pay';
+
 interface BodyProps {
-  selected: 'cash' | 'card';
-  onSelect: (method: 'cash') => void;
+  selected: PaymentMethod;
+  onSelect: (method: PaymentMethod) => void;
   onClose: () => void;
 }
 
@@ -33,57 +35,63 @@ function Body({ selected, onSelect, onClose }: BodyProps) {
       </DialogTitle>
 
       <div className="space-y-3">
-        {/* Cash */}
+        {/* Card */}
         <button
           type="button"
-          onClick={() => onSelect('cash')}
+          onClick={() => onSelect('card')}
           className={cn(
             'w-full flex items-center gap-4 px-5 py-4 rounded-2xl border text-left transition-colors',
-            selected === 'cash'
+            selected === 'card'
               ? 'border-accent-gold bg-bg-primary'
               : 'border-black/10 hover:border-black/30 bg-bg-primary',
           )}
         >
           <div className="w-11 h-11 rounded-full bg-circle-light flex items-center justify-center text-accent-gold shrink-0">
-            <Banknote className="w-5 h-5" strokeWidth={1.5} />
+            <CreditCard className="w-5 h-5" strokeWidth={1.5} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-serif text-lg text-text-primary leading-tight">Cash</p>
+            <p className="font-serif text-lg text-text-primary leading-tight">Card</p>
             <p className="text-xs text-text-secondary mt-0.5">
-              Pay when your therapist arrives.
+              Pay on arrival via card machine.
             </p>
           </div>
-          {selected === 'cash' && (
+          {selected === 'card' && (
             <span className="shrink-0 w-7 h-7 rounded-full bg-accent-gold text-bg-dark flex items-center justify-center">
               <Check className="w-3.5 h-3.5" strokeWidth={2.5} />
             </span>
           )}
         </button>
 
-        {/* Card (disabled) */}
-        <div
-          aria-disabled
-          className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl border border-black/10 bg-bg-primary opacity-50 cursor-not-allowed"
+        {/* Apple Pay */}
+        <button
+          type="button"
+          onClick={() => onSelect('apple-pay')}
+          className={cn(
+            'w-full flex items-center gap-4 px-5 py-4 rounded-2xl border text-left transition-colors',
+            selected === 'apple-pay'
+              ? 'border-accent-gold bg-bg-primary'
+              : 'border-black/10 hover:border-black/30 bg-bg-primary',
+          )}
         >
-          <div className="w-11 h-11 rounded-full bg-circle-light flex items-center justify-center text-text-secondary shrink-0">
-            <CreditCard className="w-5 h-5" strokeWidth={1.5} />
+          <div className="w-11 h-11 rounded-full bg-circle-light flex items-center justify-center text-accent-gold shrink-0">
+            <Smartphone className="w-5 h-5" strokeWidth={1.5} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-serif text-lg text-text-primary leading-tight flex items-center gap-2">
-              Card
-              <span className="text-[9px] uppercase tracking-[0.18em] bg-black/10 text-text-secondary px-1.5 py-0.5 rounded-full">
-                Soon
-              </span>
-            </p>
+            <p className="font-serif text-lg text-text-primary leading-tight">Apple Pay</p>
             <p className="text-xs text-text-secondary mt-0.5">
-              Saved cards and Apple Pay coming soon.
+              Tap to pay via the card machine on arrival.
             </p>
           </div>
-        </div>
+          {selected === 'apple-pay' && (
+            <span className="shrink-0 w-7 h-7 rounded-full bg-accent-gold text-bg-dark flex items-center justify-center">
+              <Check className="w-3.5 h-3.5" strokeWidth={2.5} />
+            </span>
+          )}
+        </button>
       </div>
 
       <p className="mt-6 text-[11px] text-text-secondary text-center leading-relaxed">
-        All prices in AED. Includes 5% VAT.
+        Payment is collected at the time of service. All prices in AED, inclusive of 5% VAT.
       </p>
     </div>
   );
@@ -98,7 +106,7 @@ export function PaymentMethodSheet() {
   } = useCart();
   const isMobile = useIsMobile();
 
-  const handleSelect = (method: 'cash') => {
+  const handleSelect = (method: PaymentMethod) => {
     setPaymentMethod(method);
     closePaymentMethod();
   };

@@ -7,7 +7,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
 const STORAGE_KEY = 'ra-membership-requests';
-const WHATSAPP_PHONE = '97145550100';
+const WHATSAPP_PHONE = '971564667165';
 
 const PHONE_REGEX = /^\+971\s?\d{2}\s?\d{3}\s?\d{4}$|^05\d\s?\d{3}\s?\d{4}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -114,7 +114,7 @@ function Body({ onClose }: BodyProps) {
             </h3>
             <p className="text-sm text-text-secondary leading-relaxed max-w-sm mx-auto mb-6">
               Our concierge will reach out within 24 hours. If WhatsApp didn't
-              open, you can also message us at +971 4 555 0100.
+              open, you can also message us at +971 56 466 7165.
             </p>
             <button
               type="button"

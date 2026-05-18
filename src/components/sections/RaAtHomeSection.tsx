@@ -31,14 +31,17 @@ interface Category {
   matches: (serviceId: string) => boolean;
 }
 
+// NOTE: titles and tagline (eyebrow) here must stay in sync with
+// `pages/AtHomePage.tsx` GROUPS so both surfaces label categories
+// identically.
 const CATEGORIES: Category[] = [
   {
     id: 'massage',
-    eyebrow: 'Somatic',
-    title: 'Massage',
-    italic: '& Recovery',
+    eyebrow: 'Wellness',
+    title: 'Body Rituals',
+    italic: 'Massages',
     description:
-      'Signature, hot stone, lymphatic, and prenatal — sixty to one-twenty minutes of restorative time, with no commute on either side.',
+      'Signature, deep tissue, Balinese, Swedish and aromatherapy — brought into your home.',
     icon: Sparkles,
     imageGents: '/assets/Images/side-view-man-getting-professional-massage.jpg',
     imageLadies: '/assets/Images/Massage%20Ladies%20final.jpg',
@@ -46,11 +49,11 @@ const CATEGORIES: Category[] = [
   },
   {
     id: 'nails',
-    eyebrow: 'Alchemic',
-    title: 'Nail',
-    italic: 'Care',
+    eyebrow: 'Coming soon',
+    title: 'Hand & Feet',
+    italic: 'Rituals',
     description:
-      'Manicure, pedicure, nail art, and warm paraffin — meticulous and unhurried, with hospital-grade tools we bring to you. Clean-formula gels.',
+      'Manicure, pedicure and care rituals — launching ahead of full studio opening.',
     icon: Wand2,
     imageGents:
       '/assets/Images/young-hispanic-man-relaxed-having-manicure-session-beauty-center.jpg',
@@ -59,13 +62,13 @@ const CATEGORIES: Category[] = [
   },
   {
     id: 'threading',
-    eyebrow: 'Velvet',
+    eyebrow: 'Coming soon',
     title: 'Threading',
-    italic: '',
+    italic: 'Rituals',
     description:
-      'Precise eyebrow, upper-lip, and full-face shaping using cotton thread. Quick, gentle, no heat or chemicals.',
+      'Precise brow, lip and full-face shaping — launching ahead of full studio opening.',
     icon: Feather,
-    imageGents: '', // not offered for gentlemen — hides from chip row + section
+    imageGents: '/assets/Images/young-woman-beauty-salon.jpg',
     imageLadies: '/assets/Images/young-woman-beauty-salon.jpg',
     matches: (id) => id.startsWith('velvet-threading-'),
   },
@@ -348,8 +351,13 @@ export function RaAtHomeSection() {
                   const list = cat ? servicesForCategory(cat).slice(0, 4) : [];
                   if (list.length === 0) {
                     return (
-                      <div className="rounded-xl border border-white/10 bg-white/[0.02] py-6 px-5 text-sm text-white/50 italic">
-                        No services available for this audience yet. Try switching the filter above.
+                      <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] py-8 px-5 text-center">
+                        <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold mb-2">
+                          Coming soon
+                        </p>
+                        <p className="text-sm text-white/70 leading-relaxed">
+                          Launching ahead of the full studio opening.
+                        </p>
                       </div>
                     );
                   }
@@ -436,8 +444,13 @@ export function RaAtHomeSection() {
                   const list = servicesForCategory(mobileCategory).slice(0, 4);
                   if (list.length === 0) {
                     return (
-                      <div className="rounded-xl border border-white/10 bg-white/[0.02] py-6 px-5 text-sm text-white/50 italic">
-                        No services available for this audience yet. Try switching the filter above.
+                      <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] py-8 px-5 text-center">
+                        <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold mb-2">
+                          Coming soon
+                        </p>
+                        <p className="text-sm text-white/70 leading-relaxed">
+                          Launching ahead of the full studio opening.
+                        </p>
                       </div>
                     );
                   }

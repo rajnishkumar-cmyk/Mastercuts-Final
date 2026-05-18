@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import type { Cart, CartItem, DraftCheckout, GuestDetails, GuestProfile, LightAccount, BookingRecord, RitualId, ServiceAddress } from '@/lib/booking/types';
+import type { Cart, CartItem, DraftCheckout, GuestDetails, GuestProfile, LightAccount, BookingRecord, RitualId, ServiceAddress, WaitlistRequest } from '@/lib/booking/types';
 import { getService, getJourney, getJourneyTotals } from '@/lib/booking/catalog';
 import {
   CART_KEY,
@@ -16,7 +16,11 @@ import {
   loadGuests,
   saveGuests,
   clearGuests,
+  loadWaitlist,
+  saveWaitlist,
+  clearWaitlist,
 } from '@/lib/booking/storage';
+import { toDateKey } from '@/lib/booking/availability';
 import { getOffer, isOfferActive, calculateDiscount, type Offer } from '@/lib/offers';
 
 const SELF_GUEST_ID = 'self';
@@ -59,8 +63,8 @@ interface CartContextValue {
   resetCheckout: () => void;
 
   // payment
-  paymentMethod: 'cash' | 'card';
-  setPaymentMethod: (m: 'cash' | 'card') => void;
+  paymentMethod: 'card' | 'apple-pay';
+  setPaymentMethod: (m: 'card' | 'apple-pay') => void;
 
   // layered modals (don't disturb the underlying surface)
   isContactEditOpen: boolean;
@@ -114,6 +118,13 @@ interface CartContextValue {
   setItemGuest: (itemId: string, guestId: string) => void;
   getGuestForItem: (item: CartItem) => GuestProfile | undefined;
 
+  // waitlist — persisted requests to be notified if a slot opens up on a
+  // specific date (with optional therapist preference).
+  waitlistRequests: WaitlistRequest[];
+  addWaitlistRequest: (input: Omit<WaitlistRequest, 'id' | 'createdAt'>) => WaitlistRequest;
+  removeWaitlistRequest: (id: string) => void;
+  hasWaitlistFor: (dateKey: string, therapistId?: string) => boolean;
+
   // checkout state
   updateDraftCheckout: (draft: Partial<DraftCheckout>) => void;
   confirmBooking: () => BookingRecord;
@@ -144,7 +155,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [surface, setSurface] = useState<Surface>('none');
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>('none');
   const [bookingResult, setBookingResult] = useState<BookingRecord | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'apple-pay'>('card');
   const [isContactEditOpen, setIsContactEditOpen] = useState(false);
   const [isPaymentMethodOpen, setIsPaymentMethodOpen] = useState(false);
   const [drawerStack, setDrawerStack] = useState<DrawerView[]>([]);
@@ -152,8 +163,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [audiencePickerDestination, setAudiencePickerDestination] = useState<string>('/explore');
   const [celebrationTriggerAt, setCelebrationTriggerAt] = useState<number | null>(null);
   const [guestProfiles, setGuestProfiles] = useState<GuestProfile[]>([]);
+  const [waitlistRequests, setWaitlistRequests] = useState<WaitlistRequest[]>([]);
   const hydratedRef = useRef(false);
   const guestsHydratedRef = useRef(false);
+  const waitlistHydratedRef = useRef(false);
   const cartItemCountRef = useRef(0);
 
   cartItemCountRef.current = cart.items.length;
@@ -170,8 +183,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setAccount(loadAccount());
     setBookings(loadBookings());
     setGuestProfiles(loadGuests());
+    // Drop waitlist entries whose preferred date has already passed so the
+    // list stays meaningful on return visits.
+    const todayKey = toDateKey(new Date());
+    const loadedWaitlist = loadWaitlist().filter(
+      (r) => r.preferredDate >= todayKey
+    );
+    setWaitlistRequests(loadedWaitlist);
     hydratedRef.current = true;
     guestsHydratedRef.current = true;
+    waitlistHydratedRef.current = true;
   }, []);
 
   // Persist cart whenever it changes (but not on the initial hydration pass)
@@ -454,6 +475,48 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     [guestProfiles]
   );
 
+  // Persist waitlist after hydration. Cleared key (not empty array) when the
+  // list is empty so the localStorage stays tidy.
+  useEffect(() => {
+    if (!waitlistHydratedRef.current) return;
+    if (waitlistRequests.length === 0) {
+      clearWaitlist();
+    } else {
+      saveWaitlist(waitlistRequests);
+    }
+  }, [waitlistRequests]);
+
+  const addWaitlistRequest = useCallback<CartContextValue['addWaitlistRequest']>(
+    (input) => {
+      const entry: WaitlistRequest = {
+        ...input,
+        id: crypto.randomUUID(),
+        createdAt: Date.now(),
+      };
+      setWaitlistRequests((prev) => [entry, ...prev]);
+      return entry;
+    },
+    []
+  );
+
+  const removeWaitlistRequest = useCallback((id: string) => {
+    setWaitlistRequests((prev) => prev.filter((r) => r.id !== id));
+  }, []);
+
+  const hasWaitlistFor = useCallback(
+    (dateKey: string, therapistId?: string): boolean => {
+      return waitlistRequests.some((r) => {
+        if (r.preferredDate !== dateKey) return false;
+        if (therapistId) {
+          return r.preferredTherapistId === therapistId;
+        }
+        // date-only query: match the date-full source (no therapist scope).
+        return !r.preferredTherapistId;
+      });
+    },
+    [waitlistRequests]
+  );
+
   const updateDraftCheckout = useCallback((draft: Partial<DraftCheckout>) => {
     setCart((prev) => ({
       ...prev,
@@ -543,6 +606,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setAccount(null);
     setGuestProfiles([]);
     clearGuests();
+    setWaitlistRequests([]);
+    clearWaitlist();
   }, []);
 
   // openCart picks a sensible default based on cart state, and when opening
@@ -587,7 +652,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const resetCheckout = useCallback(() => {
     setCheckoutStep('none');
     setBookingResult(null);
-    setPaymentMethod('cash');
+    setPaymentMethod('card');
   }, []);
   const openLogin = useCallback(() => {
     setSurface('login');
@@ -621,7 +686,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setServiceDetail(null);
     setCheckoutStep('none');
     setBookingResult(null);
-    setPaymentMethod('cash');
+    setPaymentMethod('card');
     setIsContactEditOpen(false);
     setIsPaymentMethodOpen(false);
   }, []);
@@ -688,6 +753,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     removeGuestProfile,
     setItemGuest,
     getGuestForItem,
+    waitlistRequests,
+    addWaitlistRequest,
+    removeWaitlistRequest,
+    hasWaitlistFor,
     updateDraftCheckout,
     confirmBooking,
     getSelectedAddress,

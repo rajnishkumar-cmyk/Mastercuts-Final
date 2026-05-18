@@ -8,7 +8,7 @@ import {
   type PanInfo,
 } from 'framer-motion';
 import { useState, useEffect, useCallback, type CSSProperties } from 'react';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/components/cart/CartProvider';
 
@@ -304,10 +304,18 @@ export function HeroSection() {
               className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 pt-24 pb-[max(2rem,env(safe-area-inset-bottom))] pointer-events-none"
             >
               <p className="text-[10px] uppercase tracking-[0.22em] text-white/80 mb-3 leading-[1.6] text-center">
-                Home services available
-                <br />
                 Studio opening soon
               </p>
+
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 border border-white/20 px-3 py-1.5 mb-5 backdrop-blur-md max-w-[90vw]">
+                <MapPin className="w-3 h-3 text-accent-gold shrink-0" />
+                <span className="text-[11px] text-white text-center">
+                  At-home services ·{' '}
+                  <span className="font-medium">
+                    Imperial Avenue Residences only
+                  </span>
+                </span>
+              </div>
 
               <AnimatePresence mode="wait">
                 <motion.img
@@ -418,11 +426,14 @@ export function HeroSection() {
               animate={isLoaded ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, ease: 'easeOut', delay: 1.2 }}
             >
-              <p className="text-sm text-white/60 mb-2">Based in:</p>
-              <div className="text-white font-medium">
-                <p>Downtown</p>
-                <p>Marina District</p>
-                <p>Uptown</p>
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/20 px-4 py-2 backdrop-blur-md">
+                <MapPin className="w-3.5 h-3.5 text-accent-gold shrink-0" />
+                <span className="text-sm text-white">
+                  At-home services ·{' '}
+                  <span className="font-medium">
+                    Imperial Avenue Residences only
+                  </span>
+                </span>
               </div>
             </motion.div>
           </div>

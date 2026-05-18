@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, X } from 'lucide-react';
+import { Check, MapPin, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -110,11 +110,23 @@ export function WelcomeAnnouncement() {
                 </p>
 
                 <DialogDescription asChild>
-                  <p className="text-sm text-text-secondary leading-relaxed mb-6 max-w-prose">
+                  <p className="text-sm text-text-secondary leading-relaxed mb-4 max-w-prose">
                     Select at-home services are available now while the new
                     studio takes shape at Imperial Avenue, Downtown Dubai.
                   </p>
                 </DialogDescription>
+
+                {/* Location callout — keeps the exclusivity message visible
+                    before users have to scroll anywhere else on the site. */}
+                <div className="inline-flex items-center gap-2 rounded-full bg-accent-gold/10 border border-accent-gold/30 px-3 py-1.5 mb-6">
+                  <MapPin className="w-3.5 h-3.5 text-accent-gold shrink-0" />
+                  <span className="text-[11px] text-text-primary">
+                    At-home services ·{' '}
+                    <span className="font-medium">
+                      Imperial Avenue Residences only
+                    </span>
+                  </span>
+                </div>
 
                 {/* Email capture — primary action */}
                 <form onSubmit={handleEmailSubmit} className="mb-6">

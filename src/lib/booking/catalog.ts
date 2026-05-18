@@ -361,86 +361,107 @@ export const services: Service[] = [
     audience: 'unisex',
   },
 
-  // Somatic Recovery
+  // Body Rituals (Massages) — Ra at Home launch catalog. Real services
+  // provided by the client. Single-therapist roster (Pinky Casimero) at
+  // launch.
   {
     id: 'somatic-signature-massage',
     ritualId: 'somatic-recovery',
     name: 'Ra Signature Massage',
-    description: 'Full-body bespoke massage blending Swedish, deep tissue, and aromatherapy.',
-    highlights: [
-      'Blends Swedish, deep tissue & lymphatic',
-      'Pressure negotiated, never assumed',
-      'Built fresh to what your body brings',
-    ],
+    description:
+      'A restorative fusion of warmth, deep relief and calming holistic relaxation.',
     detail:
-      "Our signature massage blends modalities the way a good chef blends a stock. Swedish for warming the tissue, deep tissue for the parts that hold tension, lymphatic for circulation, aromatherapy for the nervous system. Each session is built fresh — you tell us where you are holding it, and we go there.\n\nChoose the duration that suits your day. Sixty minutes gives a focused full-body pass. Ninety adds depth and a longer scalp ritual. One-twenty includes a short rest period at the end so the body can integrate.",
-    durationMin: 60,
-    price: 450,
+      'A curated wellness experience combining the flowing techniques of Balinese massage, the restorative depth of targeted pressure therapy and the calming warmth of heated stones. Enhanced by aromatic essential oils, each movement is designed to release tension, improve circulation and restore physical and emotional balance. The journey concludes with a focused scalp, neck and shoulder massage, leaving the body deeply relaxed, the mind quieted and the senses completely renewed.',
+    durationMin: 90,
+    price: 475,
     image: '/assets/Images/H-05.png',
     audience: 'unisex',
     location: 'both',
-    variants: [
-      { id: '60', label: '60 minutes', durationMin: 60, price: 450 },
-      { id: '90', label: '90 minutes', durationMin: 90, price: 580 },
-      { id: '120', label: '120 minutes', durationMin: 120, price: 720 },
-    ],
   },
   {
-    id: 'somatic-hot-stone',
+    id: 'somatic-deep-tissue',
     ritualId: 'somatic-recovery',
-    name: 'Hot Stone Ceremony',
-    description: 'Heated basalt stones release deep muscular tension and restore balance.',
-    highlights: [
-      'Heated basalt for deep tension release',
-      'Reaches where hands alone cannot',
-      'Leaves muscles softer, slower',
-    ],
+    name: 'The Deep Tissue Therapy',
+    description:
+      'Deep pressure therapy to relieve tension, restore mobility and rebalance the body.',
     detail:
-      'Heated basalt stones glide along the long muscles of the back, the IT bands, the shoulders. The heat does what hands cannot — it reaches deeper, faster, and persuades the tissue to soften.\n\nChoose 60 minutes for a focused upper-body session, or 75 for full coverage including legs and feet.',
+      'A targeted body therapy designed to release deep muscular tension and restore physical balance. Slow, focused techniques work into areas of tightness to ease fatigue, improve circulation and support mobility. Warm therapeutic oils and concentrated pressure help relax the body while calming the mind. Gentle attention to the shoulders, neck and scalp enhances the experience, leaving you feeling lighter, restored and deeply rebalanced.',
     durationMin: 60,
-    price: 460,
+    price: 320,
     image: '/assets/Images/H-02.png',
     audience: 'unisex',
     location: 'both',
     variants: [
-      { id: '60', label: '60 minutes', durationMin: 60, price: 460 },
-      { id: '75', label: '75 minutes', durationMin: 75, price: 520 },
+      { id: '60', label: '60 minutes', durationMin: 60, price: 320 },
+      { id: '90', label: '90 minutes', durationMin: 90, price: 450 },
     ],
   },
   {
-    id: 'somatic-lymphatic',
+    id: 'somatic-balinese',
     ritualId: 'somatic-recovery',
-    name: 'Lymphatic Drainage',
-    description: 'Gentle rhythmic technique to de-puff, detoxify, and support circulation.',
-    highlights: [
-      'Immediate de-puffing of face & ankles',
-      'Pre-event and post-flight rescue',
-      'Gentler than most clients expect',
-    ],
+    name: 'The Balinese Therapy',
+    description:
+      'A soothing Balinese massage that relieves tension, restores balance and renews energy.',
     detail:
-      'A specialist modality — light, repetitive, almost choreographic. Lymphatic drainage moves fluid through the lymph chains using pressure that is much lighter than most clients expect. The effect is immediate de-puffing, especially around the face, neck, and ankles.\n\nWell-suited to pre-event preparation, post-flight recovery, and post-surgical rehabilitation under physician guidance.',
+      'A calming body therapy inspired by traditional Balinese techniques, designed to restore balance and deep relaxation. Flowing movements, rhythmic pressure and gentle stretches work together to ease muscular tension, improve circulation and quiet the mind. Aromatic oils nourish the skin while focused attention on the back, shoulders and scalp helps release accumulated stress. The experience leaves the body softened, senses restored and the mind enveloped in a lasting sense of calm and well-being.',
     durationMin: 60,
-    price: 450,
+    price: 320,
     image: '/assets/Images/H-06.png',
     audience: 'unisex',
     location: 'both',
+    variants: [
+      { id: '60', label: '60 minutes', durationMin: 60, price: 320 },
+      { id: '90', label: '90 minutes', durationMin: 90, price: 450 },
+    ],
   },
   {
-    id: 'somatic-prenatal',
+    id: 'somatic-swedish',
     ritualId: 'somatic-recovery',
-    name: 'Prenatal Wellness',
-    description: 'Safe, nurturing massage for every stage of pregnancy.',
-    highlights: [
-      'Second & third trimester support',
-      'Side-lying positioning with cushioning',
-      'Focuses lower back, hips & feet',
-    ],
+    name: 'The Soft Serenity Massage',
+    description:
+      'A Swedish massage designed to ease tension, restore balance and relax the body.',
     detail:
-      'Our prenatal sessions are reserved for clients in the second and third trimesters. We use side-lying positions with cushioning, gentler pressure, and careful avoidance of contraindicated points.\n\nThe focus is the lower back, hips, feet, and the kind of tension that pregnancy concentrates in the upper shoulders. Sessions can be deeply restful — many clients fall asleep.',
+      'Experience deep relaxation with our Swedish Massage, a timeless therapy designed to ease muscle tension, improve circulation and calm the mind. Using gentle to medium pressure techniques combined with smooth, flowing strokes, this treatment helps reduce stress, relieve body fatigue and restore overall balance. Perfect for those seeking relaxation and wellness, this massage promotes a sense of lightness, comfort and renewed energy, leaving your body refreshed and the mind free of tensions.',
     durationMin: 60,
-    price: 420,
+    price: 285,
     image: '/assets/Images/H-07.png',
-    audience: 'ladies',
+    audience: 'unisex',
+    location: 'both',
+    variants: [
+      { id: '60', label: '60 minutes', durationMin: 60, price: 285 },
+      { id: '90', label: '90 minutes', durationMin: 90, price: 415 },
+    ],
+  },
+  {
+    id: 'somatic-aromatherapy',
+    ritualId: 'somatic-recovery',
+    name: 'The Sensory Body Therapy',
+    description:
+      'Rebalance with a deep calm massage, custom oils and rhythmic touch.',
+    detail:
+      'Experience the ultimate sensory body massage, a curated journey designed to restore emotional and physical harmony. Combining the healing power of touch with custom-blended essential oils to calm, uplift and restore. Flowing rhythmic techniques and gentle pressure quiet the mind and dissolve tension. With focused attention on the shoulders, neck and scalp, this treatment softens the body and fosters deep relaxation. Leave with a lighter mind, a soothed body and a lasting sense of well-being.',
+    durationMin: 60,
+    price: 360,
+    image: '/assets/Images/H-05.png',
+    audience: 'unisex',
+    location: 'both',
+    variants: [
+      { id: '60', label: '60 minutes', durationMin: 60, price: 360 },
+      { id: '90', label: '90 minutes', durationMin: 90, price: 510 },
+    ],
+  },
+  {
+    id: 'somatic-hot-stone-addon',
+    ritualId: 'somatic-recovery',
+    name: 'Hot Stone Enhancement',
+    description:
+      'Heated stones ease tension, relax muscles and deepen your massage experience.',
+    detail:
+      'A 20-minute thermal enhancement designed to complement your Deep Tissue Therapy, Balinese Therapy, The Soft Serenity Massage or The Sensory Body Therapy. Smooth heated stones are applied with slow, flowing movements across targeted areas of the body, allowing warmth to penetrate deeply into the muscles. This calming addition helps improve circulation, soften tension and elevate the overall massage experience, leaving the body feeling lighter, soothed and deeply relaxed.',
+    durationMin: 20,
+    price: 60,
+    image: '/assets/Images/H-02.png',
+    audience: 'unisex',
     location: 'both',
   },
 
@@ -786,114 +807,16 @@ export const services: Service[] = [
   },
 ];
 
+// Launch roster — Ra at Home Body Rituals only. Names + designation +
+// service-tag (via ritualIds). No images, no bios per the client direction
+// (inclusive, non-promotional presentation).
 export const therapists: Therapist[] = [
   {
-    id: 'sarah-jenkins',
-    name: 'Sarah Jenkins',
-    title: 'Master Therapist',
-    ritualIds: ['atelier'],
-    languages: ['English'],
-    image: '/assets/Images/headshot_1.png',
-    bio: "A London-trained master therapist known for editorial cuts and dimensional colour. Sarah's work lives in the quiet precision of a perfect fringe, a weightless long layer, a colour that looks like it was always yours. Fifteen years at the chair have taught her that listening is half the job.",
-  },
-  {
-    id: 'david-cortez',
-    name: 'David Cortez',
-    title: 'Senior Colorist',
-    ritualIds: ['atelier'],
-    languages: ['English', 'Spanish'],
-    image: '/assets/Images/headshot_2.png',
-    bio: "A colourist's colourist. Twenty years spent reading hair at root level mean that David takes on the corrections others won't, with the patient temperament the work requires. Fluent in English and Spanish, trained in New York and Barcelona.",
-  },
-  {
-    id: 'elena-rostova',
-    name: 'Elena Rostova',
-    title: 'Wellness Director',
-    ritualIds: ['somatic-recovery', 'solar-vitality'],
-    languages: ['English', 'Russian'],
-    image: '/assets/Images/headshot_3.png',
-    bio: 'Wellness Director at Ra, with a practice that spans hair, scalp, and somatic massage. Elena moves between the facial bed and the massage room with rare fluency, and her first-visit consultations set the tone for everything downstream.',
-  },
-  {
-    id: 'layla-al-mansoori',
-    name: 'Layla Al-Mansoori',
-    title: 'Skin Therapist',
-    ritualIds: ['solar-vitality'],
-    languages: ['Arabic', 'English'],
-    image: '/assets/Images/H-01.png',
-    bio: "A facialist specialising in sensitive and reactive skin, with deep training in the Arabic-botanical tradition. Layla's facials are quiet, deliberate, and built around a principle she repeats often: do less, but do it well.",
-  },
-  {
-    id: 'maya-patel',
-    name: 'Maya Patel',
-    title: 'Lead Nail Artist',
-    ritualIds: ['alchemic-aesthetics'],
-    languages: ['English', 'Hindi'],
-    image: '/assets/Images/H-02.png',
-    bio: "Ra's lead nail artist, celebrated for editorial nail art and the kind of gel work that lasts. Maya's background is in fine art — it shows in the steadiness of her hand and in the way she composes colour on a nail as she would a small canvas.",
-  },
-  {
-    id: 'zoe-tanaka',
-    name: 'Zoe Tanaka',
-    title: 'Massage Therapist',
+    id: 'pinky-casimero',
+    name: 'Pinky Casimero',
+    title: 'DHA-Certified Therapist',
     ritualIds: ['somatic-recovery'],
-    languages: ['English', 'Japanese'],
-    image: '/assets/Images/H-09.png',
-    bio: 'A massage therapist whose practice blends shiatsu, lymphatic drainage, and prenatal expertise. Zoe reads the body the way a musician reads a score — attentive to rhythm, pressure, and what the room is asking for.',
-  },
-  {
-    id: 'julien-laurent',
-    name: 'Julien Laurent',
-    title: 'Colour Specialist',
-    ritualIds: ['atelier'],
-    languages: ['French', 'English'],
-    image: '/assets/Images/H-10.png',
-    bio: 'Parisian-trained, known for balayage that grows out beautifully and colour that looks like sunlight, not product. Julien sees colour as architecture — something you return to, not something that asks to be corrected.',
-  },
-  {
-    id: 'amara-okafor',
-    name: 'Amara Okafor',
-    title: 'Longevity Specialist',
-    ritualIds: ['longevity-lab'],
-    languages: ['English'],
-    image: '/assets/Images/H-11.png',
-    bio: "A medical aesthetician with a background in functional medicine, Amara holds the clinical floor of the Longevity Lab. Her consultations are long, specific, and anchored in labs. Nothing is prescribed here that isn't justified.",
-  },
-  {
-    id: 'nina-volkov',
-    name: 'Nina Volkov',
-    title: 'Bridal Director',
-    ritualIds: ['atelier', 'alchemic-aesthetics', 'body-renewal'],
-    languages: ['English', 'Russian'],
-    image: '/assets/Images/H-12.png',
-    bio: "Ra's Bridal Director. Nina has styled brides across the Gulf for destination weddings from Mykonos to Muscat, and her trial sessions are legendary for their calm. What she delivers on the day looks effortless. The work behind it is not.",
-  },
-  {
-    id: 'farah-haddad',
-    name: 'Farah Haddad',
-    title: 'Waxing Specialist',
-    ritualIds: ['velvet-smooth'],
-    languages: ['English', 'Arabic'],
-    image: '/assets/Images/H-01.png',
-    bio: "A senior waxing therapist with a decade of practice across sensitive, first-time, and post-laser skin. Farah's approach is quiet and unhurried — she prepares the skin carefully, chooses the wax to match the area, and her rooms are known for how calm they feel.",
-  },
-  {
-    id: 'marcus-hale',
-    name: 'Marcus Hale',
-    title: "Men's Grooming Specialist",
-    ritualIds: ['velvet-smooth'],
-    languages: ['English'],
-    image: '/assets/Images/H-10.png',
-    bio: "A dedicated men's grooming specialist trained across body waxing, beard sculpting, and grooming rituals. Marcus works from a private suite and his clients return for the mix of precision, discretion, and care that defines the room.",
-  },
-  {
-    id: 'isabelle-moreau',
-    name: 'Isabelle Moreau',
-    title: 'Lead Makeup Artist',
-    ritualIds: ['body-renewal'],
-    languages: ['French', 'English'],
-    image: '/assets/Images/H-12.png',
-    bio: "Ra's lead makeup artist, trained in Paris and London, with an editorial sensibility that keeps the skin looking like skin. Isabelle's bridal trials are patient, specific, and built around the way light will actually fall on the day.",
+    languages: [],
   },
 ];
 

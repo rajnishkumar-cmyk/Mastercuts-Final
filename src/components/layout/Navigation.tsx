@@ -275,11 +275,11 @@ export function Navigation() {
           {/* Right cluster — Phone, Cart, Login */}
           <div className="hidden lg:flex items-center gap-5 shrink-0">
             <a
-              href="tel:+97145550100"
+              href="tel:+971564667165"
               className="flex items-center gap-2 text-sm text-white transition-colors duration-200 hover:opacity-70"
             >
               <Phone className="w-4 h-4" />
-              <span className="font-medium">+971 4 555 0100</span>
+              <span className="font-medium">+971 56 466 7165</span>
               <span className="text-xs text-white/60">Dubai</span>
             </a>
 
@@ -308,7 +308,7 @@ export function Navigation() {
           {/* Mobile Right Buttons */}
           <div className="flex items-center gap-2 lg:hidden">
             <a
-              href="tel:+97145550100"
+              href="tel:+971564667165"
               aria-label="Call Mastercuts"
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-200 ${
                 darkChrome
@@ -501,11 +501,11 @@ export function Navigation() {
                     )}
                     <div className="border-t border-white/10 pt-5">
                       <a
-                        href="tel:+97145550100"
+                        href="tel:+971564667165"
                         className="flex items-center gap-3 text-white/70 hover:text-white transition-colors"
                       >
                         <Phone className="w-4 h-4" />
-                        <span className="text-sm">+971 4 555 0100</span>
+                        <span className="text-sm">+971 56 466 7165</span>
                       </a>
                     </div>
                   </div>

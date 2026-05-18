@@ -2,10 +2,10 @@ import { motion, useInView, useScroll, useMotionValueEvent } from 'framer-motion
 import { useRef, useState } from 'react';
 
 const stats = [
-  { value: '15',   label: 'YEARS OF SERVICE',     color: 'dark'  },
-  { value: '50k',  label: 'HAIRCUTS STYLED',       color: 'white' },
-  { value: '20K+', label: 'SATISFIED CLIENTS',     color: 'light' },
-  { value: '10K',  label: 'COLOR TRANSFORMATIONS', color: 'light' },
+  { value: '11',   label: 'YEARS OF EXCELLENCE',          color: 'dark'  },
+  { value: '60K',  label: 'CLIENTS SERVED',               color: 'white' },
+  { value: '97%',  label: 'CLIENT SATISFACTION',          color: 'light' },
+  { value: '70K',  label: 'PERSONALIZED TREATMENTS',      color: 'light' },
 ] as const;
 
 const colorClasses = {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { X, ArrowRight, ArrowUpRight, ChevronDown, ChevronRight, Pencil, User, MapPin, Clock, Banknote, CreditCard, Gift } from 'lucide-react';
+import { X, ArrowRight, ArrowUpRight, ChevronDown, ChevronRight, Pencil, User, MapPin, Clock, CreditCard, Smartphone, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart, useCartTotals, formatAed, formatDuration } from '../CartProvider';
 import { CartItemRow } from '../CartItemRow';
@@ -241,7 +241,7 @@ export function BasketView({ onClose, onContinue }: Props) {
                   </span>
                   <div className="min-w-0">
                     <p className="text-[10px] uppercase tracking-[0.18em] text-text-secondary mb-0.5">
-                      Your details
+                      Booking for
                     </p>
                     <p className="text-sm text-text-primary truncate">
                       {account.name ? `${account.name} · ` : ''}{account.phone}
@@ -326,7 +326,8 @@ export function BasketView({ onClose, onContinue }: Props) {
               </p>
               <ul className="space-y-2 text-xs text-text-secondary">
                 <li>· Free cancellation up to 4 hours before your visit</li>
-                <li>· No payment required now — settle when your therapist arrives</li>
+                <li>· Payment collected at time of service — Card or Apple Pay</li>
+                <li>· Your therapist arrives 10 minutes early to set up</li>
                 <li>· Services run sequentially in one visit</li>
               </ul>
             </div>
@@ -386,7 +387,18 @@ export function BasketView({ onClose, onContinue }: Props) {
                   onChange={(e) => setPolicyAccepted(e.target.checked)}
                   className="mt-0.5 accent-bg-dark"
                 />
-                <span>I agree to the booking & cancellation policy</span>
+                <span>
+                  I agree to the{' '}
+                  <a
+                    href="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="underline hover:no-underline text-text-primary"
+                  >
+                    booking &amp; cancellation policy
+                  </a>
+                </span>
               </label>
 
               {/* Horizontal: Pay via pill + Pay CTA */}
@@ -398,13 +410,13 @@ export function BasketView({ onClose, onContinue }: Props) {
                   aria-label="Change payment method"
                 >
                   <span className="flex items-center gap-1.5">
-                    {paymentMethod === 'cash' ? (
-                      <Banknote className="w-3.5 h-3.5" />
+                    {paymentMethod === 'apple-pay' ? (
+                      <Smartphone className="w-3.5 h-3.5" />
                     ) : (
                       <CreditCard className="w-3.5 h-3.5" />
                     )}
                     <span className="font-medium">
-                      {paymentMethod === 'cash' ? 'Cash' : 'Card'}
+                      {paymentMethod === 'apple-pay' ? 'Apple Pay' : 'Card'}
                     </span>
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-text-secondary shrink-0" />
@@ -420,7 +432,7 @@ export function BasketView({ onClose, onContinue }: Props) {
                       : 'bg-black/10 text-text-muted cursor-not-allowed',
                   )}
                 >
-                  {submitting ? 'Confirming...' : `Pay Now · ${formatAed(grandTotal)}`}
+                  {submitting ? 'Confirming...' : `Book Now · ${formatAed(grandTotal)}`}
                 </button>
               </div>
             </>

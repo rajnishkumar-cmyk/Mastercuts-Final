@@ -1,9 +1,7 @@
-import { useState } from 'react';
-import { ChevronDown, User as UserIcon, X, Sparkles } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 import type { CartItem } from '@/lib/booking/types';
 import { useCart, formatAed, formatDuration } from './CartProvider';
 import { getTherapistsForRitual, getTherapist, getService } from '@/lib/booking/catalog';
-import { GuestPickerSheet } from './GuestPickerSheet';
 import {
   Select,
   SelectContent,
@@ -17,16 +15,8 @@ interface Props {
 }
 
 export function CartItemRow({ item }: Props) {
-  const {
-    removeItem,
-    updateTherapistPref,
-    openServiceDetail,
-    getGuestForItem,
-    account,
-  } = useCart();
+  const { removeItem, updateTherapistPref, openServiceDetail } = useCart();
   const isJourney = !!item.journeyId;
-  const [guestPickerOpen, setGuestPickerOpen] = useState(false);
-  const assignedGuest = getGuestForItem(item);
 
   if (isJourney) {
     const constituentServices = (item.journeyServiceIds ?? [])
@@ -146,34 +136,12 @@ export function CartItemRow({ item }: Props) {
             </SelectContent>
           </Select>
 
-          {/* Guest picker — only meaningful once an account exists (then a
-              "self" profile is auto-created). Hidden pre-login. */}
-          {account && (
-            <button
-              type="button"
-              onClick={() => setGuestPickerOpen(true)}
-              aria-label="Choose who this service is for"
-              className="h-9 w-full flex items-center gap-2 rounded-full border border-black/15 bg-transparent px-4 text-xs text-text-primary hover:bg-black/[0.03] transition-colors"
-            >
-              <UserIcon className="w-3.5 h-3.5 text-text-secondary shrink-0" />
-              <span className="text-text-secondary">For:</span>
-              <span className="flex-1 text-left truncate">
-                {assignedGuest?.name ?? 'You'}
-                {assignedGuest?.isSelf && (
-                  <span className="text-text-secondary"> (you)</span>
-                )}
-              </span>
-              <ChevronDown className="w-3.5 h-3.5 text-text-secondary shrink-0" />
-            </button>
-          )}
+          {/* Per-service guest picker is hidden for now — multi-guest
+              selection lives at the booking-contact level instead. Keep the
+              GuestPickerSheet wiring intact so we can re-enable per-service
+              assignment without a refactor when the client confirms. */}
         </div>
       </div>
-
-      <GuestPickerSheet
-        open={guestPickerOpen}
-        onClose={() => setGuestPickerOpen(false)}
-        itemId={item.id}
-      />
     </div>
   );
 }
