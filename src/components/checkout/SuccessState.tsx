@@ -47,13 +47,29 @@ export function SuccessState({ booking, onDone }: Props) {
           transition={{ duration: 0.5, delay: 0.15 }}
         >
           <p className="text-[10px] uppercase tracking-[0.2em] text-text-secondary mb-3">
-            You're booked
+            {booking.requiresConfirmation ? 'Request received' : "You're booked"}
           </p>
           <h2 className="font-serif text-4xl text-text-primary leading-[1.05] mb-2">
-            See you soon,
-            <br />
-            <span className="italic">{firstName}</span>
+            {booking.requiresConfirmation ? (
+              <>
+                Thank you,
+                <br />
+                <span className="italic">{firstName}</span>
+              </>
+            ) : (
+              <>
+                See you soon,
+                <br />
+                <span className="italic">{firstName}</span>
+              </>
+            )}
           </h2>
+          {booking.requiresConfirmation && (
+            <p className="text-sm text-text-secondary leading-relaxed mt-3 max-w-sm">
+              Our concierge will reach out personally to confirm your booking
+              and arrange your at-home experience.
+            </p>
+          )}
           <p className="text-xs text-text-secondary mt-3">
             Booking reference · <span className="text-text-primary">{booking.reference}</span>
           </p>

@@ -129,19 +129,19 @@ export function HeroSection() {
       title: 'Your Sanctuary of',
       titleItalic: 'beauty & inner power',
       tagline:
-        "Experience the pinnacle of beauty and wellness at Dubai's most exclusive spa and salon destination.",
+        'Where considered care, refined technique, and quiet hospitality come together — for those who notice the difference.',
       media: { type: 'video', src: '/assets/Images/Hero%20Final.mp4' },
       topMark: '/assets/Logo/mastercut-mark.png',
       durationMs: 24000,
-      primaryCta: { label: 'Book Ra at Home', onClick: () => openAudiencePicker('/at-home') },
-      secondaryCta: { label: 'Explore all services', onClick: handleExploreAll },
+      primaryCta: { label: 'Book an Experience', onClick: () => openAudiencePicker('/at-home') },
+      secondaryCta: { label: 'Explore all paths', onClick: handleExploreAll },
     },
     {
       id: 'at-home',
-      title: 'Salon-grade care,',
-      titleItalic: 'at your door',
+      title: 'Curated rituals,',
+      titleItalic: 'at home',
       tagline:
-        'Massage, manicure, and threading by hospital-grade hands — booked to your schedule, delivered to your home.',
+        'Wellness brought to the comfort and privacy of your home, by our DHA-certified therapists.',
       media: { type: 'image', src: '/assets/Images/Ra%20at%20home.jpeg' },
       topMark: '/assets/Logo/ra-emblem.png',
       primaryCta: { label: 'Book Ra at Home', onClick: () => openAudiencePicker('/at-home') },
@@ -149,10 +149,10 @@ export function HeroSection() {
     },
     {
       id: 'wellness-hub',
-      title: 'A sanctuary for',
-      titleItalic: 'stillness & recovery',
+      title: 'An urban sanctuary for',
+      titleItalic: 'stillness & renewal',
       tagline:
-        'Sound, breath, body and mind — immersive sessions designed to slow the day and restore the self.',
+        'Science-led wellness, quietly delivered — sessions designed to slow the day and restore the self.',
       media: {
         type: 'image',
         src: '/assets/Images/two-hairstylers-posing-standing-modern-spacy-beaty-salon.jpg',

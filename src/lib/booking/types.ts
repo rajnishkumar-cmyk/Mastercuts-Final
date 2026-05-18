@@ -142,13 +142,16 @@ export interface DraftCheckout {
   date?: string;
   time?: string;
   addressId?: string;
+  // Set when the chosen address is outside Imperial Avenue Residences.
+  // Surfaces the concierge tooltip in the cart and flags the booking
+  // record as requiresConfirmation at submit time.
+  outsideImperialAvenue?: boolean;
 }
 
 export interface Cart {
   items: CartItem[];
   updatedAt: number;
   draftCheckout?: DraftCheckout;
-  pendingOfferId?: string;
 }
 
 export interface LightAccount {
@@ -170,12 +173,10 @@ export interface BookingRecord {
   status: 'confirmed' | 'cancelled';
   serviceLocation: 'at-home';
   paymentMethod: 'card' | 'apple-pay';
-  offer?: {
-    id: string;
-    name: string;
-    discountPercent: number;
-    discountAmount: number;
-  };
+  // True when the booking address is outside Imperial Avenue Residences
+  // during the transition period. These bookings receive a personal
+  // confirmation call from the concierge before being scheduled.
+  requiresConfirmation?: boolean;
   // Snapshot of every guest profile referenced by items at booking time.
   // Preserved here so the confirmation/profile view renders correct names
   // even if a guest is later renamed or removed.

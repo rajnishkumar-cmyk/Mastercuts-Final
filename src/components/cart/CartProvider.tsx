@@ -21,7 +21,6 @@ import {
   clearWaitlist,
 } from '@/lib/booking/storage';
 import { toDateKey } from '@/lib/booking/availability';
-import { getOffer, isOfferActive, calculateDiscount, type Offer } from '@/lib/offers';
 
 const SELF_GUEST_ID = 'self';
 
@@ -72,6 +71,10 @@ interface CartContextValue {
   closeContactEdit: () => void;
   isPaymentMethodOpen: boolean;
   closePaymentMethod: () => void;
+  // Global search overlay — top-nav search icon opens this full-screen sheet.
+  isSearchOpen: boolean;
+  openSearch: () => void;
+  closeSearch: () => void;
 
   drawerStack: DrawerView[];
   currentDrawerView: DrawerView;
@@ -99,15 +102,6 @@ interface CartContextValue {
   removeItem: (itemId: string) => void;
   updateTherapistPref: (itemId: string, therapistPref: string | 'any') => void;
   clearAll: () => void;
-
-  // offers
-  appliedOffer: Offer | undefined;
-  setPendingOffer: (offerId: string) => void;
-  clearPendingOffer: () => void;
-  // Ephemeral timestamp set when an offer is freshly applied while the cart
-  // already has items. Drives the in-cart celebration animation. Not
-  // persisted — won't fire on reload.
-  celebrationTriggerAt: number | null;
 
   // guest profiles — saved name/phone records for booking on behalf of others.
   // The "self" profile is auto-derived from the LightAccount and pinned.
@@ -158,10 +152,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'apple-pay'>('card');
   const [isContactEditOpen, setIsContactEditOpen] = useState(false);
   const [isPaymentMethodOpen, setIsPaymentMethodOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [drawerStack, setDrawerStack] = useState<DrawerView[]>([]);
   const [serviceDetail, setServiceDetail] = useState<ServiceDetailContext | null>(null);
   const [audiencePickerDestination, setAudiencePickerDestination] = useState<string>('/explore');
-  const [celebrationTriggerAt, setCelebrationTriggerAt] = useState<number | null>(null);
   const [guestProfiles, setGuestProfiles] = useState<GuestProfile[]>([]);
   const [waitlistRequests, setWaitlistRequests] = useState<WaitlistRequest[]>([]);
   const hydratedRef = useRef(false);
@@ -178,7 +172,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (loaded) {
       setCart(loaded);
     } else if (expired) {
-      toast.info('Your cart was cleared — older than 24h.');
+      toast.info('Your cart has been cleared after 24 hours of rest.');
     }
     setAccount(loadAccount());
     setBookings(loadBookings());
@@ -249,7 +243,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       let added = false;
       setCart((prev) => {
         if (prev.items.length >= 10) {
-          toast.warning("That's a lot \u2014 please check out before adding more");
+          toast.warning('Your cart is generously full \u2014 please complete this booking first.');
           return prev;
         }
         const item: CartItem = {
@@ -302,7 +296,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           return prev;
         }
         if (prev.items.length >= 10) {
-          toast.warning("That's a lot \u2014 please check out before adding more");
+          toast.warning('Your cart is generously full \u2014 please complete this booking first.');
           return prev;
         }
         const item: CartItem = {
@@ -346,50 +340,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const clearAll = useCallback(() => {
     setCart({ items: [], updatedAt: Date.now() });
   }, []);
-
-  const setPendingOffer = useCallback((offerId: string) => {
-    setCart((prev) => {
-      // Celebrate only on a *new* application against a cart that already
-      // has items. Same-offer reselection and empty-cart "Avail now" stay
-      // silent. Defer the trigger to a microtask so we don't call setState
-      // from within another setState.
-      if (prev.pendingOfferId !== offerId && prev.items.length > 0) {
-        queueMicrotask(() => setCelebrationTriggerAt(Date.now()));
-      }
-      return {
-        ...prev,
-        pendingOfferId: offerId,
-        updatedAt: Date.now(),
-      };
-    });
-  }, []);
-
-  const clearPendingOffer = useCallback(() => {
-    setCart((prev) => {
-      if (!prev.pendingOfferId) return prev;
-      const { pendingOfferId: _omit, ...rest } = prev;
-      void _omit;
-      return { ...rest, updatedAt: Date.now() };
-    });
-  }, []);
-
-  // Auto-clear an expired offer the moment it lapses (e.g. user lingered on
-  // the cart past validUntil). Re-evaluated whenever the cart updates.
-  const appliedOffer = useMemo(() => {
-    const offer = getOffer(cart.pendingOfferId);
-    if (!offer) return undefined;
-    if (!isOfferActive(offer)) return undefined;
-    return offer;
-  }, [cart.pendingOfferId]);
-
-  useEffect(() => {
-    if (!cart.pendingOfferId) return;
-    const offer = getOffer(cart.pendingOfferId);
-    if (offer && !isOfferActive(offer)) {
-      toast.info(`Sorry, "${offer.name}" just expired.`);
-      clearPendingOffer();
-    }
-  }, [cart.pendingOfferId, clearPendingOffer]);
 
   // Persist guest profiles after hydration.
   useEffect(() => {
@@ -555,14 +505,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     };
 
     const subtotal = items.reduce((s, i) => s + i.price, 0);
-    const offerSnapshot = appliedOffer
-      ? {
-          id: appliedOffer.id,
-          name: appliedOffer.name,
-          discountPercent: appliedOffer.discountPercent,
-          discountAmount: calculateDiscount(subtotal, appliedOffer),
-        }
-      : undefined;
 
     // Snapshot the set of guest profiles actually referenced by items in
     // this booking — keeps the confirmation/profile view correct even if
@@ -574,19 +516,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       referencedGuestIds.has(g.id)
     );
 
+    const requiresConfirmation = !!cart.draftCheckout?.outsideImperialAvenue;
+
     const booking: BookingRecord = {
       reference: makeRef(),
       items,
       date,
       time,
       totalDuration: items.reduce((s, i) => s + i.durationMin, 0),
-      totalPrice: subtotal - (offerSnapshot?.discountAmount ?? 0),
+      totalPrice: subtotal,
       guest,
       createdAt: Date.now(),
       status: 'confirmed',
       serviceLocation: 'at-home',
       paymentMethod,
-      offer: offerSnapshot,
+      requiresConfirmation: requiresConfirmation || undefined,
       guests: guestSnapshot.length > 0 ? guestSnapshot : undefined,
     };
     addBooking(booking);
@@ -594,7 +538,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCart({ items: [], updatedAt: Date.now() });
     setBookingResult(booking);
     return booking;
-  }, [cart, account, paymentMethod, getSelectedAddress, appliedOffer, guestProfiles]);
+  }, [cart, account, paymentMethod, getSelectedAddress, guestProfiles]);
 
   const saveLightAccount = useCallback((next: LightAccount) => {
     saveAccount(next);
@@ -666,6 +610,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const openExplorePicker = useCallback(() => setSurface('explore-picker'), []);
   const openPaymentMethod = useCallback(() => setIsPaymentMethodOpen(true), []);
   const closePaymentMethod = useCallback(() => setIsPaymentMethodOpen(false), []);
+  const openSearch = useCallback(() => setIsSearchOpen(true), []);
+  const closeSearch = useCallback(() => setIsSearchOpen(false), []);
   const openContactEdit = useCallback(() => setIsContactEditOpen(true), []);
   const closeContactEdit = useCallback(() => setIsContactEditOpen(false), []);
   const openWellnessHub = useCallback(() => setSurface('wellness-hub'), []);
@@ -721,6 +667,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     closeContactEdit,
     isPaymentMethodOpen,
     closePaymentMethod,
+    isSearchOpen,
+    openSearch,
+    closeSearch,
     drawerStack,
     currentDrawerView,
     openCart,
@@ -743,10 +692,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     removeItem,
     updateTherapistPref,
     clearAll,
-    appliedOffer,
-    setPendingOffer,
-    clearPendingOffer,
-    celebrationTriggerAt,
     guestProfiles,
     addGuestProfile,
     updateGuestProfile,
@@ -774,19 +719,16 @@ export function useCart(): CartContextValue {
 }
 
 export function useCartTotals() {
-  const { cart, appliedOffer } = useCart();
+  const { cart } = useCart();
   return useMemo(() => {
     const totalPrice = cart.items.reduce((s, i) => s + i.price, 0);
     const totalDuration = cart.items.reduce((s, i) => s + i.durationMin, 0);
-    const discount = calculateDiscount(totalPrice, appliedOffer);
     return {
       totalPrice,
       totalDuration,
       count: cart.items.length,
-      discount,
-      subtotalAfterDiscount: totalPrice - discount,
     };
-  }, [cart, appliedOffer]);
+  }, [cart]);
 }
 
 export function formatAed(value: number): string {

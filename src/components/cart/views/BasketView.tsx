@@ -1,12 +1,9 @@
 import { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import { X, ArrowRight, ArrowUpRight, ChevronDown, ChevronRight, Pencil, User, MapPin, Clock, CreditCard, Smartphone, Gift } from 'lucide-react';
+import { X, ArrowRight, ArrowUpRight, Pencil, User, MapPin, Clock, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart, useCartTotals, formatAed, formatDuration } from '../CartProvider';
 import { CartItemRow } from '../CartItemRow';
 import { FrequentlyAddedSection } from '../FrequentlyAddedSection';
-import { OffersSheet } from '../OffersSheet';
-import { OfferCelebration } from '../OfferCelebration';
 import { cn } from '@/lib/utils';
 
 function formatDateLabel(key: string): string {
@@ -38,30 +35,22 @@ export function BasketView({ onClose, onContinue }: Props) {
     setCheckoutStep,
     confirmBooking,
     getSelectedAddress,
-    paymentMethod,
-    openPaymentMethod,
     openContactEdit,
-    appliedOffer,
-    clearPendingOffer,
-    celebrationTriggerAt,
   } = useCart();
-  const reduce = useReducedMotion();
-  const { totalPrice, totalDuration, count, discount, subtotalAfterDiscount } =
-    useCartTotals();
+  const { totalPrice, totalDuration, count } = useCartTotals();
   const navigate = useNavigate();
   const isEmpty = count === 0;
 
   const [policyAccepted, setPolicyAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [offersSheetOpen, setOffersSheetOpen] = useState(false);
 
   const selectedAddress = getSelectedAddress();
   const hasAddress = !!selectedAddress;
   const hasTimeSlot = !!(cart.draftCheckout?.date && cart.draftCheckout?.time);
   const isFinalState = hasAddress && hasTimeSlot;
 
-  const vat = Math.round(subtotalAfterDiscount * 0.05);
-  const grandTotal = subtotalAfterDiscount + vat;
+  const vat = Math.round(totalPrice * 0.05);
+  const grandTotal = totalPrice + vat;
   const canPay = isFinalState && policyAccepted && !submitting;
 
   const handlePay = async () => {
@@ -113,14 +102,14 @@ export function BasketView({ onClose, onContinue }: Props) {
               Begin your <span className="italic">visit</span>
             </h3>
             <p className="text-text-secondary text-sm max-w-xs mb-8 leading-relaxed">
-              Explore our services and add your favourite to begin building your visit.
+              Choose a ritual to begin — we'll take care of the rest.
             </p>
             <button
               type="button"
               onClick={() => { onClose(); navigate('/#services'); }}
               className="group inline-flex items-center justify-center gap-2 rounded-full bg-bg-dark text-white px-6 py-3.5 text-sm font-medium hover:bg-bg-darker transition-colors"
             >
-              Browse services
+              Explore rituals
               <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </button>
           </div>
@@ -143,8 +132,6 @@ export function BasketView({ onClose, onContinue }: Props) {
               </div>
             )}
 
-            <OfferCelebration />
-
             {cart.items.map((item) => (
               <CartItemRow key={item.id} item={item} />
             ))}
@@ -160,75 +147,16 @@ export function BasketView({ onClose, onContinue }: Props) {
             >
               <span className="flex flex-col min-w-0">
                 <span className="font-serif text-lg text-text-primary leading-tight">
-                  Add more <span className="italic">services</span>
+                  Add another <span className="italic">ritual</span>
                 </span>
                 <span className="text-[11px] uppercase tracking-wider text-text-secondary mt-1">
-                  Browse the five sanctuaries
+                  Browse the menu
                 </span>
               </span>
               <span className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-text-primary group-hover:bg-black/10 transition-colors flex-shrink-0">
                 <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </span>
             </button>
-
-            {/* Offers row — opens the bottom sheet to pick or clear an offer.
-                Sits above the client/guest details section per the cart
-                hierarchy. Pulses a soft gold halo once whenever an offer is
-                freshly applied (driven by celebrationTriggerAt). */}
-            <motion.div
-              key={celebrationTriggerAt ?? 'idle'}
-              initial={false}
-              animate={
-                celebrationTriggerAt && !reduce
-                  ? {
-                      scale: [1, 1.02, 1],
-                      boxShadow: [
-                        '0 0 0 0 rgba(232,132,43,0)',
-                        '0 0 0 8px rgba(232,132,43,0.18)',
-                        '0 0 0 0 rgba(232,132,43,0)',
-                      ],
-                    }
-                  : { scale: 1, boxShadow: '0 0 0 0 rgba(232,132,43,0)' }
-              }
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-              className="flex items-stretch justify-between gap-3 py-4 px-2 -mx-2 rounded-lg border-b border-black/10"
-            >
-              <button
-                type="button"
-                onClick={() => setOffersSheetOpen(true)}
-                className="group flex items-center gap-3 min-w-0 flex-1 text-left"
-              >
-                <span className="w-10 h-10 rounded-full bg-circle-light flex items-center justify-center text-accent-gold shrink-0">
-                  <Gift className="w-4 h-4" />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-[10px] uppercase tracking-[0.18em] text-text-secondary mb-0.5">
-                    Offers
-                  </span>
-                  <span className="flex items-baseline gap-2 min-w-0">
-                    <span className="text-sm text-text-primary truncate">
-                      {appliedOffer ? appliedOffer.name : 'None selected'}
-                    </span>
-                    {appliedOffer && (
-                      <span className="shrink-0 text-[11px] font-medium text-accent-gold tabular-nums">
-                        {appliedOffer.discountPercent}% OFF
-                      </span>
-                    )}
-                  </span>
-                </span>
-                <ChevronRight className="w-4 h-4 text-text-secondary group-hover:text-text-primary transition-colors shrink-0" />
-              </button>
-              {appliedOffer && (
-                <button
-                  type="button"
-                  onClick={clearPendingOffer}
-                  aria-label="Remove offer"
-                  className="shrink-0 self-center w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-text-secondary hover:bg-black/10 hover:text-text-primary transition-colors"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </motion.div>
 
             {/* Edit your details — only when logged in. Just above the payment
                 breakdown. Opens the same EditContactOverlay used by the
@@ -289,19 +217,6 @@ export function BasketView({ onClose, onContinue }: Props) {
                 <span className="text-xs uppercase tracking-wider text-text-secondary">Subtotal</span>
                 <span className="text-sm text-text-primary tabular-nums">{formatAed(totalPrice)}</span>
               </div>
-              {appliedOffer && discount > 0 && (
-                <div
-                  className="flex items-baseline justify-between mb-2"
-                  aria-live="polite"
-                >
-                  <span className="text-xs uppercase tracking-wider text-accent-gold">
-                    {appliedOffer.name} ({appliedOffer.discountPercent}%)
-                  </span>
-                  <span className="text-sm text-accent-gold tabular-nums">
-                    −{formatAed(discount)}
-                  </span>
-                </div>
-              )}
               <div className="flex items-baseline justify-between mb-3 pb-3 border-b border-black/10">
                 <span className="text-xs uppercase tracking-wider text-text-secondary">VAT (5%)</span>
                 <span className="text-sm text-text-primary tabular-nums">{formatAed(vat)}</span>
@@ -326,7 +241,7 @@ export function BasketView({ onClose, onContinue }: Props) {
               </p>
               <ul className="space-y-2 text-xs text-text-secondary">
                 <li>· Free cancellation up to 4 hours before your visit</li>
-                <li>· Payment collected at time of service — Card or Apple Pay</li>
+                <li>· Pay at home — card accepted (your therapist brings the card machine)</li>
                 <li>· Your therapist arrives 10 minutes early to set up</li>
                 <li>· Services run sequentially in one visit</li>
               </ul>
@@ -401,40 +316,26 @@ export function BasketView({ onClose, onContinue }: Props) {
                 </span>
               </label>
 
-              {/* Horizontal: Pay via pill + Pay CTA */}
-              <div className="flex items-stretch gap-2">
-                <button
-                  type="button"
-                  onClick={openPaymentMethod}
-                  className="flex items-center justify-between gap-2 rounded-full border border-black/15 bg-white px-4 py-3.5 text-xs text-text-primary hover:border-black/30 transition-colors min-w-[110px]"
-                  aria-label="Change payment method"
-                >
-                  <span className="flex items-center gap-1.5">
-                    {paymentMethod === 'apple-pay' ? (
-                      <Smartphone className="w-3.5 h-3.5" />
-                    ) : (
-                      <CreditCard className="w-3.5 h-3.5" />
-                    )}
-                    <span className="font-medium">
-                      {paymentMethod === 'apple-pay' ? 'Apple Pay' : 'Card'}
-                    </span>
-                  </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-text-secondary shrink-0" />
-                </button>
-                <button
-                  type="button"
-                  disabled={!canPay}
-                  onClick={handlePay}
-                  className={cn(
-                    'flex-1 rounded-full py-3.5 text-sm font-medium transition-colors',
-                    canPay
-                      ? 'bg-bg-dark text-white hover:bg-bg-darker'
-                      : 'bg-black/10 text-text-muted cursor-not-allowed',
-                  )}
-                >
-                  {submitting ? 'Confirming...' : `Book Now · ${formatAed(grandTotal)}`}
-                </button>
-              </div>
+              {/* Pay-at-home informational line — payment is collected on
+                  arrival; no in-cart payment method choice. */}
+              <p className="flex items-center justify-center gap-1.5 text-[11px] text-text-secondary mb-3">
+                <CreditCard className="w-3.5 h-3.5 text-accent-gold" />
+                Pay at home — card accepted (your therapist brings the card machine)
+              </p>
+
+              <button
+                type="button"
+                disabled={!canPay}
+                onClick={handlePay}
+                className={cn(
+                  'w-full rounded-full py-4 text-sm font-medium transition-colors',
+                  canPay
+                    ? 'bg-bg-dark text-white hover:bg-bg-darker'
+                    : 'bg-black/10 text-text-muted cursor-not-allowed',
+                )}
+              >
+                {submitting ? 'Confirming...' : `Book an Experience · ${formatAed(grandTotal)}`}
+              </button>
             </>
           ) : hasAddress ? (
             <button
@@ -457,8 +358,6 @@ export function BasketView({ onClose, onContinue }: Props) {
           )}
         </div>
       )}
-
-      <OffersSheet open={offersSheetOpen} onClose={() => setOffersSheetOpen(false)} />
     </div>
   );
 }

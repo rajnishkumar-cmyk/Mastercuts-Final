@@ -77,10 +77,6 @@ export const rituals: Ritual[] = [
         a: "Tell us at booking — we'll allocate a therapist trained in the appropriate modality and adjust the duration if needed. For clinical pain, we can recommend a physician first.",
       },
       {
-        q: 'Is prenatal massage safe?',
-        a: 'Yes, from the second trimester onward. We use supported positioning and gentler technique throughout.',
-      },
-      {
         q: 'How hard should pressure be?',
         a: 'As hard as you ask. Feedback during the session is welcome — this is collaborative.',
       },
@@ -482,7 +478,7 @@ export const services: Service[] = [
     price: 220,
     image: '/assets/Images/H-06.png',
     audience: 'unisex',
-    location: 'both',
+    location: 'salon',
   },
   {
     id: 'alchemic-luxury-pedicure',
@@ -500,13 +496,13 @@ export const services: Service[] = [
     price: 280,
     image: '/assets/Images/H-08.png',
     audience: 'unisex',
-    location: 'both',
+    location: 'salon',
   },
   {
     id: 'alchemic-nail-art',
     ritualId: 'alchemic-aesthetics',
     name: 'Nail Art & Design',
-    description: 'Bespoke hand-painted or encapsulated nail art by a resident artist.',
+    description: 'Considered hand-painted or encapsulated nail art by a resident artist.',
     highlights: [
       'Hand-painted by a resident artist',
       'Adapts references to your nail shape',
@@ -518,7 +514,7 @@ export const services: Service[] = [
     price: 360,
     image: '/assets/Images/H-09.png',
     audience: 'ladies',
-    location: 'both',
+    location: 'salon',
   },
   {
     id: 'alchemic-paraffin',
@@ -536,7 +532,7 @@ export const services: Service[] = [
     price: 180,
     image: '/assets/Images/H-10.png',
     audience: 'unisex',
-    location: 'both',
+    location: 'salon',
   },
 
   // The Longevity Lab
@@ -696,7 +692,7 @@ export const services: Service[] = [
     price: 60,
     image: '/assets/Images/H-06.png',
     audience: 'ladies',
-    location: 'both',
+    location: 'salon',
   },
   {
     id: 'velvet-threading-lip',
@@ -714,7 +710,7 @@ export const services: Service[] = [
     price: 30,
     image: '/assets/Images/H-07.png',
     audience: 'ladies',
-    location: 'both',
+    location: 'salon',
   },
   {
     id: 'velvet-threading-face',
@@ -732,7 +728,7 @@ export const services: Service[] = [
     price: 120,
     image: '/assets/Images/H-08.png',
     audience: 'ladies',
-    location: 'both',
+    location: 'salon',
   },
 
   // Body Renewal
@@ -827,7 +823,7 @@ export const packages: Package[] = [
     tagline: 'A full-day ceremony for the bride',
     category: 'Life Moment',
     description:
-      'A bespoke bridal journey designed to illuminate, restore, and celebrate the bride in the days before her day.',
+      'A curated bridal journey designed to illuminate, restore, and celebrate the bride in the days before her day.',
     longDescription:
       'The Bridal Bloom is the ceremony before the ceremony — a full day reserved for the bride, built around the idea that calm travels through the aisle more reliably than anything else we can offer. Your morning begins in the private suite with tea and a breathing ritual. From there, the day unfolds at the unhurried pace your wedding week will not.\n\nThe journey weaves together four of our most precise rituals: bridal hair design with our Bridal Director, a luminous Ra Glow facial to prepare the skin for the lights of your day, and a complete mani-pedi ritual in the clean-formula room. The sequencing matters — we schedule each service with rest between, so by the time you leave, you carry both the work and the stillness with you.',
     philosophy: 'The ceremony before the ceremony.',

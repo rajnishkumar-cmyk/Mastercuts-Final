@@ -61,9 +61,10 @@ export function ExplorePage() {
               Our <span className="italic">salon</span> is renovating.
             </h1>
             <p className="text-sm lg:text-base text-white/65 leading-relaxed mb-10 max-w-md mx-auto">
-              During this transition, we continue to serve you at home — nails,
-              massage, and threading, brought to your door by our senior team.
-              Our new space opens at Imperial Avenue, Burj Khalifa Street, soon.
+              While the new studio is being thoughtfully prepared, our at-home
+              massage rituals continue — delivered to Imperial Avenue Residences
+              by our DHA-certified therapists. The new space at Imperial Avenue,
+              Burj Khalifa Street, opens soon.
             </p>
             <button
               type="button"

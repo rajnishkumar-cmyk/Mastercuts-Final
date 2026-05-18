@@ -37,11 +37,11 @@ export function CTASection() {
           transition={{ duration: 1, ease: "easeOut" }}
         >
           <h2 className="font-serif text-4xl sm:text-5xl lg:text-7xl text-white leading-[0.95] mb-10">
-            Bringing
+            Look <span className="italic">better</span>.
             <br />
-            Your <span className="italic">Perfect</span>
+            Feel <span className="italic">lighter</span>.
             <br />
-            Look to Life
+            Live more <span className="italic">fully</span>.
           </h2>
         </motion.div>
 
@@ -54,7 +54,7 @@ export function CTASection() {
             onClick={() => openCart()}
             className="bg-white text-text-primary hover:bg-white/90 rounded-full px-8 py-6 text-sm font-medium flex items-center gap-3 group mx-auto"
           >
-            Book Your Visit
+            Book an Experience
             <Plus className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90" />
           </Button>
         </motion.div>

@@ -70,9 +70,9 @@ export function Footer() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="flex-1 font-serif text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-white leading-tight"
           >
-            Ready to Transform Your
+            We don't simply provide services.
             <br />
-            Look? <span className="italic">Book an appointment.</span>
+            We <span className="italic">create experiences.</span>
           </motion.h2>
 
           {/* Pill-shaped button — height stretches to match h2, width is fixed for pill proportion */}
@@ -93,7 +93,7 @@ export function Footer() {
               />
               {/* Label */}
               <span className="relative z-10 font-serif text-2xl italic text-white group-hover:text-text-primary transition-colors duration-300">
-                Book Now
+                Book an Experience
               </span>
             </button>
           </motion.div>

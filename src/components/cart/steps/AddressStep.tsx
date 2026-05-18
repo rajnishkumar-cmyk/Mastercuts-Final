@@ -34,6 +34,11 @@ export function AddressStep() {
   // When set, the form is editing an existing saved address rather than
   // creating a new one. Reset to null on cancel/return-to-select.
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
+  // Tooltip-driven flag — when the user indicates they're booking from
+  // somewhere other than Imperial Avenue Residences, surfaces a concierge
+  // confirmation notice and tags the resulting booking with
+  // requiresConfirmation: true.
+  const [isOutsideImperialAvenue, setIsOutsideImperialAvenue] = useState(false);
 
   const {
     register,
@@ -87,7 +92,9 @@ export function AddressStep() {
       flatVilla: values.flatVilla,
       landmark: values.landmark || undefined,
       label,
-      displayAddress: 'Imperial Avenue Residences, Downtown Dubai',
+      displayAddress: isOutsideImperialAvenue
+        ? 'Dubai (concierge confirmation)'
+        : 'Imperial Avenue Residences, Downtown Dubai',
     };
 
     // Save address to account
@@ -97,14 +104,26 @@ export function AddressStep() {
     };
     saveLightAccount(updatedAccount);
 
-    // Set as selected in draft
-    updateDraftCheckout({ addressId: newAddress.id });
+    // Set as selected in draft, plus the outside-IA flag so the booking
+    // record can be tagged with requiresConfirmation at submit time.
+    updateDraftCheckout({
+      addressId: newAddress.id,
+      outsideImperialAvenue: isOutsideImperialAvenue,
+    });
     setCheckoutStep('date-time');
   });
 
   const onSelectExisting = () => {
     if (!selectedAddressId) return;
-    updateDraftCheckout({ addressId: selectedAddressId });
+    // Derive the outside-IA flag from the saved address's displayAddress
+    // tag we set when it was created.
+    const addr = savedAddresses.find((a) => a.id === selectedAddressId);
+    const outside =
+      !!addr && !addr.displayAddress.includes('Imperial Avenue Residences');
+    updateDraftCheckout({
+      addressId: selectedAddressId,
+      outsideImperialAvenue: outside,
+    });
     setCheckoutStep('date-time');
   };
 
@@ -254,21 +273,67 @@ export function AddressStep() {
         <div className="space-y-5">
           <div>
             <label className="block text-xs uppercase tracking-wider text-text-secondary mb-2">
-              Flat number{' '}
-              <span className="text-accent-gold normal-case tracking-normal">
-                (Imperial Avenue Residences)
-              </span>
+              {isOutsideImperialAvenue ? (
+                <>
+                  Address{' '}
+                  <span className="text-accent-gold normal-case tracking-normal">
+                    (anywhere in Dubai)
+                  </span>
+                </>
+              ) : (
+                <>
+                  Flat number{' '}
+                  <span className="text-accent-gold normal-case tracking-normal">
+                    (Imperial Avenue Residences)
+                  </span>
+                </>
+              )}
             </label>
             <input
               {...register('flatVilla')}
-              placeholder="e.g. R05-1502"
+              placeholder={
+                isOutsideImperialAvenue
+                  ? 'Building name, floor / flat, area'
+                  : 'e.g. R05-1502'
+              }
               autoFocus
               className="w-full bg-transparent border-b border-black/15 py-2.5 text-text-primary focus:border-text-primary outline-none transition-colors"
             />
-            <p className="mt-2 text-[11px] text-text-secondary">
-              Ra at Home is available exclusively to residents of Imperial
-              Avenue Residences during this transition period.
-            </p>
+            {!isOutsideImperialAvenue && (
+              <p className="mt-2 text-[11px] text-text-secondary">
+                Ra at Home is currently available exclusively at Imperial
+                Avenue Residences.{' '}
+                <button
+                  type="button"
+                  onClick={() => setIsOutsideImperialAvenue(true)}
+                  className="text-text-primary underline hover:no-underline"
+                >
+                  Not staying there?
+                </button>
+              </p>
+            )}
+            {isOutsideImperialAvenue && (
+              <div
+                className="mt-3 rounded-xl border border-accent-gold/30 bg-accent-gold/5 px-4 py-3"
+                aria-live="polite"
+              >
+                <p className="text-[11px] uppercase tracking-[0.18em] text-accent-gold mb-1.5">
+                  A note from our concierge
+                </p>
+                <p className="text-xs text-text-primary leading-relaxed">
+                  Beyond Imperial Avenue Residences during this transition,
+                  our concierge will reach out personally to confirm your
+                  booking and arrange your at-home experience.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setIsOutsideImperialAvenue(false)}
+                  className="mt-2 text-[11px] text-text-secondary underline hover:no-underline"
+                >
+                  Actually, I'm at Imperial Avenue
+                </button>
+              </div>
+            )}
             {errors.flatVilla && (
               <p className="text-xs text-red-600 mt-1">{errors.flatVilla.message}</p>
             )}

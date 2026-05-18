@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
 import { useRef, useState } from 'react';
 
-const LONG_TEXT_WORDS = "to deliver world-class salon and wellness care through advanced techniques, customized treatments, and a bespoke level of service that makes every client feel valued.".split(' ');
+const LONG_TEXT_WORDS = "to help every guest leave looking better, feeling lighter, and living more fully — through considered rituals, attentive technique, and care offered with quiet warmth.".split(' ');
 
 export function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -43,9 +43,9 @@ export function AboutSection() {
             className="absolute top-[9%] left-[54%] w-[18%] z-10"
           >
             <p className="text-sm text-text-secondary">
-              With decades of combined experience and ongoing advanced education, our
-              team delivers care rooted in knowledge, precision, and an unwavering
-              dedication to excellence.
+              Decades of considered care, offered with warmth, discretion, and a
+              quiet attention to detail — so every appointment feels less like a
+              service and more like being looked after.
             </p>
           </motion.div>
 
@@ -86,7 +86,7 @@ export function AboutSection() {
                     i < revealedCount ? 'text-text-primary' : 'text-text-primary/20'
                   }`}
                 >
-                  {word === 'advanced' ? <em>{word}</em> : word}{' '}
+                  {word === 'considered' ? <em>{word}</em> : word}{' '}
                 </span>
               ))}
             </p>
@@ -112,9 +112,9 @@ export function AboutSection() {
         </h2>
 
         <p className="font-serif text-3xl text-text-primary leading-tight">
-          to deliver world-class salon and wellness care through{' '}
-          <em>advanced</em> techniques, customized treatments, and a bespoke
-          level of service that makes every client feel valued.
+          to help every guest leave looking better, feeling lighter, and living
+          more fully — through <em>considered</em> rituals, attentive technique,
+          and care offered with quiet warmth.
         </p>
       </div>
 

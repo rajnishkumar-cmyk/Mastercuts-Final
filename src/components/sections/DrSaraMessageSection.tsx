@@ -44,17 +44,18 @@ export function DrSaraMessageSection() {
             <div className="h-px w-12 bg-accent-gold mb-8" />
 
             <p className="font-serif text-xl lg:text-2xl text-white leading-[1.45] mb-6">
-              Welcome to Mastercuts. Every detail of this space — the services, the
-              techniques, the products we bring into your visit — has been
-              chosen with intention.
+              Welcome. You are our guest — and that single idea shapes
+              everything that happens next.
             </p>
 
             <p className="text-sm lg:text-base text-white/70 leading-relaxed mb-6 max-w-prose">
-              My promise is simple: you will leave feeling more like yourself
-              than when you arrived. We are in the middle of an exciting
-              transformation as we relocate, and I am personally overseeing
-              every choice so the next chapter is worthy of the trust you've
-              placed in us.
+              For decades, we have believed that true care extends beyond
+              appearance — it lives in how you are listened to, how your time
+              is held, how your privacy is protected. As Mastercuts evolves
+              into Ra, I am personally overseeing every choice so the next
+              chapter is worthy of the trust you have placed in us. You will
+              leave feeling more like yourself than when you arrived. That is
+              the only promise I make.
             </p>
 
             <p className="font-serif italic text-base text-white/90">

@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { AboutSection } from '@/components/sections/AboutSection';
 import { ExploreCategoriesSection } from '@/components/sections/ExploreCategoriesSection';
-import { OffersSection } from '@/components/sections/OffersSection';
 import { RaAtHomeSection } from '@/components/sections/RaAtHomeSection';
 import { DrSaraMessageSection } from '@/components/sections/DrSaraMessageSection';
 import { StatsTeamSection } from '@/components/sections/StatsTeamSection';
@@ -33,7 +32,6 @@ export function HomePage() {
       <main>
         <HeroSection />
         <ExploreCategoriesSection />
-        <OffersSection />
         <RaAtHomeSection />
         <AboutSection />
         <DrSaraMessageSection />

@@ -107,11 +107,11 @@ function Body({ onClose }: { onClose: () => void }) {
       </button>
 
       <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold mb-2">
-        Explore services
+        Three paths
       </p>
       <DialogTitle asChild>
         <h2 className="font-serif text-2xl lg:text-3xl text-white leading-[1.05] mb-6">
-          Where would you like to <span className="italic">begin</span>?
+          Choose your <span className="italic">experience</span>.
         </h2>
       </DialogTitle>
 

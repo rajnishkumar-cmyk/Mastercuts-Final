@@ -19,6 +19,7 @@ import { WellnessHubSheet } from './components/layout/WellnessHubSheet';
 import { BottomNav } from './components/layout/BottomNav';
 import { ServiceDetailSheet } from './components/services/ServiceDetailSheet';
 import { WelcomeAnnouncement } from './components/layout/WelcomeAnnouncement';
+import { SearchSheet } from './components/layout/SearchSheet';
 import { EditContactOverlay } from './components/cart/steps/EditContactOverlay';
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
           <CartStrip />
           <BottomNav />
           <WelcomeAnnouncement />
+          <SearchSheet />
 
           <Toaster
             position="top-center"

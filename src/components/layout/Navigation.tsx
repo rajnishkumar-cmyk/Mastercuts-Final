@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, ChevronDown, Phone, X, User as UserIcon } from 'lucide-react';
+import { Menu, ChevronDown, Phone, Search as SearchIcon, X, User as UserIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetClose, SheetTrigger } from '@/components/ui/sheet';
 import { useCart } from '@/components/cart/CartProvider';
@@ -17,7 +17,7 @@ export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [heroInView, setHeroInView] = useState(true);
   const headerRef = useRef<HTMLElement>(null);
-  const { cart, account, openLogin, openProfile, openAudiencePicker, openWellnessHub } = useCart();
+  const { cart, account, openLogin, openProfile, openAudiencePicker, openWellnessHub, openSearch } = useCart();
   const [, setAudience] = useAudience();
   const cartHasItemsRef = useRef(false);
   cartHasItemsRef.current = cart.items.length > 0;
@@ -272,7 +272,7 @@ export function Navigation() {
             </button>
           </div>
 
-          {/* Right cluster — Phone, Cart, Login */}
+          {/* Right cluster — Phone, Search, Cart, Login */}
           <div className="hidden lg:flex items-center gap-5 shrink-0">
             <a
               href="tel:+971564667165"
@@ -282,6 +282,15 @@ export function Navigation() {
               <span className="font-medium">+971 56 466 7165</span>
               <span className="text-xs text-white/60">Dubai</span>
             </a>
+
+            <button
+              type="button"
+              onClick={openSearch}
+              aria-label="Search rituals"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-colors duration-200"
+            >
+              <SearchIcon className="w-4 h-4" />
+            </button>
 
             <CartIcon tone="light" />
 
@@ -307,6 +316,19 @@ export function Navigation() {
 
           {/* Mobile Right Buttons */}
           <div className="flex items-center gap-2 lg:hidden">
+            <button
+              type="button"
+              onClick={openSearch}
+              aria-label="Search rituals"
+              className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-200 ${
+                darkChrome
+                  ? 'bg-white/20 text-white hover:bg-white/30'
+                  : 'bg-white/15 text-white hover:bg-white/25 backdrop-blur-sm'
+              }`}
+            >
+              <SearchIcon className="w-4 h-4" />
+            </button>
+
             <a
               href="tel:+971564667165"
               aria-label="Call Mastercuts"

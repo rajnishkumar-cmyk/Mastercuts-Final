@@ -94,10 +94,10 @@ export function ExploreCategoriesSection() {
         {/* Section heading */}
         <div className="mb-6 lg:mb-8 max-w-2xl">
           <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary mb-2">
-            Explore services
+            Three paths
           </p>
           <h2 className="font-serif text-2xl lg:text-4xl text-text-primary leading-[1.05]">
-            Where would you like to <span className="italic">begin</span>?
+            Choose your <span className="italic">experience</span>.
           </h2>
         </div>
 
@@ -112,7 +112,7 @@ export function ExploreCategoriesSection() {
           {/* Ra at Home — full width on mobile, equal column on desktop */}
           <div className="col-span-12 lg:col-span-3">
             <CategoryCard
-              eyebrow="Nails · Massage · Threading"
+              eyebrow="Massage · More coming soon"
               titleStart="Ra at"
               titleItalic="Home"
               image={IMG_AT_HOME}
