@@ -94,7 +94,7 @@ export function ExploreCategoriesSection() {
         {/* Section heading */}
         <div className="mb-6 lg:mb-8 max-w-2xl">
           <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary mb-2">
-            Three paths
+            Four paths
           </p>
           <h2 className="font-serif text-2xl lg:text-4xl text-text-primary leading-[1.05]">
             Choose your <span className="italic">experience</span>.
