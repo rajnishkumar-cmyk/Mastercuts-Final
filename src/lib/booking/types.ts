@@ -46,10 +46,23 @@ export interface Service {
   durationMin: number;
   price: number;
   image: string;
+  // Optional audience-specific imagery — used when the active audience is
+  // known. Falls back to `image` when absent or for unisex contexts.
+  imageGents?: string;
+  imageLadies?: string;
   audience: ServiceAudience;
   location?: ServiceLocation;
   requiresConsultation?: boolean;
   variants?: ServiceVariant[];
+}
+
+export function pickServiceImage(
+  service: Pick<Service, 'image' | 'imageGents' | 'imageLadies'>,
+  audience: ServiceAudience,
+): string {
+  if (audience === 'gentlemen' && service.imageGents) return service.imageGents;
+  if (audience === 'ladies' && service.imageLadies) return service.imageLadies;
+  return service.image;
 }
 
 export interface Therapist {

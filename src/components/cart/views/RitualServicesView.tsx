@@ -2,6 +2,8 @@ import { ArrowLeft, X } from 'lucide-react';
 import { formatAed, formatDuration } from '../CartProvider';
 import { getRitual, getServicesForRitual, getTherapistsForRitual } from '@/lib/booking/catalog';
 import type { RitualId } from '@/lib/booking/types';
+import { pickServiceImage } from '@/lib/booking/types';
+import { useAudience } from '@/components/services/useAudience';
 import { AddToCartButton } from '../AddToCartButton';
 import { DrawerStickyFooter } from './DrawerStickyFooter';
 
@@ -15,6 +17,7 @@ export function RitualServicesView({ ritualId, onClose, onBack }: Props) {
   const ritual = getRitual(ritualId);
   const services = getServicesForRitual(ritualId);
   const therapistCount = getTherapistsForRitual(ritualId).length;
+  const [audience] = useAudience();
 
   if (!ritual) return null;
 
@@ -68,7 +71,7 @@ export function RitualServicesView({ ritualId, onClose, onBack }: Props) {
               className="flex items-start gap-4 py-5 border-b border-black/10"
             >
               <div className="w-20 h-24 flex-shrink-0 overflow-hidden bg-black/5">
-                <img src={svc.image} alt={svc.name} className="w-full h-full object-cover" />
+                <img src={pickServiceImage(svc, audience)} alt={svc.name} className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-serif text-lg text-text-primary leading-tight">

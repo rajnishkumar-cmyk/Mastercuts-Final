@@ -1,6 +1,8 @@
 import { ArrowLeft, X, Check, Plus } from 'lucide-react';
 import { useCart, formatAed, formatDuration } from '../CartProvider';
 import { getJourney, getJourneyTotals, getService } from '@/lib/booking/catalog';
+import { pickServiceImage } from '@/lib/booking/types';
+import { useAudience } from '@/components/services/useAudience';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -11,6 +13,7 @@ interface Props {
 
 export function JourneyDetailView({ journeyId, onClose, onBack }: Props) {
   const { cart, addJourneyToCart, removeItem } = useCart();
+  const [audience] = useAudience();
   const journey = getJourney(journeyId);
   if (!journey) return null;
   const totals = getJourneyTotals(journey);
@@ -85,7 +88,7 @@ export function JourneyDetailView({ journeyId, onClose, onBack }: Props) {
                   className="flex items-start gap-3 border-b border-black/5 pb-3 last:border-b-0"
                 >
                   <div className="w-14 h-14 flex-shrink-0 overflow-hidden bg-black/5">
-                    <img src={svc.image} alt={svc.name} className="w-full h-full object-cover" />
+                    <img src={pickServiceImage(svc, audience)} alt={svc.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-text-primary leading-tight">{svc.name}</p>

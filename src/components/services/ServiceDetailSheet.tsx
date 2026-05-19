@@ -16,6 +16,8 @@ import {
   getServicesForRitual,
   getTherapistsForRitual,
 } from '@/lib/booking/catalog';
+import { pickServiceImage } from '@/lib/booking/types';
+import { useAudience } from '@/components/services/useAudience';
 import { cn } from '@/lib/utils';
 
 export function ServiceDetailSheet() {
@@ -51,6 +53,7 @@ export function ServiceDetailSheet() {
 
   const cartItem = cart.items.find((i) => i.serviceId === serviceDetail?.serviceId);
   const inCart = !!cartItem;
+  const [audience] = useAudience();
 
   const variants = service?.variants ?? [];
   const hasVariants = variants.length > 1;
@@ -117,7 +120,7 @@ export function ServiceDetailSheet() {
               className="absolute inset-0"
             >
               <img
-                src={service.image}
+                src={pickServiceImage(service, audience)}
                 alt={service.name}
                 className="w-full h-full object-cover"
               />
@@ -294,7 +297,7 @@ export function ServiceDetailSheet() {
                     {
                       icon: HeartHandshake,
                       title: 'Trained hands',
-                      body: 'Every therapist is senior, certified, and reviewed.',
+                      body: 'Professionally certified and trained to Ra Standards.',
                     },
                     {
                       icon: Hourglass,
@@ -402,7 +405,7 @@ export function ServiceDetailSheet() {
                       >
                         <div className="aspect-[4/3] overflow-hidden mb-3">
                           <img
-                            src={s.image}
+                            src={pickServiceImage(s, audience)}
                             alt={s.name}
                             className="w-full h-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
                           />

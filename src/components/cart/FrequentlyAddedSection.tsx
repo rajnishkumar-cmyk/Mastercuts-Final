@@ -2,9 +2,12 @@ import { useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { useCart, formatAed, formatDuration } from './CartProvider';
 import { getFrequentlyAddedSuggestions } from '@/lib/booking/catalog';
+import { pickServiceImage } from '@/lib/booking/types';
+import { useAudience } from '@/components/services/useAudience';
 
 export function FrequentlyAddedSection() {
   const { cart, addToCart } = useCart();
+  const [audience] = useAudience();
 
   const cartServiceIds = useMemo(
     () => cart.items.map((i) => i.serviceId),
@@ -32,7 +35,7 @@ export function FrequentlyAddedSection() {
           >
             <div className="h-20 bg-black/[0.03] overflow-hidden">
               <img
-                src={svc.image}
+                src={pickServiceImage(svc, audience)}
                 alt={svc.name}
                 className="w-full h-full object-cover"
               />

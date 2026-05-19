@@ -111,7 +111,7 @@ export const rituals: Ritual[] = [
         a: 'Warmed stones are already part of the choreography. No add-on needed.',
       },
     ],
-    image: '/assets/Images/H-05.png',
+    image: '/assets/Service category images/Signature Ritual Banner .jpg',
   },
   {
     id: 'solar-vitality',
@@ -396,7 +396,9 @@ export const services: Service[] = [
       'A curated wellness experience combining the flowing techniques of Balinese massage, the restorative depth of targeted pressure therapy and the calming warmth of heated stones. Enhanced by aromatic essential oils, each movement is designed to release tension, improve circulation and restore physical and emotional balance. The journey concludes with a focused scalp, neck and shoulder massage, leaving the body deeply relaxed, the mind quieted and the senses completely renewed.',
     durationMin: 90,
     price: 475,
-    image: '/assets/Images/H-05.png',
+    image: '/assets/Massage Ritual Images/Ra signature massage ladies.jpg',
+    imageGents: '/assets/Massage Ritual Images/Ra signature massage Men.jpg',
+    imageLadies: '/assets/Massage Ritual Images/Ra signature massage ladies.jpg',
     audience: 'unisex',
     location: 'both',
   },
@@ -410,7 +412,9 @@ export const services: Service[] = [
       'A targeted body therapy designed to release deep muscular tension and restore physical balance. Slow, focused techniques work into areas of tightness to ease fatigue, improve circulation and support mobility. Warm therapeutic oils and concentrated pressure help relax the body while calming the mind. Gentle attention to the shoulders, neck and scalp enhances the experience, leaving you feeling lighter, restored and deeply rebalanced.',
     durationMin: 60,
     price: 320,
-    image: '/assets/Images/H-02.png',
+    image: '/assets/Massage Ritual Images/Deep Tissue massage Ladies.jpg',
+    imageGents: '/assets/Massage Ritual Images/Deep tissue massage men.jpg',
+    imageLadies: '/assets/Massage Ritual Images/Deep Tissue massage Ladies.jpg',
     audience: 'unisex',
     location: 'both',
     variants: [
@@ -428,7 +432,9 @@ export const services: Service[] = [
       'A calming body therapy inspired by traditional Balinese techniques, designed to restore balance and deep relaxation. Flowing movements, rhythmic pressure and gentle stretches work together to ease muscular tension, improve circulation and quiet the mind. Aromatic oils nourish the skin while focused attention on the back, shoulders and scalp helps release accumulated stress. The experience leaves the body softened, senses restored and the mind enveloped in a lasting sense of calm and well-being.',
     durationMin: 60,
     price: 320,
-    image: '/assets/Images/H-06.png',
+    image: '/assets/Massage Ritual Images/Balinese Massage Ladies.jpg',
+    imageGents: '/assets/Massage Ritual Images/Balinese Massage Men.jpg',
+    imageLadies: '/assets/Massage Ritual Images/Balinese Massage Ladies.jpg',
     audience: 'unisex',
     location: 'both',
     variants: [
@@ -446,7 +452,9 @@ export const services: Service[] = [
       'Experience deep relaxation with our Swedish Massage, a timeless therapy designed to ease muscle tension, improve circulation and calm the mind. Using gentle to medium pressure techniques combined with smooth, flowing strokes, this treatment helps reduce stress, relieve body fatigue and restore overall balance. Perfect for those seeking relaxation and wellness, this massage promotes a sense of lightness, comfort and renewed energy, leaving your body refreshed and the mind free of tensions.',
     durationMin: 60,
     price: 285,
-    image: '/assets/Images/H-07.png',
+    image: '/assets/Massage Ritual Images/Soft serinity massage ladies.jpg',
+    imageGents: '/assets/Massage Ritual Images/Soft serinity massage men.jpg',
+    imageLadies: '/assets/Massage Ritual Images/Soft serinity massage ladies.jpg',
     audience: 'unisex',
     location: 'both',
     variants: [
@@ -454,39 +462,6 @@ export const services: Service[] = [
       { id: '90', label: '90 minutes', durationMin: 90, price: 415 },
     ],
   },
-  {
-    id: 'somatic-aromatherapy',
-    ritualId: 'somatic-recovery',
-    name: 'The Sensory Body Therapy',
-    description:
-      'Rebalance with a deep calm massage, custom oils and rhythmic touch.',
-    detail:
-      'Experience the ultimate sensory body massage, a curated journey designed to restore emotional and physical harmony. Combining the healing power of touch with custom-blended essential oils to calm, uplift and restore. Flowing rhythmic techniques and gentle pressure quiet the mind and dissolve tension. With focused attention on the shoulders, neck and scalp, this treatment softens the body and fosters deep relaxation. Leave with a lighter mind, a soothed body and a lasting sense of well-being.',
-    durationMin: 60,
-    price: 360,
-    image: '/assets/Images/H-05.png',
-    audience: 'unisex',
-    location: 'both',
-    variants: [
-      { id: '60', label: '60 minutes', durationMin: 60, price: 360 },
-      { id: '90', label: '90 minutes', durationMin: 90, price: 510 },
-    ],
-  },
-  {
-    id: 'somatic-hot-stone-addon',
-    ritualId: 'somatic-recovery',
-    name: 'Hot Stone Enhancement',
-    description:
-      'Heated stones ease tension, relax muscles and deepen your massage experience.',
-    detail:
-      'A 20-minute thermal enhancement designed to complement your Deep Tissue Therapy, Balinese Therapy, The Soft Serenity Massage or The Sensory Body Therapy. Smooth heated stones are applied with slow, flowing movements across targeted areas of the body, allowing warmth to penetrate deeply into the muscles. This calming addition helps improve circulation, soften tension and elevate the overall massage experience, leaving the body feeling lighter, soothed and deeply relaxed.',
-    durationMin: 20,
-    price: 60,
-    image: '/assets/Images/H-02.png',
-    audience: 'unisex',
-    location: 'both',
-  },
-
   // Signature Rituals — the awareness ritual; a 45-minute Ra introduction.
   // ID prefix 'signature-' is matched by the Signature group in AtHomePage.
   {
@@ -504,7 +479,9 @@ export const services: Service[] = [
     ],
     durationMin: 45,
     price: 305,
-    image: '/assets/Images/H-05.png',
+    image: '/assets/Massage Ritual Images/Ra signature introduction Ladies.jpg',
+    imageGents: '/assets/Massage Ritual Images/Ra signature introduction Men.jpg',
+    imageLadies: '/assets/Massage Ritual Images/Ra signature introduction Ladies.jpg',
     audience: 'unisex',
     location: 'home',
   },

@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import type { Cart, CartItem, DraftCheckout, GuestDetails, GuestProfile, LightAccount, BookingRecord, RitualId, ServiceAddress, WaitlistRequest } from '@/lib/booking/types';
+import { pickServiceImage } from '@/lib/booking/types';
+import { useAudience } from '@/components/services/useAudience';
 import { getService, getJourney, getJourneyTotals } from '@/lib/booking/catalog';
 import {
   CART_KEY,
@@ -158,6 +160,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [audiencePickerDestination, setAudiencePickerDestination] = useState<string>('/explore');
   const [guestProfiles, setGuestProfiles] = useState<GuestProfile[]>([]);
   const [waitlistRequests, setWaitlistRequests] = useState<WaitlistRequest[]>([]);
+  const [audience] = useAudience();
+  const audienceRef = useRef(audience);
+  audienceRef.current = audience;
   const hydratedRef = useRef(false);
   const guestsHydratedRef = useRef(false);
   const waitlistHydratedRef = useRef(false);
@@ -253,7 +258,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           name: service.name,
           durationMin: effectiveDuration,
           price: effectivePrice,
-          image: service.image,
+          image: pickServiceImage(service, audienceRef.current),
           therapistPref,
           variantId: effectiveVariantId,
           variantLabel: effectiveVariantLabel,

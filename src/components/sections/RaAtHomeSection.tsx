@@ -53,7 +53,7 @@ const CATEGORIES: Category[] = [
     title: 'Body Rituals',
     italic: 'Massages',
     description:
-      'Signature, deep tissue, Balinese, Swedish and aromatherapy — brought into your home.',
+      'Signature, deep tissue, Balinese and Swedish — brought into your home.',
     icon: Sparkles,
     imageGents: '/assets/New%20Images%20/Ra%20at%20home%20Gentlemen%20Body%20Ritual.jpg',
     imageLadies: '/assets/New%20Images%20/Ra%20at%20home%20Ladies%20Body%20Ritual.jpg',

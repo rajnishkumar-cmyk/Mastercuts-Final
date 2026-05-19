@@ -42,7 +42,7 @@ const GROUPS: Group[] = [
     italic: 'Massages',
     tagline: 'Wellness',
     description:
-      'Signature, deep tissue, Balinese, Swedish and aromatherapy — brought into your home.',
+      'Signature, deep tissue, Balinese and Swedish — brought into your home.',
     icon: Sparkles,
     matches: (id) => id.startsWith('somatic-'),
   },

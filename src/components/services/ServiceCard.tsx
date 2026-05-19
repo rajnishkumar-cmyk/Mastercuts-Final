@@ -2,7 +2,9 @@ import { ArrowUpRight, Minus, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
 import type { Service, Package } from '@/lib/booking/types';
+import { pickServiceImage } from '@/lib/booking/types';
 import { getJourneyTotals } from '@/lib/booking/catalog';
+import { useAudience } from '@/components/services/useAudience';
 import { cn } from '@/lib/utils';
 
 interface ServiceCardProps {
@@ -19,6 +21,8 @@ export function ServiceCard({
   className,
 }: ServiceCardProps) {
   const { openServiceDetail, addToCart, removeItem, cart } = useCart();
+  const [audience] = useAudience();
+  const serviceImage = pickServiceImage(service, audience);
 
   const itemsOfService = cart.items.filter((i) => i.serviceId === service.id);
   const count = itemsOfService.length;
@@ -131,7 +135,7 @@ export function ServiceCard({
           <div className="relative w-[112px]">
             <div className="w-[112px] h-[112px] rounded-lg overflow-hidden bg-black/5">
               <img
-                src={service.image}
+                src={serviceImage}
                 alt={service.name}
                 className="w-full h-full object-cover"
               />

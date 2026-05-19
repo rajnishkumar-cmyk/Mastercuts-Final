@@ -2,6 +2,8 @@ import { motion } from 'framer-motion';
 import { ArrowUpRight, Plus, Check } from 'lucide-react';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
 import type { Service } from '@/lib/booking/types';
+import { pickServiceImage } from '@/lib/booking/types';
+import { useAudience } from '@/components/services/useAudience';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -12,6 +14,7 @@ interface Props {
 
 export function RitualServiceRow({ service, index, inView }: Props) {
   const { cart, openServiceDetail } = useCart();
+  const [audience] = useAudience();
   const cartItem = cart.items.find((i) => i.serviceId === service.id);
   const inCart = !!cartItem;
 
@@ -41,7 +44,7 @@ export function RitualServiceRow({ service, index, inView }: Props) {
         aria-label={`Open ${service.name} details`}
       >
         <img
-          src={service.image}
+          src={pickServiceImage(service, audience)}
           alt={service.name}
           className="w-full h-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
         />
