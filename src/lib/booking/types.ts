@@ -5,7 +5,8 @@ export type RitualId =
   | 'alchemic-aesthetics'
   | 'longevity-lab'
   | 'velvet-smooth'
-  | 'body-renewal';
+  | 'body-renewal'
+  | 'signature-rituals';
 
 export type ServiceAudience = 'gentlemen' | 'ladies' | 'unisex';
 

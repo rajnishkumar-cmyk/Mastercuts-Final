@@ -2,7 +2,7 @@ import { ArrowUpRight, Minus, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
 import type { Service, Package } from '@/lib/booking/types';
-import { getRitual, getJourneyTotals } from '@/lib/booking/catalog';
+import { getJourneyTotals } from '@/lib/booking/catalog';
 import { cn } from '@/lib/utils';
 
 interface ServiceCardProps {
@@ -19,7 +19,6 @@ export function ServiceCard({
   className,
 }: ServiceCardProps) {
   const { openServiceDetail, addToCart, removeItem, cart } = useCart();
-  const ritual = getRitual(service.ritualId);
 
   const itemsOfService = cart.items.filter((i) => i.serviceId === service.id);
   const count = itemsOfService.length;
@@ -92,11 +91,6 @@ export function ServiceCard({
           <h3 className="font-serif text-[22px] leading-[26px] text-text-primary">
             {service.name}
           </h3>
-          {ritual && (
-            <p className="font-sans text-[12px] leading-[16px] text-text-primary/55 mt-1">
-              {ritual.tagline}
-            </p>
-          )}
           <p className="font-sans text-[14px] leading-[18px] text-text-primary mt-2 font-medium">
             {hasVariants ? 'Starts at ' : ''}
             {formatAed(startingPrice)}

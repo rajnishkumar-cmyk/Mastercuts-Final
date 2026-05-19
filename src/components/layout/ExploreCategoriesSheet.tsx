@@ -125,14 +125,14 @@ function Body({ onClose }: { onClose: () => void }) {
             variant="compact"
             titleStart="Mastercuts For"
             titleItalic="Gents"
-            image="/assets/Images/Ra for gents.jpg"
+            image="/assets/New Images /Mastercuts Gentlemen New.JPG"
             onClick={() => handleSalon('gentlemen')}
           />
           <MiniCard
             variant="compact"
             titleStart="Mastercuts For"
             titleItalic="Ladies"
-            image="/assets/Images/Ra for ladies.jpg"
+            image="/assets/New Images /Mastercuts Ladies New.jpg"
             onClick={() => handleSalon('ladies')}
           />
         </div>
@@ -162,7 +162,7 @@ function Body({ onClose }: { onClose: () => void }) {
           eyebrow="By invitation"
           titleStart="Ra Wellness"
           titleItalic="Hub"
-          image="/assets/Images/two-hairstylers-posing-standing-modern-spacy-beaty-salon.jpg"
+          image="/assets/New Images /Ra Wellness hub new.jpg"
           raBadge
           onClick={handleHub}
         />

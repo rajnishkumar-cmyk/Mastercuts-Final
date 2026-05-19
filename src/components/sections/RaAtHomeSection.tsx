@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRef, useState, useEffect, useCallback, useMemo, type ComponentType } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUpRight, Feather, Sparkles, Wand2 } from 'lucide-react';
+import { ArrowUpRight, Feather, Sparkles, Sun, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getAtHomeServices } from '@/lib/booking/catalog';
 import type { ServiceAudience } from '@/lib/booking/types';
@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 const RA_EMBLEM = '/assets/Logo/ra-emblem.png';
 const WIPE_START = 0.5;
 
-type CategoryId = 'massage' | 'nails' | 'threading';
+type CategoryId = 'signature' | 'massage' | 'nails' | 'threading';
 type IconComponent = ComponentType<{ className?: string; strokeWidth?: number }>;
 
 interface Category {
@@ -36,6 +36,18 @@ interface Category {
 // identically.
 const CATEGORIES: Category[] = [
   {
+    id: 'signature',
+    eyebrow: 'Begin your Ra Experience',
+    title: 'Signature',
+    italic: 'Rituals',
+    description:
+      'A focused 45-minute introduction to the Ra approach — aromatherapy, deep tissue and warmed stones, choreographed for first-time guests.',
+    icon: Sun,
+    imageGents: '/assets/Images/Ra%20at%20home.jpeg',
+    imageLadies: '/assets/Images/Ra%20at%20home.jpeg',
+    matches: (id) => id.startsWith('signature-'),
+  },
+  {
     id: 'massage',
     eyebrow: 'Wellness',
     title: 'Body Rituals',
@@ -43,8 +55,8 @@ const CATEGORIES: Category[] = [
     description:
       'Signature, deep tissue, Balinese, Swedish and aromatherapy — brought into your home.',
     icon: Sparkles,
-    imageGents: '/assets/Images/side-view-man-getting-professional-massage.jpg',
-    imageLadies: '/assets/Images/Massage%20Ladies%20final.jpg',
+    imageGents: '/assets/New%20Images%20/Ra%20at%20home%20Gentlemen%20Body%20Ritual.jpg',
+    imageLadies: '/assets/New%20Images%20/Ra%20at%20home%20Ladies%20Body%20Ritual.jpg',
     matches: (id) => id.startsWith('somatic-'),
   },
   {
@@ -68,8 +80,8 @@ const CATEGORIES: Category[] = [
     description:
       'Precise brow, lip and full-face shaping — launching ahead of full studio opening.',
     icon: Feather,
-    imageGents: '/assets/Images/young-woman-beauty-salon.jpg',
-    imageLadies: '/assets/Images/young-woman-beauty-salon.jpg',
+    imageGents: '/assets/New%20Images%20/Ra%20at%20home%20Gents%20Threading.jpg',
+    imageLadies: '/assets/New%20Images%20/Ra%20at%20home%20Ladies%20Threading%20Ritual.jpg',
     matches: (id) => id.startsWith('velvet-threading-'),
   },
 ];
@@ -133,7 +145,7 @@ export function RaAtHomeSection() {
     [audience],
   );
 
-  const [mobileCategoryId, setMobileCategoryId] = useState<CategoryId>('massage');
+  const [mobileCategoryId, setMobileCategoryId] = useState<CategoryId>('signature');
 
   // Desktop scroll-driven wipe state
   const [currentService, setCurrentService] = useState(0);
@@ -154,7 +166,7 @@ export function RaAtHomeSection() {
   // If audience change removes the current mobile category, fall back to first.
   useEffect(() => {
     if (!visibleCategories.find((c) => c.id === mobileCategoryId)) {
-      setMobileCategoryId(visibleCategories[0]?.id ?? 'massage');
+      setMobileCategoryId(visibleCategories[0]?.id ?? 'signature');
     }
   }, [visibleCategories, mobileCategoryId]);
 
@@ -209,7 +221,7 @@ export function RaAtHomeSection() {
     setMobileCategoryId(id);
   }, []);
 
-  const activeDesktopId: CategoryId = visibleCategories[currentService]?.id ?? 'massage';
+  const activeDesktopId: CategoryId = visibleCategories[currentService]?.id ?? 'signature';
   const mobileCategory = useMemo(
     () =>
       visibleCategories.find((c) => c.id === mobileCategoryId) ??

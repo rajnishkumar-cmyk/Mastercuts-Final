@@ -155,10 +155,8 @@ export function HeroSection() {
         'Science-led wellness, quietly delivered — sessions designed to slow the day and restore the self.',
       media: {
         type: 'image',
-        src: '/assets/Images/two-hairstylers-posing-standing-modern-spacy-beaty-salon.jpg',
-        position: 'top-left',
-        transform: 'scale(1.12)',
-        transformOrigin: 'top left',
+        src: '/assets/New%20Images%20/Ra%20Wellness%20hub%20new.jpg',
+        position: 'center',
       },
       topMark: '/assets/Logo/ra-emblem.png',
       primaryCta: { label: 'Explore Wellness Hub', onClick: () => navigate('/wellness-hub') },

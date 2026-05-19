@@ -5,9 +5,9 @@ import { useCart } from '@/components/cart/CartProvider';
 import { useAudience } from '@/components/services/useAudience';
 
 const IMG_AT_HOME = '/assets/Images/Ra at home.jpeg';
-const IMG_GENTS = '/assets/Images/Ra for gents.jpg';
-const IMG_LADIES = '/assets/Images/Ra for ladies.jpg';
-const IMG_WELLNESS = '/assets/Images/two-hairstylers-posing-standing-modern-spacy-beaty-salon.jpg';
+const IMG_GENTS = '/assets/New Images /Mastercuts Gentlemen New.JPG';
+const IMG_LADIES = '/assets/New Images /Mastercuts Ladies New.jpg';
+const IMG_WELLNESS = '/assets/New Images /Ra Wellness hub new.jpg';
 const RA_EMBLEM = '/assets/Logo/ra-emblem.png';
 
 interface CategoryCardProps {
@@ -112,7 +112,7 @@ export function ExploreCategoriesSection() {
           {/* Ra at Home — full width on mobile, equal column on desktop */}
           <div className="col-span-12 lg:col-span-3">
             <CategoryCard
-              eyebrow="Massage · More coming soon"
+              eyebrow="Begin with our Signature Introduction"
               titleStart="Ra at"
               titleItalic="Home"
               image={IMG_AT_HOME}

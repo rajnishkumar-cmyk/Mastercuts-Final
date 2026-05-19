@@ -23,7 +23,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
 };
 
-const IMG_WELLNESS = '/assets/Images/two-hairstylers-posing-standing-modern-spacy-beaty-salon.jpg';
+const IMG_WELLNESS = '/assets/New Images /Ra Wellness hub new.jpg';
 const RA_EMBLEM = '/assets/Logo/ra-emblem.png';
 
 export function DesktopMenu({ open, onClose }: DesktopMenuProps) {

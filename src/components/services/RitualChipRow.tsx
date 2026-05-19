@@ -2,6 +2,7 @@ import { useEffect, useRef, type ComponentType } from 'react';
 import {
   Scissors,
   Sun,
+  Sunrise,
   Flower2,
   Sparkles,
   Activity,
@@ -43,6 +44,9 @@ const CHIP_ICONS: Record<ChipId, IconComponent> = {
   'longevity-lab': Activity,
   'velvet-smooth': Feather,
   'body-renewal': Wand2,
+  // Not currently rendered in HOME_CHIPS (signature-rituals is at-home only),
+  // but required to satisfy the Record<ChipId, IconComponent> constraint.
+  'signature-rituals': Sunrise,
 };
 
 interface RitualChipRowProps {

@@ -5,42 +5,49 @@ interface Testimonial {
   id: number;
   quote: string;
   author: string;
+  role: string;
   service: string;
 }
 
 const testimonials: Testimonial[] = [
   {
     id: 1,
-    quote: "I had an excellent experience at Mastercuts with Sarah for my new look. The therapist was thorough, explained the process clearly, and made me feel completely at ease. The staff was friendly, and the salon was clean and welcoming. My hair feels amazing, and I'm already looking forward to my next visit. Highly recommend this salon for top-notch care.",
-    author: "Alessandro B.",
-    service: "Signature Cut & Style"
+    quote: "I loved my hair cut — patiently done to suit my face. The place is clean and has a very warm feeling. Thank you for making my day. Would recommend friends to visit Mastercuts!",
+    author: "Dr Angela Murze",
+    role: "Customer",
+    service: "Signature Haircut"
   },
   {
     id: 2,
-    quote: "Staff is amazing as always. Everyone is friendly and makes you feel welcomed. David is always friendly and takes the time to listen and render an exceptional service. He often checks on his past and current clients. I really appreciate his artistry. The salon feels like home.",
-    author: "Jenny S.",
-    service: "Colour Transformation"
+    quote: "I tried the massage and manicure/pedicure service at Mastercuts and it was really an amazing experience. The staff are friendly and accommodating to all their customers. I will always recommend Mastercuts to my family and friends.",
+    author: "Mariz De Leon",
+    role: "Designer",
+    service: "Massage & Mani-Pedi"
   },
   {
     id: 3,
-    quote: "The deep conditioning treatment completely transformed my hair. After years of heat damage I had given up hope, but the team here knew exactly what my hair needed. The treatment was incredibly relaxing and the results were immediate — soft, shiny, and full of life again.",
-    author: "Priya M.",
-    service: "Deep Conditioning Treatment"
+    quote: "Very professional staff and the ambience is amazing at Mastercuts. Ruby did a great full body massage and my hair colour came out exactly as I wanted. I was very happy with the services and would definitely recommend to my friends. Thank you Mastercuts!",
+    author: "Samantha Samson",
+    role: "Designer",
+    service: "Hair Colour & Body Massage"
   },
   {
     id: 4,
-    quote: "I cannot imagine a more perfect wedding day experience. The bridal hair team was calm, creative, and precise — they brought my vision to life better than I had pictured it. Every bridesmaid felt beautiful and the whole morning felt like a luxury experience rather than a rushed appointment.",
-    author: "Claire D.",
-    service: "Bridal Hair Design"
+    quote: "I visited your salon a few days back. Very professional staff with a neat and clean environment — Nilofar was so helpful during my visit. The ambience and interior were mesmerising. I will visit soon again and recommend everyone in my friends and family to get your services. Thank you so much.",
+    author: "Ahsan Ali Ahmad",
+    role: "Celebrity Makeup Artist",
+    service: "Salon Experience"
+  },
+  {
+    id: 5,
+    quote: "Great men's haircut by Allistair. Covered parking and easy access in and out.",
+    author: "Zein Mocke",
+    role: "Writer / Producer",
+    service: "Men's Grooming"
   }
 ];
 
-const services = [
-  'Signature Cut & Style',
-  'Colour Transformation',
-  'Deep Conditioning Treatment',
-  'Bridal Hair Design'
-];
+const services = testimonials.map(t => t.service);
 
 const TIMER_DURATION = 6000;
 const TICK_MS = 50;
@@ -191,8 +198,11 @@ export function TestimonialsSection() {
                   &quot; {testimonials[activeTestimonial].quote} &quot;
                 </blockquote>
 
-                <p className="text-white/50 text-sm">
+                <p className="text-white text-base font-medium">
                   {testimonials[activeTestimonial].author}
+                </p>
+                <p className="text-white/50 text-sm mt-1">
+                  {testimonials[activeTestimonial].role}
                 </p>
               </motion.div>
             </AnimatePresence>

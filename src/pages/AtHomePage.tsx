@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentType } from 'react';
 import { motion } from 'framer-motion';
-import { Feather, Search, Sparkles, Wand2, X } from 'lucide-react';
+import { Feather, Search, Sparkles, Sun, Wand2, X } from 'lucide-react';
 import { getAtHomeServices } from '@/lib/booking/catalog';
 import { useAudience } from '@/components/services/useAudience';
 import { AudienceToggle } from '@/components/services/AudienceToggle';
 import { ServiceCard } from '@/components/services/ServiceCard';
 import { cn } from '@/lib/utils';
 
-// Three permitted at-home categories during the transition.
-type GroupId = 'massage' | 'nails' | 'threading';
+// At-home categories during the transition. 'signature' is the entry-tier
+// Ra Experience intro; the other three are the existing studio rituals.
+type GroupId = 'signature' | 'massage' | 'nails' | 'threading';
 
 type IconComponent = ComponentType<{ className?: string; strokeWidth?: number }>;
 
@@ -23,6 +24,18 @@ interface Group {
 }
 
 const GROUPS: Group[] = [
+  {
+    id: 'signature',
+    title: 'Signature',
+    italic: 'Rituals',
+    tagline: 'Begin your Ra Experience',
+    description:
+      'A focused 45-minute introduction to the Ra approach — choose this to meet the studio for the first time.',
+    icon: Sun,
+    // Future signature intros (Glow Intro, Atelier Intro) should share the
+    // 'signature-' id prefix to surface here.
+    matches: (id) => id.startsWith('signature-'),
+  },
   {
     id: 'massage',
     title: 'Body Rituals',
@@ -57,7 +70,7 @@ const SCROLL_BREATHING = 12;
 
 export function AtHomePage() {
   const [audience, setAudience] = useAudience();
-  const [activeId, setActiveId] = useState<GroupId>('massage');
+  const [activeId, setActiveId] = useState<GroupId>('signature');
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -163,7 +176,7 @@ export function AtHomePage() {
     const compute = () => {
       const filterBottom = filterRef.current?.getBoundingClientRect().bottom ?? 120;
       const threshold = filterBottom + SCROLL_BREATHING + 4;
-      let candidate: GroupId = grouped[0]?.group.id ?? 'massage';
+      let candidate: GroupId = grouped[0]?.group.id ?? 'signature';
       for (const { group } of grouped) {
         const el = sectionRefs.current[group.id];
         if (!el) continue;

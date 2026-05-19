@@ -88,6 +88,32 @@ export const rituals: Ritual[] = [
     image: '/assets/Images/H-05.png',
   },
   {
+    id: 'signature-rituals',
+    title: 'Signature',
+    titleItalic: 'Rituals',
+    tagline: 'Begin your Ra Experience',
+    description:
+      'A curated introduction to the essence of Ra — aromatherapy, focused deep tissue and warmed stones, choreographed into a single mindful experience.',
+    longDescription:
+      'Signature Rituals are the entry point to Ra — short, considered experiences designed to introduce the studio rather than overwhelm it. Each ritual draws from across our wider practice (somatic, sensory, restorative) and edits it down to a focused 45 minutes.\n\nThe brief is the same as the rest of our work: unhurried hands, considered pressure, and an environment that asks nothing of you but presence. Whether this is the first time you are meeting Ra, or you simply want a quieter window in the week, this is where to begin.',
+    philosophy: 'Begin where the body asks you to.',
+    faqs: [
+      {
+        q: 'Is the Signature Introduction suitable for a first-time massage?',
+        a: 'Yes — it is designed for first visits. Pressure is negotiated at the start, and the choreography is restorative rather than clinical.',
+      },
+      {
+        q: 'How is this different from the Ra Signature Massage?',
+        a: 'The Signature Massage is a full 90-minute experience across multiple modalities. The Introduction is a shorter, 45-minute edit — built to give you a sense of the Ra approach before committing to a longer ritual.',
+      },
+      {
+        q: 'Can I add a Hot Stone Enhancement to the Introduction?',
+        a: 'Warmed stones are already part of the choreography. No add-on needed.',
+      },
+    ],
+    image: '/assets/Images/H-05.png',
+  },
+  {
     id: 'solar-vitality',
     title: 'Solar',
     titleItalic: 'Vitality',
@@ -459,6 +485,28 @@ export const services: Service[] = [
     image: '/assets/Images/H-02.png',
     audience: 'unisex',
     location: 'both',
+  },
+
+  // Signature Rituals — the awareness ritual; a 45-minute Ra introduction.
+  // ID prefix 'signature-' is matched by the Signature group in AtHomePage.
+  {
+    id: 'signature-intro-45',
+    ritualId: 'signature-rituals',
+    name: 'Ra Signature Introduction',
+    description:
+      'A 45-minute introduction to the essence of Ra — aromatherapy, focused deep tissue and warmed stones.',
+    detail:
+      'A 45-minute introduction to the essence of Ra. Aromatherapy, focused deep tissue work and warmed stones come together in a mindfully choreographed experience designed to relax, restore and rejuvenate.',
+    highlights: [
+      '45 mindfully choreographed minutes',
+      'Aromatherapy with warmed stones',
+      'Focused deep tissue work',
+    ],
+    durationMin: 45,
+    price: 305,
+    image: '/assets/Images/H-05.png',
+    audience: 'unisex',
+    location: 'home',
   },
 
   // Alchemic Aesthetics

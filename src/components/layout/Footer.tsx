@@ -99,8 +99,8 @@ export function Footer() {
           </motion.div>
         </motion.div>
 
-        {/* Footer Links */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 py-12 border-t border-white/10">
+        {/* Footer Links — Services | Our Salon | Social (Contact now lives below with the map) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 py-12 border-t border-white/10">
 
           {/* Services */}
           <motion.div
@@ -177,56 +177,76 @@ export function Footer() {
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
+            <p className="text-white/50 text-sm mb-6">Follow us</p>
             <div className="flex gap-4">
               <a
                 href="#"
+                aria-label="Instagram"
                 className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors duration-200"
               >
                 <Instagram className="w-5 h-5" />
               </a>
               <a
                 href="#"
+                aria-label="LinkedIn"
                 className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors duration-200"
               >
                 <Linkedin className="w-5 h-5" />
               </a>
             </div>
           </motion.div>
+        </div>
 
-          {/* Contact */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className="lg:col-span-1"
-          >
-            <p className="text-white/50 text-sm mb-6">Contact</p>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-accent-gold shrink-0 mt-1" />
-                <p className="text-white text-sm leading-relaxed">
-                  {STUDIO_ADDRESS}
-                </p>
+        {/* Visit the studio — Contact card + map paired as one composition.
+            Imperial Avenue is for at-home delivery during the transition;
+            the embedded map points to the salon being revamped. */}
+        <div className="mt-12 pt-12 border-t border-white/10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 lg:items-stretch">
+
+            {/* Contact card */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.7 }}
+              className="lg:col-span-5 rounded-2xl border border-white/10 bg-white/[0.02] p-6 lg:p-8 flex flex-col"
+            >
+              <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
+                <h3 className="font-serif text-2xl lg:text-3xl text-white leading-tight">
+                  Visit the studio
+                </h3>
+                <span className="text-[10px] uppercase tracking-[0.22em] text-accent-gold border border-accent-gold/40 rounded-full px-3 py-1 whitespace-nowrap">
+                  Opening soon
+                </span>
               </div>
-              <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-accent-gold shrink-0" />
-                <a
-                  href={`tel:${STUDIO_PHONE_HREF}`}
-                  className="text-white text-sm hover:text-white/70 transition-colors"
-                >
-                  {STUDIO_PHONE}
-                </a>
+
+              <div className="space-y-4 flex-1">
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-4 h-4 text-accent-gold shrink-0 mt-1" />
+                  <p className="text-white text-sm leading-relaxed">
+                    {STUDIO_ADDRESS}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Phone className="w-4 h-4 text-accent-gold shrink-0" />
+                  <a
+                    href={`tel:${STUDIO_PHONE_HREF}`}
+                    className="text-white text-sm hover:text-white/70 transition-colors"
+                  >
+                    {STUDIO_PHONE}
+                  </a>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Mail className="w-4 h-4 text-accent-gold shrink-0" />
+                  <a
+                    href={`mailto:${STUDIO_EMAIL}`}
+                    className="text-white text-sm hover:text-white/70 transition-colors"
+                  >
+                    {STUDIO_EMAIL}
+                  </a>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-accent-gold shrink-0" />
-                <a
-                  href={`mailto:${STUDIO_EMAIL}`}
-                  className="text-white text-sm hover:text-white/70 transition-colors"
-                >
-                  {STUDIO_EMAIL}
-                </a>
-              </div>
-              <div className="pt-2 border-t border-white/10 space-y-1">
+
+              <div className="mt-6 pt-5 border-t border-white/10 space-y-1">
                 <p className="text-[10px] uppercase tracking-[0.18em] text-white/40">
                   Studio hours
                 </p>
@@ -236,45 +256,35 @@ export function Footer() {
                 </p>
                 <p className="text-white/80 text-xs leading-snug">{AT_HOME_HOURS}</p>
               </div>
-            </div>
-          </motion.div>
-        </div>
+            </motion.div>
 
-        {/* Studio map — the actual store currently being revamped. The
-            Imperial Avenue location is for at-home services delivery only
-            during the transition period. */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="mt-12 pt-12 border-t border-white/10"
-        >
-          <div className="flex items-baseline justify-between gap-4 mb-4 flex-wrap">
-            <p className="text-white/50 text-sm">Visit the studio</p>
-            <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold">
-              Currently being revamped · Opening soon
-            </p>
+            {/* Map */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="lg:col-span-7 rounded-2xl overflow-hidden border border-white/10 aspect-[4/3] lg:aspect-auto lg:min-h-[420px]"
+            >
+              <iframe
+                title="Map of Mastercuts Beauty Salon"
+                src={STORE_MAP_SRC}
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            </motion.div>
           </div>
-          <div className="rounded-2xl overflow-hidden border border-white/10 aspect-[16/9] md:aspect-[21/9]">
-            <iframe
-              title="Map of Mastercuts Beauty Salon"
-              src={STORE_MAP_SRC}
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              allowFullScreen
-            />
-          </div>
-        </motion.div>
+        </div>
 
         {/* Copyright */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4"
+          className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4"
         >
           <div className="text-white/50 text-sm">
             <p>Copyright 2026</p>
