@@ -349,7 +349,7 @@ export function Navigation() {
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="w-full sm:w-96 bg-bg-dark border-none"
+                className="w-full sm:w-96 bg-ra-ivory text-text-primary border-none"
                 hideDefaultClose
               >
                 <div className="flex flex-col h-full px-8 pt-8 pb-10">
@@ -365,8 +365,8 @@ export function Navigation() {
                           className="flex flex-col leading-none"
                           aria-hidden="true"
                         >
-                          <span className="font-serif text-xl text-white">Ra</span>
-                          <span className="mt-1 text-[9px] uppercase tracking-[0.22em] text-white/60">
+                          <span className="font-serif text-xl text-text-primary">Ra</span>
+                          <span className="mt-1 text-[9px] uppercase tracking-[0.22em] text-text-secondary">
                             by mastercuts
                           </span>
                         </span>
@@ -375,10 +375,10 @@ export function Navigation() {
                       <img
                         src="/assets/Logo/mastercut-wordmark.png"
                         alt="Mastercuts"
-                        className="h-7 object-contain brightness-0 invert"
+                        className="h-7 object-contain"
                       />
                     )}
-                    <SheetClose className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors duration-200">
+                    <SheetClose className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-text-primary hover:bg-black/10 transition-colors duration-200">
                       <X className="w-5 h-5" />
                     </SheetClose>
                   </div>
@@ -386,7 +386,7 @@ export function Navigation() {
                   <nav className="flex-1 overflow-y-auto -mx-8 px-8 py-2 flex flex-col gap-5">
                     <button
                       type="button"
-                      className="text-left text-2xl font-serif text-white hover:opacity-60 transition-opacity"
+                      className="text-left text-2xl font-serif text-text-primary hover:opacity-60 transition-opacity"
                       onClick={() => {
                         setMobileMenuOpen(false);
                         navigate('/');
@@ -396,7 +396,7 @@ export function Navigation() {
                     </button>
                     <button
                       type="button"
-                      className="text-left text-2xl font-serif text-white hover:opacity-60 transition-opacity"
+                      className="text-left text-2xl font-serif text-text-primary hover:opacity-60 transition-opacity"
                       onClick={() => {
                         setMobileMenuOpen(false);
                         setTimeout(() => goToSection('about'), 220);
@@ -406,7 +406,7 @@ export function Navigation() {
                     </button>
                     <button
                       type="button"
-                      className="text-left text-2xl font-serif text-white hover:opacity-60 transition-opacity"
+                      className="text-left text-2xl font-serif text-text-primary hover:opacity-60 transition-opacity"
                       onClick={() => {
                         setMobileMenuOpen(false);
                         setTimeout(() => goToSection('dr-sara'), 220);
@@ -416,7 +416,7 @@ export function Navigation() {
                     </button>
 
                     <div className="pt-2">
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-white/40 mb-3">
+                      <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary mb-3">
                         Services
                       </p>
                       <div className="flex flex-col gap-4">
@@ -425,10 +425,10 @@ export function Navigation() {
                           onClick={() => goToAtHome(() => setMobileMenuOpen(false))}
                           className="flex flex-col gap-0.5 group text-left"
                         >
-                          <span className="text-xl font-serif text-white/90 group-hover:text-white transition-colors">
+                          <span className="text-xl font-serif text-text-primary group-hover:opacity-60 transition-opacity">
                             Ra at <span className="italic">Home</span>
                           </span>
-                          <span className="text-[11px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60 transition-colors">
+                          <span className="text-[11px] uppercase tracking-[0.18em] text-text-muted group-hover:text-text-secondary transition-colors">
                             Nails · Massage · Threading
                           </span>
                         </button>
@@ -437,10 +437,10 @@ export function Navigation() {
                           onClick={() => goToSalon('gentlemen', () => setMobileMenuOpen(false))}
                           className="flex flex-col gap-0.5 group text-left"
                         >
-                          <span className="text-xl font-serif text-white/90 group-hover:text-white transition-colors">
+                          <span className="text-xl font-serif text-text-primary group-hover:opacity-60 transition-opacity">
                             Mastercuts For <span className="italic">Gents</span>
                           </span>
-                          <span className="text-[11px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60 transition-colors">
+                          <span className="text-[11px] uppercase tracking-[0.18em] text-text-muted group-hover:text-text-secondary transition-colors">
                             In salon
                           </span>
                         </button>
@@ -449,10 +449,10 @@ export function Navigation() {
                           onClick={() => goToSalon('ladies', () => setMobileMenuOpen(false))}
                           className="flex flex-col gap-0.5 group text-left"
                         >
-                          <span className="text-xl font-serif text-white/90 group-hover:text-white transition-colors">
+                          <span className="text-xl font-serif text-text-primary group-hover:opacity-60 transition-opacity">
                             Mastercuts For <span className="italic">Ladies</span>
                           </span>
-                          <span className="text-[11px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60 transition-colors">
+                          <span className="text-[11px] uppercase tracking-[0.18em] text-text-muted group-hover:text-text-secondary transition-colors">
                             In salon
                           </span>
                         </button>
@@ -461,10 +461,10 @@ export function Navigation() {
                           onClick={() => goToWellnessHub(() => setMobileMenuOpen(false))}
                           className="flex flex-col gap-0.5 group text-left"
                         >
-                          <span className="text-xl font-serif text-white/90 group-hover:text-white transition-colors">
+                          <span className="text-xl font-serif text-text-primary group-hover:opacity-60 transition-opacity">
                             Ra Wellness <span className="italic">Hub</span>
                           </span>
-                          <span className="text-[11px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60 transition-colors">
+                          <span className="text-[11px] uppercase tracking-[0.18em] text-text-muted group-hover:text-text-secondary transition-colors">
                             By invitation
                           </span>
                         </button>
@@ -473,7 +473,7 @@ export function Navigation() {
 
                     <button
                       type="button"
-                      className="text-left text-2xl font-serif text-white hover:opacity-60 transition-opacity pt-2"
+                      className="text-left text-2xl font-serif text-text-primary hover:opacity-60 transition-opacity pt-2"
                       onClick={() => {
                         setMobileMenuOpen(false);
                         setTimeout(() => goToSection('team'), 220);
@@ -483,7 +483,7 @@ export function Navigation() {
                     </button>
                     <button
                       type="button"
-                      className="text-left text-2xl font-serif text-white hover:opacity-60 transition-opacity"
+                      className="text-left text-2xl font-serif text-text-primary hover:opacity-60 transition-opacity"
                       onClick={() => {
                         setMobileMenuOpen(false);
                         setTimeout(() => goToSection('contact'), 220);
@@ -500,9 +500,9 @@ export function Navigation() {
                           setMobileMenuOpen(false);
                           setTimeout(() => openProfile(), 220);
                         }}
-                        className="w-full bg-white text-text-primary hover:bg-white/90 rounded-full py-6 text-sm font-medium flex items-center justify-center gap-3"
+                        className="w-full bg-bg-dark text-white hover:bg-bg-dark/90 rounded-full py-6 text-sm font-medium flex items-center justify-center gap-3"
                       >
-                        <span className="w-7 h-7 rounded-full bg-bg-dark text-white flex items-center justify-center text-[11px] font-medium">
+                        <span className="w-7 h-7 rounded-full bg-white text-bg-dark flex items-center justify-center text-[11px] font-medium">
                           {initials || <UserIcon className="w-3.5 h-3.5" />}
                         </span>
                         <span>
@@ -515,16 +515,16 @@ export function Navigation() {
                           setMobileMenuOpen(false);
                           setTimeout(() => openLogin(), 220);
                         }}
-                        className="w-full bg-white text-text-primary hover:bg-white/90 rounded-full py-6 text-sm font-medium flex items-center justify-center gap-2"
+                        className="w-full bg-bg-dark text-white hover:bg-bg-dark/90 rounded-full py-6 text-sm font-medium flex items-center justify-center gap-2"
                       >
                         <UserIcon className="w-4 h-4" />
                         Log in
                       </Button>
                     )}
-                    <div className="border-t border-white/10 pt-5">
+                    <div className="border-t border-black/10 pt-5">
                       <a
                         href="tel:+971564667165"
-                        className="flex items-center gap-3 text-white/70 hover:text-white transition-colors"
+                        className="flex items-center gap-3 text-text-secondary hover:text-text-primary transition-colors"
                       >
                         <Phone className="w-4 h-4" />
                         <span className="text-sm">+971 56 466 7165</span>

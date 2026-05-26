@@ -123,9 +123,6 @@ export function WellnessHubPage() {
             Home
           </button>
 
-          <div className="w-12 h-12 rounded-full bg-accent-gold/20 flex items-center justify-center text-accent-gold mb-6">
-            <Sparkles className="w-5 h-5" strokeWidth={1.5} />
-          </div>
           <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold mb-3">
             By invitation
           </p>

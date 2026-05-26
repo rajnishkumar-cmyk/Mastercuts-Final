@@ -54,25 +54,26 @@ export function Footer() {
   ];
 
   return (
-    <footer id="contact" className="bg-bg-dark pt-24 lg:pt-32 pb-8" ref={ref}>
-      <div className="w-full px-6 lg:px-12 xl:px-20">
+    <footer id="contact" ref={ref}>
 
-        {/* CTA Section — title + button in a horizontal row */}
+      {/* CTA Section — title + button on a full-bleed image background */}
+      <section
+        className="relative w-full bg-cover bg-center bg-no-repeat px-6 lg:px-12 xl:px-20 pt-20 lg:pt-[100px] pb-48 lg:pb-64"
+        style={{ backgroundImage: "url('/assets/Images/cta-background.jpg')" }}
+      >
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="flex flex-col sm:flex-row items-stretch gap-6 sm:gap-12 lg:gap-20 mb-16 lg:mb-24"
+          className="flex flex-col sm:flex-row items-stretch gap-6 sm:gap-12 lg:gap-20"
         >
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="flex-1 font-serif text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-white leading-tight"
+            className="flex-1 font-serif text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-white leading-[34px] sm:leading-tight text-center sm:text-left"
           >
-            We don't simply provide services.
-            <br />
-            We <span className="italic">create experiences.</span>
+            We don't simply provide services. we <span className="italic">create experiences.</span>
           </motion.h2>
 
           {/* Pill-shaped button — height stretches to match h2, width is fixed for pill proportion */}
@@ -87,17 +88,22 @@ export function Footer() {
               onClick={openExplorePicker}
               className="group relative w-full h-full rounded-full border border-white/30 flex items-center justify-center overflow-hidden transition-colors duration-500"
             >
-              {/* Fill layer — scales up from center on hover */}
+              {/* Fill layer — always filled on mobile, scales in on hover at sm+ */}
               <span
-                className="absolute inset-0 rounded-full bg-white scale-0 group-hover:scale-100 transition-transform duration-500 ease-in-out origin-center"
+                className="absolute inset-0 rounded-full bg-white scale-100 sm:scale-0 sm:group-hover:scale-100 transition-transform duration-500 ease-in-out origin-center"
               />
-              {/* Label */}
-              <span className="relative z-10 font-serif text-2xl italic text-white group-hover:text-text-primary transition-colors duration-300">
+              {/* Label — dark on mobile (matches filled state), white→dark on hover at sm+ */}
+              <span className="relative z-10 font-serif text-2xl italic text-text-primary sm:text-white sm:group-hover:text-text-primary transition-colors duration-300">
                 Book an Experience
               </span>
             </button>
           </motion.div>
         </motion.div>
+      </section>
+
+      {/* Dark surface — Links + Visit + Copyright */}
+      <div className="bg-bg-dark pb-8">
+        <div className="w-full px-6 lg:px-12 xl:px-20">
 
         {/* Footer Links — Services | Our Salon | Social (Contact now lives below with the map) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 py-12 border-t border-white/10">
@@ -270,7 +276,11 @@ export function Footer() {
                 src={STORE_MAP_SRC}
                 width="100%"
                 height="100%"
-                style={{ border: 0 }}
+                style={{
+                  border: 0,
+                  filter:
+                    'invert(0.92) hue-rotate(180deg) saturate(0.55) brightness(0.95) contrast(0.95)',
+                }}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 allowFullScreen
@@ -313,6 +323,7 @@ export function Footer() {
           </p>
         </motion.div>
 
+        </div>
       </div>
     </footer>
   );

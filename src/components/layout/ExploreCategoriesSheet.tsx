@@ -1,78 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowUpRight, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useCart } from '@/components/cart/CartProvider';
 import { useAudience } from '@/components/services/useAudience';
 import { useIsMobile } from '@/hooks/use-mobile';
-
-const RA_EMBLEM = '/assets/Logo/ra-emblem.png';
-
-interface CardProps {
-  variant?: 'compact' | 'full';
-  eyebrow?: string;
-  titleStart: string;
-  titleItalic: string;
-  image: string;
-  raBadge?: boolean;
-  onClick: () => void;
-}
-
-function MiniCard({
-  variant = 'full',
-  eyebrow,
-  titleStart,
-  titleItalic,
-  image,
-  raBadge = false,
-  onClick,
-}: CardProps) {
-  const compact = variant === 'compact';
-  return (
-    <motion.button
-      type="button"
-      onClick={onClick}
-      whileTap={{ scale: 0.985 }}
-      className={`group relative w-full overflow-hidden rounded-xl text-left bg-bg-dark border border-white/5 hover:border-accent-gold/40 transition-colors ${
-        compact ? 'aspect-square' : 'aspect-[5/2]'
-      }`}
-    >
-      <img
-        src={image}
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover opacity-80 transition-transform duration-[1400ms] ease-out group-hover:scale-105"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-3">
-        {raBadge && (
-          <img
-            src={RA_EMBLEM}
-            alt="Ra"
-            className={`object-contain mb-2 drop-shadow-[0_3px_8px_rgba(0,0,0,0.4)] ${compact ? 'w-9 h-9' : 'w-12 h-12'}`}
-          />
-        )}
-        {eyebrow && (
-          <p className="text-[9px] uppercase tracking-[0.22em] text-accent-gold mb-1">
-            {eyebrow}
-          </p>
-        )}
-        <div className="flex items-end justify-between gap-2">
-          <h3
-            className={`font-serif text-white leading-[1.05] ${
-              compact ? 'text-sm' : 'text-xl'
-            }`}
-          >
-            {titleStart} <span className="italic">{titleItalic}</span>
-          </h3>
-          <span className="shrink-0 w-7 h-7 rounded-full bg-white/10 backdrop-blur flex items-center justify-center text-white group-hover:bg-accent-gold group-hover:text-bg-dark transition-colors">
-            <ArrowUpRight className="w-3 h-3" />
-          </span>
-        </div>
-      </div>
-    </motion.button>
-  );
-}
+import { CategoryCard } from '@/components/services/CategoryCard';
 
 function Body({ onClose }: { onClose: () => void }) {
   const navigate = useNavigate();
@@ -96,74 +29,78 @@ function Body({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="px-6 pt-7 pb-7 max-h-[92vh] overflow-y-auto">
+    <div className="px-6 pt-10 pb-7 max-h-[92vh] overflow-y-auto">
       <button
         type="button"
         onClick={onClose}
         aria-label="Close"
-        className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white/10 backdrop-blur text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+        className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/5 backdrop-blur text-text-primary flex items-center justify-center hover:bg-black/10 transition-colors"
       >
         <X className="w-4 h-4" />
       </button>
 
-      <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold mb-2">
-        Three paths
-      </p>
       <DialogTitle asChild>
-        <h2 className="font-serif text-2xl lg:text-3xl text-white leading-[1.05] mb-6">
-          Choose your <span className="italic">experience</span>.
+        <h2 className="font-serif-regular text-[32px] lg:text-4xl text-text-primary leading-[1.05] mb-6">
+          Choose your <span className="italic">Experience</span>.
         </h2>
       </DialogTitle>
 
-      {/* Salon */}
-      <div className="mb-4">
-        <p className="text-[10px] uppercase tracking-[0.22em] text-white/50 mb-2">
-          Salon services
+      {/* Home Experiences */}
+      <div className="mb-6">
+        <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-text-secondary mb-2 text-center">
+          Home Experiences
         </p>
-        <div className="grid grid-cols-2 gap-2">
-          <MiniCard
-            variant="compact"
+        <CategoryCard
+          eyebrow="Begin with our Signature Introduction"
+          titleStart="Ra at"
+          titleItalic="Home"
+          image="/assets/Images/Ra at home.jpeg"
+          aspectClass="aspect-[2/1] lg:aspect-[5/2]"
+          raBadge
+          titleAlign="center"
+          imageObjectPosition="object-[50%_71%] lg:object-[53%_67%]"
+          onClick={handleAtHome}
+        />
+      </div>
+
+      {/* Salon Experiences */}
+      <div className="mb-6">
+        <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-text-secondary mb-2 text-center">
+          Salon Experiences{' '}
+          <span className="text-text-muted">( Coming soon )</span>
+        </p>
+        <div className="grid grid-cols-2 gap-3">
+          <CategoryCard
             titleStart="Mastercuts For"
             titleItalic="Gents"
             image="/assets/New Images /Mastercuts Gentlemen New.JPG"
+            aspectClass="aspect-[23/25] lg:aspect-[113/100]"
             onClick={() => handleSalon('gentlemen')}
           />
-          <MiniCard
-            variant="compact"
+          <CategoryCard
             titleStart="Mastercuts For"
             titleItalic="Ladies"
             image="/assets/New Images /Mastercuts Ladies New.jpg"
+            aspectClass="aspect-[23/25] lg:aspect-[113/100]"
             onClick={() => handleSalon('ladies')}
           />
         </div>
       </div>
 
-      {/* Home */}
-      <div className="mb-4">
-        <p className="text-[10px] uppercase tracking-[0.22em] text-white/50 mb-2">
-          Home services
-        </p>
-        <MiniCard
-          eyebrow="Nails · Massage · Threading"
-          titleStart="Ra at"
-          titleItalic="Home"
-          image="/assets/Images/Ra at home.jpeg"
-          raBadge
-          onClick={handleAtHome}
-        />
-      </div>
-
-      {/* Wellness */}
+      {/* For Invited members only */}
       <div>
-        <p className="text-[10px] uppercase tracking-[0.22em] text-white/50 mb-2">
-          For members only
+        <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-text-secondary mb-2 text-center">
+          For Invited members only
         </p>
-        <MiniCard
-          eyebrow="By invitation"
+        <CategoryCard
+          eyebrow="By invitation only"
           titleStart="Ra Wellness"
           titleItalic="Hub"
           image="/assets/New Images /Ra Wellness hub new.jpg"
+          aspectClass="aspect-[2/1] lg:aspect-[5/2]"
           raBadge
+          titleAlign="center"
+          imageObjectPosition="object-[61%_47%] lg:object-[63%_53%]"
           onClick={handleHub}
         />
       </div>
@@ -182,9 +119,9 @@ export function ExploreCategoriesSheet() {
         <SheetContent
           side="bottom"
           hideDefaultClose
-          className="bg-bg-dark border-none p-0 w-full max-w-full rounded-t-3xl h-auto max-h-[92vh]"
+          className="bg-bg-primary border-none p-0 w-full max-w-full rounded-t-3xl h-auto max-h-[92vh]"
         >
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-white/25 z-10" />
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-black/25 z-10" />
           <Body onClose={closeAll} />
         </SheetContent>
       </Sheet>
@@ -195,7 +132,7 @@ export function ExploreCategoriesSheet() {
     <Dialog open={open} onOpenChange={(v) => (v ? null : closeAll())}>
       <DialogContent
         showCloseButton={false}
-        className="bg-bg-dark border-none p-0 sm:max-w-lg w-[calc(100%-2rem)] overflow-hidden rounded-2xl shadow-2xl"
+        className="bg-bg-primary border-none p-0 sm:max-w-lg w-[calc(100%-2rem)] overflow-hidden rounded-2xl shadow-2xl"
       >
         <Body onClose={closeAll} />
       </DialogContent>

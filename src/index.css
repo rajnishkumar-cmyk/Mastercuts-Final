@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 36 50% 96%;  /* Bone #FAF6F0 — warm default surface, not pure white */
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -82,13 +82,22 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
   .clip-inset-full {
     clip-path: inset(100% 0 0 0);
   }
-  
+
   .clip-inset-none {
     clip-path: inset(0);
+  }
+
+  /* Forces Cormorant Garamond Regular (weight 400). Needed when an
+     ancestor (e.g. shadcn's DialogTitle / SheetTitle) injects
+     `font-semibold`, which would otherwise win the cascade and trigger
+     faux-bold rendering since only weights 300/400/500 are loaded. */
+  .font-serif-regular {
+    font-family: 'Cormorant Garamond', serif !important;
+    font-weight: 400 !important;
   }
 }
 

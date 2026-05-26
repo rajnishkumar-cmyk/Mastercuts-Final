@@ -8,7 +8,6 @@ import { DrSaraMessageSection } from '@/components/sections/DrSaraMessageSection
 import { StatsTeamSection } from '@/components/sections/StatsTeamSection';
 import { StatsSection } from '@/components/sections/StatsSection';
 import { TestimonialsSection } from '@/components/sections/TestimonialsSection';
-import { CTASection } from '@/components/sections/CTASection';
 import { Footer } from '@/components/layout/Footer';
 
 export function HomePage() {
@@ -38,7 +37,6 @@ export function HomePage() {
         <StatsTeamSection />
         <StatsSection />
         <TestimonialsSection />
-        <CTASection />
       </main>
       <Footer />
     </>

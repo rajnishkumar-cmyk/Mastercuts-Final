@@ -30,7 +30,7 @@ export function StatsTeamSection() {
               transition={{ duration: 0.55, delay: 0.08 + i * 0.07, ease: 'easeOut' }}
               className="border-t border-black/10 pt-5"
             >
-              <p className="font-serif text-5xl lg:text-7xl text-text-primary leading-none mb-2">
+              <p className="font-sans font-extralight text-5xl lg:text-7xl text-text-primary leading-none mb-2">
                 {s.value}
               </p>
               <p className="text-[10px] lg:text-xs uppercase tracking-[0.18em] text-text-secondary leading-snug">

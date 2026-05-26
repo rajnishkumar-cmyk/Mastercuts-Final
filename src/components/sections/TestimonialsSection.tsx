@@ -91,7 +91,7 @@ export function TestimonialsSection() {
   const strokeDashoffset = RING_CIRC * (1 - progress / 100);
 
   return (
-    <section className="relative bg-bg-dark py-24 lg:py-32 select-none overflow-hidden" ref={ref}>
+    <section className="relative bg-ra-ivory py-24 lg:py-32 select-none overflow-hidden" ref={ref}>
 
       {/* Full-width left zone → previous */}
       <div
@@ -110,12 +110,12 @@ export function TestimonialsSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-0">
 
           {/* Left - Service list; ring replaces the bullet of the active item */}
-          <div className="lg:pr-16 lg:border-r border-white/10">
+          <div className="lg:pr-16 lg:border-r border-black/10">
             <motion.p
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6 }}
-              className="text-white text-lg mb-8"
+              className="text-text-primary text-lg mb-8"
             >
               Testimonials
             </motion.p>
@@ -135,7 +135,7 @@ export function TestimonialsSection() {
                     <button
                       onClick={() => hasTestimonial && setActiveTestimonial(index)}
                       className={`flex items-center gap-3 text-sm transition-colors duration-200 ${
-                        isActive ? 'text-white' : 'text-white/40 hover:text-white/70'
+                        isActive ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'
                       }`}
                     >
                       {/* Bullet: ring for active item, dot otherwise */}
@@ -156,7 +156,7 @@ export function TestimonialsSection() {
                               cy={RING_SIZE / 2}
                               r={RING_R}
                               fill="none"
-                              stroke="rgba(255,255,255,0.2)"
+                              stroke="rgba(15,30,92,0.2)"
                               strokeWidth="1.5"
                             />
                             {/* Progress */}
@@ -165,7 +165,7 @@ export function TestimonialsSection() {
                               cy={RING_SIZE / 2}
                               r={RING_R}
                               fill="none"
-                              stroke="white"
+                              stroke="#E8842B"
                               strokeWidth="1.5"
                               strokeLinecap="round"
                               strokeDasharray={RING_CIRC}
@@ -194,14 +194,14 @@ export function TestimonialsSection() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.5 }}
               >
-                <blockquote className="text-white text-lg lg:text-xl leading-relaxed mb-8">
+                <blockquote className="text-text-primary text-lg lg:text-xl leading-relaxed mb-8">
                   &quot; {testimonials[activeTestimonial].quote} &quot;
                 </blockquote>
 
-                <p className="text-white text-base font-medium">
+                <p className="text-text-primary text-base font-medium">
                   {testimonials[activeTestimonial].author}
                 </p>
-                <p className="text-white/50 text-sm mt-1">
+                <p className="text-text-secondary text-sm mt-1">
                   {testimonials[activeTestimonial].role}
                 </p>
               </motion.div>

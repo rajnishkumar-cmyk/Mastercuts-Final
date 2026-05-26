@@ -2,7 +2,7 @@ import { motion, useInView, useScroll, useMotionValueEvent } from 'framer-motion
 import { useRef, useState } from 'react';
 
 const stats = [
-  { value: '11',   label: 'YEARS OF EXCELLENCE',          color: 'dark'  },
+  { value: '11',   label: 'YEARS OF EXCELLENCE',          color: 'blue'  },
   { value: '60K',  label: 'CLIENTS SERVED',               color: 'white' },
   { value: '97%',  label: 'CLIENT SATISFACTION',          color: 'light' },
   { value: '70K',  label: 'PERSONALIZED TREATMENTS',      color: 'light' },
@@ -12,6 +12,7 @@ const colorClasses = {
   light: 'bg-circle-light text-text-primary',
   white: 'bg-white text-text-primary',
   dark:  'bg-circle-dark text-white',
+  blue:  'bg-circle-blue text-white',
 };
 
 // Scroll threshold at which each bubble (index i) pops in
@@ -51,7 +52,7 @@ export function StatsSection() {
       >
         <section
           ref={sectionRef}
-          className="sticky top-0 h-screen bg-bg-darker flex flex-col overflow-hidden"
+          className="sticky top-0 h-screen bg-bg-indigo flex flex-col overflow-hidden"
         >
           {/* Rotating arcs background */}
           <div className="absolute inset-0 pointer-events-none">
@@ -79,10 +80,10 @@ export function StatsSection() {
             >
               <p className="text-sm text-white/50 mb-4">Why choose us?</p>
               <h2 className="font-serif text-5xl lg:text-7xl text-white leading-tight">
-                We are <span className="italic">here</span> to Enhance
+                We are <span className="italic">here</span> to
               </h2>
               <h2 className="font-serif text-5xl lg:text-7xl text-white leading-tight">
-                Your Style
+                Enhance Your Style
               </h2>
             </motion.div>
 
@@ -104,7 +105,7 @@ export function StatsSection() {
                   }}
                   className={`aspect-square rounded-full ${colorClasses[stat.color]} flex flex-col items-center justify-center text-center p-6`}
                 >
-                  <span className="font-serif text-3xl xl:text-4xl leading-none">
+                  <span className="font-sans font-extralight text-5xl xl:text-6xl leading-none">
                     {stat.value}
                   </span>
                   <span className="text-[10px] xl:text-xs uppercase tracking-wider mt-2 opacity-70 leading-tight">
@@ -121,14 +122,15 @@ export function StatsSection() {
       {/* ─────────────────────────────────────────────
           MOBILE — equal 2×2 grid, fade-up entrance
       ───────────────────────────────────────────── */}
-      <section className="lg:hidden bg-bg-darker py-20 relative overflow-hidden">
+      <section className="lg:hidden bg-bg-indigo py-20 relative overflow-hidden">
 
-        {/* Rotating arcs background */}
+        {/* Rotating arcs background — centered at 43% from top of section
+            (matches Figma mobile frame: arcs concentric at y=268 of 624). */}
         <div className="absolute inset-0 pointer-events-none">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px]"
+            className="absolute top-[43%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px]"
           >
             <svg viewBox="0 0 600 600" className="w-full h-full opacity-10">
               <circle cx="300" cy="300" r="270" fill="none" stroke="white" strokeWidth="1" />
@@ -147,7 +149,9 @@ export function StatsSection() {
           >
             <p className="text-sm text-white/50 mb-3">Why choose us?</p>
             <h2 className="font-serif text-3xl sm:text-4xl text-white leading-tight">
-              We are <span className="italic">here</span> to Enhance Your Style
+              We are <span className="italic">here</span> to
+              <br />
+              Enhance Your Style
             </h2>
           </motion.div>
 
@@ -161,7 +165,7 @@ export function StatsSection() {
                 transition={{ duration: 0.6, ease: 'easeOut', delay: 0.3 + i * 0.12 }}
                 className={`w-36 h-36 rounded-full ${colorClasses[stat.color]} flex flex-col items-center justify-center text-center p-4`}
               >
-                <span className="font-serif text-2xl leading-none">{stat.value}</span>
+                <span className="font-sans font-extralight text-3xl leading-none">{stat.value}</span>
                 <span className="text-[9px] uppercase tracking-wider mt-1 opacity-70 leading-tight">
                   {stat.label}
                 </span>

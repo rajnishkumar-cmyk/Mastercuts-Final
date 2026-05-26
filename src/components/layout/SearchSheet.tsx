@@ -1,29 +1,112 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ComponentType } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Search as SearchIcon, X, ArrowUpRight } from 'lucide-react';
+import {
+  Search as SearchIcon,
+  X,
+  ArrowUpRight,
+  Sun,
+  HandHeart,
+  Flower2,
+  Scissors,
+} from 'lucide-react';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
 import { getAtHomeServices } from '@/lib/booking/catalog';
 
 const QUERY_DEBOUNCE_MS = 120;
 
+type IconComponent = ComponentType<{ className?: string; strokeWidth?: number }>;
+
+interface Category {
+  id: string;
+  name: string;
+  subtitle: string;
+  icon: IconComponent;
+  path: string;
+}
+
+// Mirrors the AtHomePage chip row so the search surface and the page agree
+// on what a "category" is. Paths point at the page anchors so a click lands
+// the user directly in that section.
+const CATEGORIES: Category[] = [
+  {
+    id: 'signature',
+    name: 'Signature Rituals',
+    subtitle: 'Begin your Ra Experience',
+    icon: Sun,
+    path: '/at-home#signature',
+  },
+  {
+    id: 'massage',
+    name: 'Body Rituals — Massages',
+    subtitle: 'Wellness',
+    icon: HandHeart,
+    path: '/at-home#massage',
+  },
+  {
+    id: 'nails',
+    name: 'Hand & Feet Rituals',
+    subtitle: 'Coming soon',
+    icon: Flower2,
+    path: '/at-home#nails',
+  },
+  {
+    id: 'threading',
+    name: 'Threading Rituals',
+    subtitle: 'Coming soon',
+    icon: Scissors,
+    path: '/at-home#threading',
+  },
+];
+
+// Renders `text` with the portion matching `query` in normal weight, and the
+// surrounding (non-typed) characters in bold. Falls back to fully bold when
+// the query doesn't appear in the visible text — e.g. when a match came from
+// the description, not the name.
+function HighlightUntyped({ text, query }: { text: string; query: string }) {
+  if (!query) return <span className="font-semibold">{text}</span>;
+  const lower = text.toLowerCase();
+  const q = query.toLowerCase();
+  const idx = lower.indexOf(q);
+  if (idx === -1) return <span className="font-semibold">{text}</span>;
+  const before = text.slice(0, idx);
+  const match = text.slice(idx, idx + query.length);
+  const after = text.slice(idx + query.length);
+  return (
+    <>
+      {before && <span className="font-semibold">{before}</span>}
+      <span className="font-normal">{match}</span>
+      {after && <span className="font-semibold">{after}</span>}
+    </>
+  );
+}
+
 export function SearchSheet() {
+  const navigate = useNavigate();
   const { isSearchOpen, closeSearch, openServiceDetail } = useCart();
   const [query, setQuery] = useState('');
   const [debounced, setDebounced] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  // Reset query when the sheet closes; refocus the input when it opens.
+  // Open/close lifecycle: aggressively try to take focus so the user can
+  // start typing immediately. Multiple attempts cover the cases where the
+  // input is still being mounted by AnimatePresence on the first tick.
   useEffect(() => {
-    if (isSearchOpen) {
-      // Slight defer so the input is mounted before we focus.
-      const t = window.setTimeout(() => inputRef.current?.focus(), 50);
-      return () => window.clearTimeout(t);
+    if (!isSearchOpen) {
+      setQuery('');
+      setDebounced('');
+      return;
     }
-    setQuery('');
-    setDebounced('');
+    const tryFocus = () => inputRef.current?.focus();
+    tryFocus();
+    const r = requestAnimationFrame(tryFocus);
+    const t = window.setTimeout(tryFocus, 80);
+    return () => {
+      cancelAnimationFrame(r);
+      window.clearTimeout(t);
+    };
   }, [isSearchOpen]);
 
-  // Debounce the query so we're not re-filtering on every keystroke.
   useEffect(() => {
     const t = window.setTimeout(
       () => setDebounced(query.trim().toLowerCase()),
@@ -32,7 +115,6 @@ export function SearchSheet() {
     return () => window.clearTimeout(t);
   }, [query]);
 
-  // Lock body scroll while open.
   useEffect(() => {
     if (!isSearchOpen) return;
     const original = document.body.style.overflow;
@@ -42,7 +124,6 @@ export function SearchSheet() {
     };
   }, [isSearchOpen]);
 
-  // Close on ESC.
   useEffect(() => {
     if (!isSearchOpen) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -52,7 +133,16 @@ export function SearchSheet() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [isSearchOpen, closeSearch]);
 
-  const results = useMemo(() => {
+  const categoryResults = useMemo(() => {
+    if (!debounced) return [];
+    return CATEGORIES.filter(
+      (c) =>
+        c.name.toLowerCase().includes(debounced) ||
+        c.subtitle.toLowerCase().includes(debounced),
+    );
+  }, [debounced]);
+
+  const serviceResults = useMemo(() => {
     if (!debounced) return [];
     const services = getAtHomeServices();
     return services.filter(
@@ -62,11 +152,18 @@ export function SearchSheet() {
     );
   }, [debounced]);
 
+  const hasAny = categoryResults.length > 0 || serviceResults.length > 0;
+
   const handleOpenService = (serviceId: string, ritualId: string) => {
     closeSearch();
-    // Small defer so the search sheet's exit animation can begin before the
-    // service detail sheet opens — avoids two stacked transitions.
+    // Defer so the sheet's exit animation can begin before the service
+    // detail sheet opens — avoids two stacked transitions.
     window.setTimeout(() => openServiceDetail(serviceId, ritualId as never), 180);
+  };
+
+  const handleOpenCategory = (path: string) => {
+    closeSearch();
+    window.setTimeout(() => navigate(path), 180);
   };
 
   return (
@@ -81,7 +178,7 @@ export function SearchSheet() {
           className="fixed inset-0 z-[80] bg-bg-primary overflow-y-auto"
           role="dialog"
           aria-modal="true"
-          aria-label="Search at-home rituals"
+          aria-label="Search rituals"
         >
           {/* Top bar */}
           <div className="sticky top-0 z-10 bg-bg-primary border-b border-black/10">
@@ -92,13 +189,15 @@ export function SearchSheet() {
               <SearchIcon className="w-4 h-4 text-text-secondary shrink-0" />
               <input
                 ref={inputRef}
+                id="universal-search-input"
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search at-home rituals…"
-                className="flex-1 bg-transparent outline-none text-base text-text-primary placeholder:text-text-secondary"
+                placeholder="Search rituals…"
+                autoFocus
+                className="flex-1 bg-transparent outline-none text-base text-text-primary placeholder:text-text-secondary [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
                 autoComplete="off"
-                aria-label="Search at-home rituals"
+                aria-label="Search rituals"
               />
               {query && (
                 <button
@@ -125,61 +224,94 @@ export function SearchSheet() {
           <div className="px-6 py-8 max-w-3xl mx-auto">
             {!debounced ? (
               <div className="py-10 text-center">
-                <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary mb-3">
-                  At-home rituals
-                </p>
                 <h2 className="font-serif text-3xl lg:text-4xl text-text-primary leading-[1.05] mb-3">
                   What are you looking <span className="italic">for?</span>
                 </h2>
-                <p className="text-sm text-text-secondary leading-relaxed max-w-sm mx-auto">
-                  Search by name or technique — try &ldquo;Balinese&rdquo;,
-                  &ldquo;deep tissue&rdquo;, or &ldquo;aromatherapy&rdquo;.
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  Try &ldquo;Balinese&rdquo;, &ldquo;signature&rdquo;, &ldquo;threading&rdquo;.
                 </p>
               </div>
-            ) : results.length === 0 ? (
+            ) : !hasAny ? (
               <div className="py-10 text-center">
-                <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary mb-3">
-                  No matches
-                </p>
-                <h2 className="font-serif text-2xl lg:text-3xl text-text-primary leading-[1.05] mb-3">
+                <h2 className="font-serif text-2xl lg:text-3xl text-text-primary leading-[1.05]">
                   We don&apos;t have that <span className="italic">yet</span>.
                 </h2>
-                <p className="text-sm text-text-secondary leading-relaxed max-w-sm mx-auto">
-                  Only at-home massage rituals are available during this
-                  transition. Hand &amp; feet and threading rituals are
-                  coming soon.
-                </p>
               </div>
             ) : (
-              <>
-                <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary mb-4">
-                  {results.length}{' '}
-                  {results.length === 1 ? 'result' : 'results'}
-                </p>
-                <ul className="divide-y divide-black/10 border-y border-black/10">
-                  {results.map((s) => (
-                    <li key={s.id}>
-                      <button
-                        type="button"
-                        onClick={() => handleOpenService(s.id, s.ritualId)}
-                        className="group w-full flex items-center gap-4 py-4 text-left"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <p className="font-serif text-lg text-text-primary leading-tight truncate">
-                            {s.name}
-                          </p>
-                          <p className="text-xs text-text-secondary mt-0.5 truncate">
-                            {formatDuration(s.durationMin)} · {formatAed(s.price)}
-                          </p>
-                        </div>
-                        <span className="shrink-0 w-9 h-9 rounded-full bg-black/5 flex items-center justify-center text-text-primary group-hover:bg-black/10 transition-colors">
-                          <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </>
+              <div className="space-y-8">
+                {categoryResults.length > 0 && (
+                  <section>
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary mb-3">
+                      Experience Categories
+                    </p>
+                    <ul className="divide-y divide-black/10 border-y border-black/10">
+                      {categoryResults.map((c) => {
+                        const Icon = c.icon;
+                        return (
+                          <li key={c.id}>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenCategory(c.path)}
+                              className="group w-full flex items-center gap-4 py-3.5 text-left"
+                            >
+                              <span className="shrink-0 w-12 h-12 lg:w-14 lg:h-14 rounded-lg bg-bg-dark/[0.06] flex items-center justify-center text-accent-gold">
+                                <Icon className="w-5 h-5" strokeWidth={1.5} />
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-serif text-lg text-text-primary leading-tight truncate">
+                                  <HighlightUntyped text={c.name} query={debounced} />
+                                </p>
+                                <p className="text-xs text-text-secondary mt-0.5 truncate">
+                                  {c.subtitle}
+                                </p>
+                              </div>
+                              <span className="shrink-0 w-9 h-9 rounded-full bg-black/5 flex items-center justify-center text-text-primary group-hover:bg-black/10 transition-colors">
+                                <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                              </span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
+                )}
+
+                {serviceResults.length > 0 && (
+                  <section>
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary mb-3">
+                      Experiences
+                    </p>
+                    <ul className="divide-y divide-black/10 border-y border-black/10">
+                      {serviceResults.map((s) => (
+                        <li key={s.id}>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenService(s.id, s.ritualId)}
+                            className="group w-full flex items-center gap-4 py-3.5 text-left"
+                          >
+                            <img
+                              src={s.image}
+                              alt=""
+                              className="shrink-0 w-12 h-12 lg:w-14 lg:h-14 rounded-lg object-cover bg-black/5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-serif text-lg text-text-primary leading-tight truncate">
+                                <HighlightUntyped text={s.name} query={debounced} />
+                              </p>
+                              <p className="text-xs text-text-secondary mt-0.5 truncate">
+                                {formatDuration(s.durationMin)} · {formatAed(s.price)}
+                              </p>
+                            </div>
+                            <span className="shrink-0 w-9 h-9 rounded-full bg-black/5 flex items-center justify-center text-text-primary group-hover:bg-black/10 transition-colors">
+                              <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+              </div>
             )}
           </div>
         </motion.div>

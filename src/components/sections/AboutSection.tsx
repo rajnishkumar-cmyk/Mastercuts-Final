@@ -31,7 +31,7 @@ export function AboutSection() {
   });
 
   return (
-    <section ref={sectionRef} id="about" className="relative z-10 w-full bg-bg-primary">
+    <section ref={sectionRef} id="about" className="relative z-10 w-full bg-ra-ivory">
 
       {/* ── Desktop: sticky scroll-driven layout ── */}
       <div className="hidden lg:block h-[300vh]">

@@ -49,7 +49,7 @@ export function ExplorePage() {
   if (!SALON_OPEN) {
     return (
       <main
-        className="min-h-screen bg-bg-dark text-white flex flex-col"
+        className="min-h-screen bg-ra-ivory text-text-primary flex flex-col"
         style={{ paddingTop: 'var(--nav-offset, 0px)' }}
       >
         <div className="flex-1 flex items-center justify-center px-6 lg:px-16 py-16">
@@ -57,10 +57,10 @@ export function ExplorePage() {
             <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold mb-4">
               In-salon services
             </p>
-            <h1 className="font-serif text-4xl lg:text-5xl text-white leading-[1.05] mb-5">
+            <h1 className="font-serif text-4xl lg:text-5xl text-text-primary leading-[1.05] mb-5">
               Our <span className="italic">salon</span> is renovating.
             </h1>
-            <p className="text-sm lg:text-base text-white/65 leading-relaxed mb-10 max-w-md mx-auto">
+            <p className="text-sm lg:text-base text-text-secondary leading-relaxed mb-10 max-w-md mx-auto">
               While the new studio is being thoughtfully prepared, our at-home
               massage rituals continue — delivered to Imperial Avenue Residences
               by our DHA-certified therapists. The new space at Imperial Avenue,
@@ -69,7 +69,7 @@ export function ExplorePage() {
             <button
               type="button"
               onClick={() => navigate('/at-home')}
-              className="group inline-flex items-center justify-center gap-2 rounded-full bg-white text-text-primary px-7 py-3.5 text-sm font-medium hover:bg-white/90 transition-colors"
+              className="group inline-flex items-center justify-center gap-2 rounded-full bg-bg-dark text-white px-7 py-3.5 text-sm font-medium hover:bg-bg-darker transition-colors"
             >
               Explore Ra at Home
               <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -78,7 +78,7 @@ export function ExplorePage() {
               <button
                 type="button"
                 onClick={() => navigate('/')}
-                className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors"
+                className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-text-secondary hover:text-text-primary transition-colors"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 Back to home
@@ -205,20 +205,20 @@ export function ExplorePage() {
 
   return (
     <main
-      className="min-h-screen bg-bg-dark text-white pb-28 lg:pb-16"
+      className="min-h-screen bg-ra-ivory text-text-primary pb-28 lg:pb-16"
       style={{ paddingTop: 'var(--nav-offset, 0px)' }}
     >
       {/* ───────── Sticky filter bar — stacks below Navigation ───────── */}
       <div
         ref={filterRef}
-        className="sticky z-30 bg-bg-dark/95 backdrop-blur-md border-b border-white/5 pt-4 pb-4 transition-[top] duration-300 ease-out"
+        className="sticky z-30 bg-ra-ivory/95 backdrop-blur-md border-b border-black/10 pt-4 pb-4 transition-[top] duration-300 ease-out"
         style={{ top: 'var(--nav-offset, 0px)' }}
       >
         <div className="px-6 lg:px-16 flex items-center justify-between mb-3">
-          <p className="text-white/50 text-[11px] uppercase tracking-[0.18em]">
+          <p className="text-text-secondary text-[11px] uppercase tracking-[0.18em]">
             Our services for
           </p>
-          <AudienceToggle value={audience} onChange={setAudience} size="sm" />
+          <AudienceToggle value={audience} onChange={setAudience} size="sm" variant="light" />
         </div>
 
         {/* Search input — collapses on scroll-down, reveals on scroll-up */}
@@ -234,21 +234,21 @@ export function ExplorePage() {
         >
           <div className="px-6 lg:px-16">
             <div className="relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search services"
                 aria-label="Search services"
-                className="w-full bg-white/5 border border-white/10 rounded-full pl-10 pr-10 py-2.5 text-sm text-white placeholder:text-white/40 focus:bg-white/10 focus:border-white/30 outline-none transition-colors"
+                className="w-full bg-white border border-black/10 rounded-full pl-10 pr-10 py-2.5 text-sm text-text-primary placeholder:text-text-secondary focus:bg-white focus:border-black/30 outline-none transition-colors"
               />
               {query && (
                 <button
                   type="button"
                   onClick={() => setQuery('')}
                   aria-label="Clear search"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-white/60 hover:bg-white/10 hover:text-white transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-text-secondary hover:bg-bg-dark/5 hover:text-text-primary transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -262,7 +262,7 @@ export function ExplorePage() {
           <RitualChipRow
             activeId={activeId}
             onChange={handleChipChange}
-            variant="dark"
+            variant="light"
           />
         )}
       </div>
@@ -279,10 +279,10 @@ export function ExplorePage() {
             <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold">
               Packages
             </p>
-            <h2 className="font-serif text-3xl lg:text-4xl text-white leading-[1.05]">
-              <span className="italic text-white/90">Curated</span> Journeys
+            <h2 className="font-serif text-3xl lg:text-4xl text-text-primary leading-[1.05]">
+              <span className="italic text-text-primary/85">Curated</span> Journeys
             </h2>
-            <p className="text-white/60 text-sm lg:text-base leading-6 max-w-prose">
+            <p className="text-text-secondary text-sm lg:text-base leading-6 max-w-prose">
               Half-day and full-day packages, thoughtfully assembled so every transition is calm.
             </p>
           </div>
@@ -309,7 +309,7 @@ export function ExplorePage() {
               key={ritual.id}
               ref={setSectionRef(ritual.id)}
               id={ritual.id}
-              className="px-6 lg:px-16 pt-4 pb-14 border-t border-white/5"
+              className="px-6 lg:px-16 pt-4 pb-14 border-t border-black/5"
               style={{ scrollMarginTop: 'calc(var(--explore-filter-h, 180px) + 12px)' }}
             >
               <div className="mx-auto max-w-lg pt-8">
@@ -317,17 +317,17 @@ export function ExplorePage() {
                   <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold">
                     {ritual.tagline}
                   </p>
-                  <h2 className="font-serif text-3xl lg:text-4xl text-white leading-[1.05]">
-                    <span className="italic text-white/90">{ritual.title}</span>{' '}
+                  <h2 className="font-serif text-3xl lg:text-4xl text-text-primary leading-[1.05]">
+                    <span className="italic text-text-primary/85">{ritual.title}</span>{' '}
                     {ritual.titleItalic}
                   </h2>
-                  <p className="text-white/60 text-sm lg:text-base leading-6 max-w-prose">
+                  <p className="text-text-secondary text-sm lg:text-base leading-6 max-w-prose">
                     {ritual.description}
                   </p>
                 </div>
                 <div className="space-y-4">
                   {services.length === 0 ? (
-                    <div className="rounded-xl border border-white/10 bg-white/[0.02] py-6 px-5 text-sm text-white/50 italic">
+                    <div className="rounded-xl border border-black/10 bg-white/60 py-6 px-5 text-sm text-text-secondary italic">
                       No services available for this audience yet. Try switching the filter above.
                     </div>
                   ) : (
@@ -343,7 +343,7 @@ export function ExplorePage() {
             {isSearching && (
               <div className="px-6 lg:px-16 pt-6 pb-2">
                 <div className="mx-auto max-w-lg">
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-white/50">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-text-secondary">
                     {totalMatches === 0
                       ? `No services match "${debouncedQuery}"`
                       : `${totalMatches} ${totalMatches === 1 ? 'service' : 'services'} match "${debouncedQuery}"`}

@@ -20,14 +20,14 @@ const OPTIONS: {
   {
     key: 'ladies',
     label: 'Ladies',
-    tagline: 'Services tailored to her',
-    image: '/assets/Images/pretty-young-eyebrow-master-put-paint-models-face.jpg',
+    tagline: 'Experiences for',
+    image: '/assets/New Images /woman-having-hair-treatment-latino-hair-salon.jpg',
   },
   {
     key: 'gentlemen',
     label: 'Gentlemen',
-    tagline: 'Services tailored to him',
-    image: '/assets/Images/medium-shot-hairstylist-cutting-client-s-hair.jpg',
+    tagline: 'Experiences for',
+    image: '/assets/New Images /back-view-man-hair-salon.jpg',
   },
 ];
 
@@ -51,7 +51,7 @@ function PickerBody({ onSelect, onClose, tone }: PickerBodyProps) {
         type="button"
         onClick={onClose}
         aria-label="Close"
-        className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-white/10 backdrop-blur text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+        className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-black/5 backdrop-blur text-text-primary flex items-center justify-center hover:bg-black/10 transition-colors"
       >
         <X className="w-4 h-4" />
       </button>
@@ -59,7 +59,7 @@ function PickerBody({ onSelect, onClose, tone }: PickerBodyProps) {
       {/* Heading */}
       <div className="mb-8 max-w-sm">
         <DialogTitle asChild>
-          <h2 className="font-serif text-4xl lg:text-5xl leading-[1.02] text-white">
+          <h2 className="font-serif-regular text-[32px] lg:text-4xl leading-[1.06] text-text-primary">
             Who is this <span className="italic">visit</span> for?
           </h2>
         </DialogTitle>
@@ -96,7 +96,7 @@ function PickerBody({ onSelect, onClose, tone }: PickerBodyProps) {
         ))}
       </div>
 
-      <p className="mt-8 text-center text-[11px] text-white/40 leading-relaxed">
+      <p className="mt-8 text-center text-[11px] text-text-muted leading-relaxed">
         Unisex services appear in both selections.
       </p>
     </div>
@@ -125,10 +125,10 @@ export function AudiencePickerSheet() {
         <SheetContent
           side="bottom"
           hideDefaultClose
-          className="bg-bg-dark border-none p-0 flex flex-col overflow-hidden w-full max-w-full rounded-t-3xl h-auto max-h-[88vh]"
+          className="bg-bg-primary border-none p-0 flex flex-col overflow-hidden w-full max-w-full rounded-t-3xl h-auto max-h-[88vh]"
         >
           {/* Grabber handle */}
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 w-10 h-1 rounded-full bg-white/25" />
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 w-10 h-1 rounded-full bg-black/25" />
           <PickerBody onSelect={handleSelect} onClose={closeAll} tone="mobile" />
         </SheetContent>
       </Sheet>
@@ -139,7 +139,7 @@ export function AudiencePickerSheet() {
     <Dialog open={open} onOpenChange={(v) => (v ? null : closeAll())}>
       <DialogContent
         showCloseButton={false}
-        className="bg-bg-dark border-none p-0 sm:max-w-lg w-[calc(100%-2rem)] overflow-hidden rounded-2xl shadow-2xl"
+        className="bg-bg-primary border-none p-0 sm:max-w-lg w-[calc(100%-2rem)] overflow-hidden rounded-2xl shadow-2xl"
       >
         <PickerBody onSelect={handleSelect} onClose={closeAll} tone="desktop" />
       </DialogContent>

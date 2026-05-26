@@ -104,7 +104,7 @@ export function HeroSection() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const navigate = useNavigate();
-  const { openAudiencePicker, openWellnessHub } = useCart();
+  const { openAudiencePicker, openWellnessHub, openExplorePicker } = useCart();
   const progress = useMotionValue(0);
   const prefersReducedMotion = useReducedMotion();
   const reduceMotion = !!prefersReducedMotion;
@@ -113,8 +113,8 @@ export function HeroSection() {
     setIsLoaded(true);
   }, []);
 
-  const handleExploreAll = useCallback(() => {
-    const el = document.getElementById('services');
+  const handleScrollToAbout = useCallback(() => {
+    const el = document.getElementById('about');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
@@ -133,8 +133,8 @@ export function HeroSection() {
       media: { type: 'video', src: '/assets/Images/Hero%20Final.mp4' },
       topMark: '/assets/Logo/mastercut-mark.png',
       durationMs: 24000,
-      primaryCta: { label: 'Book an Experience', onClick: () => openAudiencePicker('/at-home') },
-      secondaryCta: { label: 'Explore all paths', onClick: handleExploreAll },
+      primaryCta: { label: 'Book an Experience', onClick: openExplorePicker },
+      secondaryCta: { label: 'Our story', onClick: handleScrollToAbout },
     },
     {
       id: 'at-home',
@@ -145,7 +145,7 @@ export function HeroSection() {
       media: { type: 'image', src: '/assets/Images/Ra%20at%20home.jpeg' },
       topMark: '/assets/Logo/ra-emblem.png',
       primaryCta: { label: 'Book Ra at Home', onClick: () => openAudiencePicker('/at-home') },
-      secondaryCta: { label: 'Explore Ra at Home', onClick: () => navigate('/at-home') },
+      secondaryCta: { label: 'Step inside Ra at Home', onClick: () => navigate('/at-home') },
     },
     {
       id: 'wellness-hub',
@@ -159,8 +159,8 @@ export function HeroSection() {
         position: 'center',
       },
       topMark: '/assets/Logo/ra-emblem.png',
-      primaryCta: { label: 'Explore Wellness Hub', onClick: () => navigate('/wellness-hub') },
-      secondaryCta: { label: 'See sessions', onClick: openWellnessHub },
+      primaryCta: { label: 'Request an invitation', onClick: openWellnessHub },
+      secondaryCta: { label: 'About the Wellness Hub', onClick: () => navigate('/wellness-hub') },
     },
   ];
 

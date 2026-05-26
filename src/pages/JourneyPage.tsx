@@ -15,14 +15,14 @@ import { cn } from '@/lib/utils';
 
 function JourneyNotFound() {
   return (
-    <div className="min-h-screen bg-bg-dark text-white flex flex-col items-center justify-center px-6 text-center">
-      <p className="text-[11px] uppercase tracking-[0.22em] text-white/50 mb-4">404</p>
+    <div className="min-h-screen bg-ra-ivory text-text-primary flex flex-col items-center justify-center px-6 text-center">
+      <p className="text-[11px] uppercase tracking-[0.22em] text-text-secondary mb-4">404</p>
       <h1 className="font-serif text-5xl mb-6">
         This <span className="italic">journey</span> does not exist
       </h1>
       <Link
         to="/"
-        className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Return home

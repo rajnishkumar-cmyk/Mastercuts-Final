@@ -127,7 +127,12 @@ export function DateTimeStep() {
           </p>
         </div>
 
-        <div className="px-2 sm:px-6">
+        {/* overflow-hidden is a safety net: if the calendar grid ever reports
+            a height shorter than it paints (an iOS Safari sizing quirk), its
+            cells are clipped to this box instead of bleeding over the slots
+            section below. The deterministic cell height in calendar.tsx is the
+            actual fix; this guarantees the two sections can never overlap. */}
+        <div className="px-2 sm:px-6 overflow-hidden">
           <Calendar
             mode="single"
             selected={date}

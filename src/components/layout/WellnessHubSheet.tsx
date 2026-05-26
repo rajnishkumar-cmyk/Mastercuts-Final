@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Sparkles, X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useCart } from '@/components/cart/CartProvider';
@@ -126,12 +126,9 @@ function Body({ onClose }: BodyProps) {
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-accent-gold" strokeWidth={2} />
-              <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold">
-                By invitation
-              </p>
-            </div>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold mb-2">
+              By invitation
+            </p>
             <DialogTitle asChild>
               <h2 className="font-serif text-3xl text-text-primary leading-[1.05] mb-3">
                 Ra Wellness <span className="italic">Hub</span>

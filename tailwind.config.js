@@ -49,7 +49,7 @@ module.exports = {
           ring: "hsl(var(--sidebar-ring))",
         },
         // Ra by Mastercuts brand palette (Brand Book v1.1)
-        'bg-primary': '#E8E6E3',
+        'bg-primary': '#FAF6F0', // Bone — warm light surface (brand digital default; was cool grey #E8E6E3)
         'bg-dark': '#1A1A1A',
         'bg-darker': '#0D0D0D',
         'bg-indigo': '#0F1E5C',

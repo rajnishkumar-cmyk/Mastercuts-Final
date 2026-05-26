@@ -1,7 +1,7 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { useRef, useState, useEffect, useCallback, useMemo, type ComponentType } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { forwardRef, useRef, useState, useEffect, useCallback, useMemo, type ComponentType } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUpRight, Feather, Sparkles, Sun, Wand2 } from 'lucide-react';
+import { ArrowUpRight, Flower2, HandHeart, Scissors, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getAtHomeServices } from '@/lib/booking/catalog';
 import type { ServiceAudience } from '@/lib/booking/types';
@@ -54,7 +54,7 @@ const CATEGORIES: Category[] = [
     italic: 'Massages',
     description:
       'Signature, deep tissue, Balinese and Swedish — brought into your home.',
-    icon: Sparkles,
+    icon: HandHeart,
     imageGents: '/assets/New%20Images%20/Ra%20at%20home%20Gentlemen%20Body%20Ritual.jpg',
     imageLadies: '/assets/New%20Images%20/Ra%20at%20home%20Ladies%20Body%20Ritual.jpg',
     matches: (id) => id.startsWith('somatic-'),
@@ -66,7 +66,7 @@ const CATEGORIES: Category[] = [
     italic: 'Rituals',
     description:
       'Manicure, pedicure and care rituals — launching ahead of full studio opening.',
-    icon: Wand2,
+    icon: Flower2,
     imageGents:
       '/assets/Images/young-hispanic-man-relaxed-having-manicure-session-beauty-center.jpg',
     imageLadies: '/assets/Images/manicure-process.jpg',
@@ -79,7 +79,7 @@ const CATEGORIES: Category[] = [
     italic: 'Rituals',
     description:
       'Precise brow, lip and full-face shaping — launching ahead of full studio opening.',
-    icon: Feather,
+    icon: Scissors,
     imageGents: '/assets/New%20Images%20/Ra%20at%20home%20Gents%20Threading.jpg',
     imageLadies: '/assets/New%20Images%20/Ra%20at%20home%20Ladies%20Threading%20Ritual.jpg',
     matches: (id) => id.startsWith('velvet-threading-'),
@@ -96,10 +96,14 @@ interface ChipProps {
   onClick: () => void;
 }
 
-function CategoryChip({ category, active, onClick }: ChipProps) {
+const CategoryChip = forwardRef<HTMLButtonElement, ChipProps>(function CategoryChip(
+  { category, active, onClick },
+  ref,
+) {
   const Icon = category.icon;
   return (
     <button
+      ref={ref}
       type="button"
       onClick={onClick}
       className={cn(
@@ -109,17 +113,13 @@ function CategoryChip({ category, active, onClick }: ChipProps) {
           : 'bg-white/[0.03] text-white/80 border-white/15 hover:border-white/40 hover:text-white',
       )}
     >
+      <Icon
+        className={cn('w-4 h-4 shrink-0', active ? 'text-bg-dark' : 'text-accent-gold')}
+        strokeWidth={1.5}
+      />
       <span
         className={cn(
-          'shrink-0 w-6 h-6 rounded-full flex items-center justify-center',
-          active ? 'bg-bg-dark text-white' : 'bg-white/10 text-accent-gold',
-        )}
-      >
-        <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
-      </span>
-      <span
-        className={cn(
-          'font-serif text-sm leading-tight whitespace-nowrap',
+          'font-sans text-[13px] leading-[18px] whitespace-nowrap',
           active ? 'text-bg-dark' : 'text-white',
         )}
       >
@@ -128,12 +128,25 @@ function CategoryChip({ category, active, onClick }: ChipProps) {
       </span>
     </button>
   );
-}
+});
 
 export function RaAtHomeSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
   const [audience, setAudience] = useAudience();
+  const reduceMotion = useReducedMotion();
+
+  // Refs for the two horizontal chip rows + their per-chip buttons. Used to
+  // center the active chip in view whenever the active id changes (scroll-spy
+  // on desktop, tap on mobile).
+  const desktopChipScrollRef = useRef<HTMLDivElement>(null);
+  const desktopChipRefs = useRef<Record<CategoryId, HTMLButtonElement | null>>(
+    {} as never,
+  );
+  const mobileChipScrollRef = useRef<HTMLDivElement>(null);
+  const mobileChipRefs = useRef<Record<CategoryId, HTMLButtonElement | null>>(
+    {} as never,
+  );
 
   // Categories whose audience-specific image exists. Threading has no
   // gentlemen image / services, so it drops out for the 'gentlemen' audience.
@@ -222,6 +235,37 @@ export function RaAtHomeSection() {
   }, []);
 
   const activeDesktopId: CategoryId = visibleCategories[currentService]?.id ?? 'signature';
+
+  // Centers the active chip horizontally in its container. Manual math
+  // (not scrollIntoView) so the page's vertical scroll cannot be disturbed —
+  // important because the desktop active id updates *during* a vertical scroll.
+  useEffect(() => {
+    const container = desktopChipScrollRef.current;
+    const chip = desktopChipRefs.current[activeDesktopId];
+    if (!container || !chip) return;
+    const containerRect = container.getBoundingClientRect();
+    const chipRect = chip.getBoundingClientRect();
+    const chipCenter =
+      chipRect.left - containerRect.left + container.scrollLeft + chipRect.width / 2;
+    const target = chipCenter - container.clientWidth / 2;
+    const max = container.scrollWidth - container.clientWidth;
+    const clamped = Math.max(0, Math.min(target, max));
+    container.scrollTo({ left: clamped, behavior: reduceMotion ? 'auto' : 'smooth' });
+  }, [activeDesktopId, reduceMotion]);
+
+  useEffect(() => {
+    const container = mobileChipScrollRef.current;
+    const chip = mobileChipRefs.current[mobileCategoryId];
+    if (!container || !chip) return;
+    const containerRect = container.getBoundingClientRect();
+    const chipRect = chip.getBoundingClientRect();
+    const chipCenter =
+      chipRect.left - containerRect.left + container.scrollLeft + chipRect.width / 2;
+    const target = chipCenter - container.clientWidth / 2;
+    const max = container.scrollWidth - container.clientWidth;
+    const clamped = Math.max(0, Math.min(target, max));
+    container.scrollTo({ left: clamped, behavior: reduceMotion ? 'auto' : 'smooth' });
+  }, [mobileCategoryId, reduceMotion]);
   const mobileCategory = useMemo(
     () =>
       visibleCategories.find((c) => c.id === mobileCategoryId) ??
@@ -239,16 +283,52 @@ export function RaAtHomeSection() {
   );
 
   return (
-    <section id="ra-at-home" className="bg-bg-dark">
-      {/* Section title — single line, strong */}
-      <div className="px-6 lg:px-16 pt-12 pb-8 lg:pt-16 lg:pb-12">
-        <h2 className="font-serif text-4xl lg:text-6xl text-white leading-[1.05]">
-          Care, at your <span className="italic">door</span>.
-        </h2>
-        <p className="mt-4 text-sm lg:text-base text-white/60 italic max-w-prose">
-          Currently available exclusively to residents of Imperial Avenue
-          Residences.
-        </p>
+    <section id="ra-at-home" className="bg-bg-indigo">
+      {/* Section title — emblem + heading + (desktop only) Explore CTA */}
+      <div className="px-6 lg:px-16 pt-12 pb-8 lg:pt-14 lg:pb-10">
+        {/* Mobile: emblem on top, title + subtitle centered */}
+        <div className="flex flex-col items-center text-center lg:hidden">
+          <img
+            src={RA_EMBLEM}
+            alt="Ra"
+            className="h-20 w-auto object-contain mb-4"
+          />
+          <h2 className="font-serif text-4xl text-white leading-[1.05]">
+            Care, at your <span className="italic">door</span>.
+          </h2>
+          <p className="mt-4 text-[13px] italic leading-5 text-white/60 max-w-prose">
+            Currently available exclusively to residents of
+            <br />
+            <span className="text-accent-gold">Imperial Avenue Residences</span>.
+          </p>
+        </div>
+
+        {/* Desktop: emblem | title + subtitle | spacer | Explore CTA */}
+        <div className="hidden lg:flex items-center gap-6">
+          <img
+            src={RA_EMBLEM}
+            alt="Ra"
+            className="h-[120px] w-auto object-contain shrink-0"
+          />
+          <div className="flex flex-col">
+            <h2 className="font-serif text-6xl text-white leading-[1.05]">
+              Care, at your <span className="italic">door</span>.
+            </h2>
+            <p className="mt-2 text-[15px] italic leading-6 text-white/60">
+              Currently available exclusively to residents of{' '}
+              <span className="text-accent-gold">Imperial Avenue Residences.</span>
+            </p>
+          </div>
+          <div className="ml-auto">
+            <Button
+              onClick={() => navigate('/at-home')}
+              className="bg-white text-text-primary hover:bg-white/90 rounded-full px-7 py-4 text-sm font-medium flex items-center gap-3 group"
+            >
+              Explore Ra at Home
+              <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* ─────────────────────────────────────────────
@@ -293,7 +373,7 @@ export function RaAtHomeSection() {
               )}
 
               {/* Readability gradient — pinned to bottom, behind text */}
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-bg-dark via-bg-dark/70 to-transparent" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black via-black/70 to-transparent" />
 
               {/* Category title block — bottom-right */}
               <motion.div
@@ -303,11 +383,6 @@ export function RaAtHomeSection() {
                 transition={{ duration: 0.4, ease: 'easeOut' }}
                 className="absolute bottom-10 right-10 z-10 max-w-md text-right"
               >
-                <img
-                  src={RA_EMBLEM}
-                  alt="Ra"
-                  className="w-12 h-12 object-contain ml-auto mb-4 drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
-                />
                 <h2 className="font-serif text-6xl xl:text-7xl leading-[0.95] text-white">
                   {visibleCategories[currentService]?.title}
                   {visibleCategories[currentService]?.italic && (
@@ -330,7 +405,7 @@ export function RaAtHomeSection() {
               {/* Combined sticky chrome — audience toggle on top, chips below.
                   Single fully-opaque block so no cards bleed through. Negative
                   horizontal margins extend the bg to the right panel's full width. */}
-              <div className="sticky top-0 z-20 -mx-8 lg:-mx-16 px-8 lg:px-16 pt-5 pb-3 bg-bg-dark">
+              <div className="sticky top-0 z-20 -mx-8 lg:-mx-16 px-8 lg:px-16 pt-5 pb-3 bg-bg-indigo">
                 <div className="max-w-md mx-auto">
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-white/50 text-xs uppercase tracking-[0.18em]">
@@ -338,10 +413,16 @@ export function RaAtHomeSection() {
                     </p>
                     <AudienceToggle value={audience} onChange={setAudience} size="sm" />
                   </div>
-                  <div className="flex gap-2 overflow-x-auto -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <div
+                    ref={desktopChipScrollRef}
+                    className="flex gap-2 overflow-x-auto -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                  >
                     {visibleCategories.map((cat) => (
                       <CategoryChip
                         key={cat.id}
+                        ref={(el) => {
+                          desktopChipRefs.current[cat.id] = el;
+                        }}
                         category={cat}
                         active={cat.id === activeDesktopId}
                         onClick={() => handleDesktopChipChange(cat.id)}
@@ -379,15 +460,6 @@ export function RaAtHomeSection() {
             </div>
           </div>
 
-          <div className="absolute bottom-8 right-8 lg:right-16 z-20">
-            <Button
-              onClick={() => navigate('/at-home')}
-              className="bg-white text-text-primary hover:bg-white/90 rounded-full px-8 py-6 text-sm font-medium flex items-center gap-3 group"
-            >
-              Explore Ra at Home
-              <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </Button>
-          </div>
         </div>
       </div>
 
@@ -396,7 +468,7 @@ export function RaAtHomeSection() {
       ───────────────────────────────────────────── */}
       <div className="lg:hidden pb-14">
         <div
-          className="sticky z-20 bg-bg-dark pt-4 pb-3 transition-[top] duration-300 ease-out"
+          className="sticky z-20 bg-bg-indigo pt-4 pb-3 transition-[top] duration-300 ease-out"
           style={{ top: 'var(--nav-offset, 0px)' }}
         >
           <div className="px-6 mb-3">
@@ -408,10 +480,16 @@ export function RaAtHomeSection() {
             </div>
           </div>
           <div className="px-6">
-            <div className="flex gap-2 overflow-x-auto -mx-1 px-1 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div
+              ref={mobileChipScrollRef}
+              className="flex gap-2 overflow-x-auto -mx-1 px-1 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
               {visibleCategories.map((cat) => (
                 <CategoryChip
                   key={cat.id}
+                  ref={(el) => {
+                    mobileChipRefs.current[cat.id] = el;
+                  }}
                   category={cat}
                   active={cat.id === mobileCategoryId}
                   onClick={() => handleMobileChipChange(cat.id)}
@@ -429,28 +507,8 @@ export function RaAtHomeSection() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="space-y-5"
+              className="space-y-3"
             >
-              <img
-                src={RA_EMBLEM}
-                alt="Ra"
-                className="w-12 h-12 object-contain mb-2 drop-shadow-[0_3px_8px_rgba(0,0,0,0.4)]"
-              />
-              <div className="space-y-2">
-                <h2 className="font-serif text-3xl text-white leading-[1.05]">
-                  {mobileCategory.title}
-                  {mobileCategory.italic && (
-                    <>
-                      {' '}
-                      <span className="italic text-white/90">{mobileCategory.italic}</span>
-                    </>
-                  )}
-                </h2>
-                <p className="text-white/60 text-sm leading-6 max-w-prose">
-                  {mobileCategory.description}
-                </p>
-              </div>
-
               <div className="space-y-3">
                 {(() => {
                   const list = servicesForCategory(mobileCategory).slice(0, 4);
