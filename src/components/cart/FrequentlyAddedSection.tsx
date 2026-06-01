@@ -1,13 +1,14 @@
 import { useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { useCart, formatAed, formatDuration } from './CartProvider';
-import { getFrequentlyAddedSuggestions } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { pickServiceImage } from '@/lib/booking/types';
 import { useAudience } from '@/components/services/useAudience';
 
 export function FrequentlyAddedSection() {
   const { cart, addToCart } = useCart();
   const [audience] = useAudience();
+  const { getFrequentlyAddedSuggestions } = useCatalog();
 
   const cartServiceIds = useMemo(
     () => cart.items.map((i) => i.serviceId),
@@ -16,7 +17,7 @@ export function FrequentlyAddedSection() {
 
   const suggestions = useMemo(
     () => getFrequentlyAddedSuggestions(cartServiceIds, 6),
-    [cartServiceIds]
+    [cartServiceIds, getFrequentlyAddedSuggestions]
   );
 
   if (suggestions.length === 0) return null;

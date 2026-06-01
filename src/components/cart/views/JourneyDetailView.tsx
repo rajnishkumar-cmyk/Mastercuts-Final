@@ -1,6 +1,6 @@
 import { ArrowLeft, X, Check, Plus } from 'lucide-react';
 import { useCart, formatAed, formatDuration } from '../CartProvider';
-import { getJourney, getJourneyTotals, getService } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { pickServiceImage } from '@/lib/booking/types';
 import { useAudience } from '@/components/services/useAudience';
 import { cn } from '@/lib/utils';
@@ -14,6 +14,7 @@ interface Props {
 export function JourneyDetailView({ journeyId, onClose, onBack }: Props) {
   const { cart, addJourneyToCart, removeItem } = useCart();
   const [audience] = useAudience();
+  const { getJourney, getJourneyTotals, getService } = useCatalog();
   const journey = getJourney(journeyId);
   if (!journey) return null;
   const totals = getJourneyTotals(journey);

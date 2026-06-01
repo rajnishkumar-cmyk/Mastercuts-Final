@@ -57,8 +57,11 @@ export function BasketView({ onClose, onContinue }: Props) {
     if (!canPay) return;
     setSubmitting(true);
     try {
-      await new Promise((r) => setTimeout(r, 600));
-      confirmBooking();
+      await confirmBooking();
+    } catch {
+      // confirmBooking already surfaces the failure via toast; just bail
+      // out so the user can correct the issue (full slot, expired session,
+      // missing address) and retry.
     } finally {
       setSubmitting(false);
     }

@@ -1,6 +1,6 @@
 import { ArrowLeft, X } from 'lucide-react';
 import { formatAed, formatDuration } from '../CartProvider';
-import { getRitual, getServicesForRitual, getTherapistsForRitual } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import type { RitualId } from '@/lib/booking/types';
 import { pickServiceImage } from '@/lib/booking/types';
 import { useAudience } from '@/components/services/useAudience';
@@ -14,6 +14,7 @@ interface Props {
 }
 
 export function RitualServicesView({ ritualId, onClose, onBack }: Props) {
+  const { getRitual, getServicesForRitual, getTherapistsForRitual } = useCatalog();
   const ritual = getRitual(ritualId);
   const services = getServicesForRitual(ritualId);
   const therapistCount = getTherapistsForRitual(ritualId).length;

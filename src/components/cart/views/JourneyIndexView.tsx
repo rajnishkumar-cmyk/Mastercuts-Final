@@ -1,6 +1,6 @@
 import { ArrowLeft, X, ArrowUpRight } from 'lucide-react';
 import { useCart, formatAed, formatDuration } from '../CartProvider';
-import { journeys, getJourneyTotals } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { DrawerStickyFooter } from './DrawerStickyFooter';
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
 
 export function JourneyIndexView({ onClose, canGoBack, onBack }: Props) {
   const { pushDrawerView } = useCart();
+  const { journeys, getJourneyTotals } = useCatalog();
 
   return (
     <div className="flex flex-col h-full">

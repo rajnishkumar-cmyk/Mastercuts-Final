@@ -69,14 +69,27 @@ export function cartWasExpired(): boolean {
 
 export function loadAccount(): LightAccount | null {
   if (!storageAvailable) return null;
-  const raw = safeParse<LightAccount & { email?: string }>(window.localStorage.getItem(ACCOUNT_KEY));
+  const raw = safeParse<Partial<LightAccount> & { email?: string }>(
+    window.localStorage.getItem(ACCOUNT_KEY),
+  );
   if (!raw) return null;
-  // Migrate old accounts that had email but no addresses array
-  if (!Array.isArray(raw.addresses)) {
-    raw.addresses = [];
+
+  // Pre-auth-integration accounts have no `token` / `customerId`. We can't
+  // safely call any backend endpoint as them, so wipe and force re-login.
+  if (typeof raw.token !== 'string' || raw.token.length === 0) {
+    window.localStorage.removeItem(ACCOUNT_KEY);
+    return null;
   }
+  if (typeof raw.customerId !== 'string' || raw.customerId.length === 0) {
+    window.localStorage.removeItem(ACCOUNT_KEY);
+    return null;
+  }
+
+  // Defensive migrations for older valid-but-incomplete shapes.
+  if (!Array.isArray(raw.addresses)) raw.addresses = [];
   delete raw.email;
-  return raw;
+
+  return raw as LightAccount;
 }
 
 export function saveAccount(account: LightAccount): void {

@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { journeys, getJourneyTotals } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { formatAed, formatDuration } from '@/components/cart/CartProvider';
 
 export function TechnologySection() {
@@ -12,6 +12,7 @@ export function TechnologySection() {
   const isInView = useInView(wrapperRef, { once: true, margin: '-100px' });
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
+  const { journeys, getJourneyTotals } = useCatalog();
 
   const { scrollYProgress } = useScroll({
     target: scrollContainerRef,

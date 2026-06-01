@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Search, X } from 'lucide-react';
-import { rituals, getServicesForRitual, packages } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { useAudience } from '@/components/services/useAudience';
 import { AudienceToggle } from '@/components/services/AudienceToggle';
 import {
@@ -24,6 +24,7 @@ const SCROLL_BREATHING = 12;
 export function ExplorePage() {
   const { hash } = useLocation();
   const navigate = useNavigate();
+  const { rituals, packages, getServicesForRitual } = useCatalog();
   const [audience, setAudience] = useAudience();
   const [activeId, setActiveId] = useState<ChipId>('curated-journeys');
   const [query, setQuery] = useState('');

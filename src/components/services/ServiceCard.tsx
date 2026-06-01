@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
 import type { Service, Package } from '@/lib/booking/types';
 import { pickServiceImage } from '@/lib/booking/types';
-import { getJourneyTotals } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { useAudience } from '@/components/services/useAudience';
 import { cn } from '@/lib/utils';
 
@@ -215,6 +215,7 @@ interface JourneyCardProps {
 
 export function JourneyCard({ journey, className }: JourneyCardProps) {
   const navigate = useNavigate();
+  const { getJourneyTotals } = useCatalog();
   const totals = getJourneyTotals(journey);
 
   const bullets = [

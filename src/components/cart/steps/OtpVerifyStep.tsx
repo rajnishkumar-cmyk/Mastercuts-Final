@@ -1,56 +1,142 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { toast } from 'sonner';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { useCart } from '../CartProvider';
 import { cn } from '@/lib/utils';
+import { formatPhoneForDisplay } from '@/lib/phone';
+import {
+  resendOtp,
+  verifyOtp,
+  type OtpChannel,
+} from '@/lib/api/auth';
+import { toErrorMessage } from '@/lib/api/errors';
+import { authConfig } from '@/lib/authConfig';
+import { LOGIN_PHONE_KEY, LOGIN_CHANNEL_KEY } from './PhoneLoginStep';
 
-const OTP_LENGTH = 6;
-const RESEND_COOLDOWN = 30;
+const OTP_LENGTH = authConfig.otpLength;
+const RESEND_COOLDOWN_SEC = authConfig.resendCooldownSec;
+
+function channelCopy(channel: OtpChannel): string {
+  switch (channel) {
+    case 'whatsapp':
+      return 'Check your WhatsApp messages.';
+    case 'sms':
+      return 'Check your SMS inbox.';
+    default:
+      return 'Check your messages.';
+  }
+}
 
 export function OtpVerifyStep() {
-  const { saveLightAccount, setCheckoutStep, surface, closeAll } = useCart();
+  const { saveLightAccount, setCheckoutStep, surface, closeAll, account } =
+    useCart();
 
-  const phone = sessionStorage.getItem('ra-login-phone') ?? '';
+  // Read handoff from PhoneLoginStep on mount. We snapshot into state so
+  // the values stay stable across re-renders (and so a stale tab can't
+  // start verifying with a phone the user changed in a different tab).
+  const [phone] = useState<string>(
+    () => sessionStorage.getItem(LOGIN_PHONE_KEY) ?? '',
+  );
+  const [channel] = useState<OtpChannel>(
+    () =>
+      (sessionStorage.getItem(LOGIN_CHANNEL_KEY) as OtpChannel | null) ??
+      'whatsapp',
+  );
+
   const [otp, setOtp] = useState('');
   const [verifying, setVerifying] = useState(false);
-  const [error, setError] = useState('');
-  const [cooldown, setCooldown] = useState(RESEND_COOLDOWN);
+  const [resending, setResending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [cooldown, setCooldown] = useState(RESEND_COOLDOWN_SEC);
 
-  // Countdown timer for resend
+  const displayPhone = useMemo(() => formatPhoneForDisplay(phone), [phone]);
+
+  // If we somehow landed here without a phone (e.g. user reloaded mid-flow
+  // after sessionStorage was wiped), bounce back to the entry step.
+  useEffect(() => {
+    if (!phone) setCheckoutStep('phone-login');
+  }, [phone, setCheckoutStep]);
+
+  // Resend cooldown ticker.
   useEffect(() => {
     if (cooldown <= 0) return;
-    const t = setInterval(() => setCooldown((c) => c - 1), 1000);
+    const t = setInterval(() => setCooldown((c) => Math.max(0, c - 1)), 1000);
     return () => clearInterval(t);
   }, [cooldown]);
 
   const handleVerify = useCallback(async () => {
-    if (otp.length !== OTP_LENGTH) return;
+    if (otp.length !== OTP_LENGTH || verifying || !phone) return;
     setVerifying(true);
-    setError('');
+    setError(null);
 
-    // Simulated verification — accept any 6-digit code
-    await new Promise((r) => setTimeout(r, 600));
+    try {
+      const result = await verifyOtp(phone, otp);
 
-    // Create LightAccount with phone only
-    saveLightAccount({
-      name: '',
-      phone,
-      addresses: [],
-      createdAt: Date.now(),
-    });
+      // Persist auth into the LightAccount. We keep existing addresses
+      // when the user is already logged in and is just re-authenticating
+      // (rare in Phase 1 but cheap to support).
+      saveLightAccount({
+        name: result.customer.name ?? account?.name ?? '',
+        phone: result.customer.mobile,
+        addresses: account?.addresses ?? [],
+        createdAt: account?.createdAt ?? Date.now(),
+        token: result.token,
+        customerId: result.customer.id,
+      });
 
-    sessionStorage.removeItem('ra-login-phone');
-    if (surface === 'login') {
-      closeAll();
-    } else {
-      setCheckoutStep('address');
+      sessionStorage.removeItem(LOGIN_PHONE_KEY);
+      sessionStorage.removeItem(LOGIN_CHANNEL_KEY);
+
+      if (surface === 'login') {
+        toast.success('Signed in');
+        closeAll();
+      } else {
+        // Continuing the booking flow: hop to address step.
+        setCheckoutStep('address');
+      }
+    } catch (err) {
+      setError(toErrorMessage(err, 'Could not verify OTP. Please try again.'));
+      // Clear the input so the user can retype without manually backspacing
+      // each slot. The OTP field is auto-focused, so this is a clean reset.
+      setOtp('');
+    } finally {
+      setVerifying(false);
     }
-    setVerifying(false);
-  }, [otp, phone, saveLightAccount, setCheckoutStep, surface, closeAll]);
+  }, [
+    otp,
+    phone,
+    verifying,
+    saveLightAccount,
+    account,
+    surface,
+    closeAll,
+    setCheckoutStep,
+  ]);
 
-  const handleResend = () => {
-    if (cooldown > 0) return;
-    setCooldown(RESEND_COOLDOWN);
-    // Simulated resend
+  // Auto-submit when all OTP digits are entered — typical OTP UX.
+  useEffect(() => {
+    if (otp.length === OTP_LENGTH && !verifying) {
+      void handleVerify();
+    }
+    // We intentionally don't depend on handleVerify here to avoid
+    // re-triggering submission on every keystroke. The latest closure
+    // captures the current otp value.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otp]);
+
+  const handleResend = async () => {
+    if (cooldown > 0 || resending || !phone) return;
+    setResending(true);
+    setError(null);
+    try {
+      await resendOtp(phone);
+      setCooldown(RESEND_COOLDOWN_SEC);
+      toast.success('OTP resent');
+    } catch (err) {
+      setError(toErrorMessage(err, 'Could not resend OTP. Please try again.'));
+    } finally {
+      setResending(false);
+    }
   };
 
   const isComplete = otp.length === OTP_LENGTH;
@@ -65,9 +151,9 @@ export function OtpVerifyStep() {
           Enter <span className="italic">OTP</span>
         </h2>
         <p className="text-sm text-text-secondary mb-8">
-          We sent a 6-digit code to{' '}
-          <span className="text-text-primary">{phone}</span>. Check your
-          WhatsApp messages.
+          We sent a {OTP_LENGTH}-digit code to{' '}
+          <span className="text-text-primary">{displayPhone}</span>.{' '}
+          {channelCopy(channel)}
         </p>
 
         <div className="flex justify-center mb-6">
@@ -76,8 +162,9 @@ export function OtpVerifyStep() {
             value={otp}
             onChange={(value) => {
               setOtp(value);
-              setError('');
+              if (error) setError(null);
             }}
+            disabled={verifying}
             autoFocus
           >
             <InputOTPGroup className="gap-2">
@@ -93,22 +180,28 @@ export function OtpVerifyStep() {
         </div>
 
         {error && (
-          <p className="text-xs text-red-600 text-center mb-4">{error}</p>
+          <p className="text-xs text-red-600 text-center mb-4" role="alert">
+            {error}
+          </p>
         )}
 
         <div className="text-center">
           <button
             type="button"
             onClick={handleResend}
-            disabled={cooldown > 0}
+            disabled={cooldown > 0 || resending || verifying}
             className={cn(
               'text-xs transition-colors',
-              cooldown > 0
+              cooldown > 0 || resending || verifying
                 ? 'text-text-muted cursor-not-allowed'
-                : 'text-text-primary underline hover:no-underline'
+                : 'text-text-primary underline hover:no-underline',
             )}
           >
-            {cooldown > 0 ? `Resend code in ${cooldown}s` : 'Resend code'}
+            {resending
+              ? 'Resending…'
+              : cooldown > 0
+                ? `Resend code in ${cooldown}s`
+                : 'Resend code'}
           </button>
         </div>
       </div>
@@ -123,10 +216,10 @@ export function OtpVerifyStep() {
             'w-full rounded-full py-4 text-sm font-medium transition-colors',
             isComplete && !verifying
               ? 'bg-bg-dark text-white hover:bg-bg-darker'
-              : 'bg-black/10 text-text-muted cursor-not-allowed'
+              : 'bg-black/10 text-text-muted cursor-not-allowed',
           )}
         >
-          {verifying ? 'Verifying...' : 'Verify'}
+          {verifying ? 'Verifying…' : 'Verify'}
         </button>
       </div>
     </div>

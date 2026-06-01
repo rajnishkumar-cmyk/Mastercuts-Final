@@ -4,12 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Plus, Check, ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/layout/Footer';
-import {
-  getJourney,
-  getJourneyTotals,
-  getService,
-  journeys,
-} from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
 import { cn } from '@/lib/utils';
 
@@ -35,14 +30,18 @@ export function JourneyPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { cart, addJourneyToCart, removeItem, openServiceDetail } = useCart();
+  const { journeys, getJourney, getService, getJourneyTotals } = useCatalog();
 
-  const journey = useMemo(() => (id ? getJourney(id) : undefined), [id]);
+  const journey = useMemo(() => (id ? getJourney(id) : undefined), [id, getJourney]);
   const services = useMemo(
     () => (journey ? journey.serviceIds.map(getService).filter(Boolean) : []),
-    [journey]
+    [journey, getService]
   );
-  const totals = useMemo(() => (journey ? getJourneyTotals(journey) : null), [journey]);
-  const otherJourneys = useMemo(() => journeys.filter((j) => j.id !== id), [id]);
+  const totals = useMemo(
+    () => (journey ? getJourneyTotals(journey) : null),
+    [journey, getJourneyTotals]
+  );
+  const otherJourneys = useMemo(() => journeys.filter((j) => j.id !== id), [id, journeys]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });

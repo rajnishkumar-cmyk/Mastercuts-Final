@@ -11,7 +11,7 @@ import {
   Scissors,
 } from 'lucide-react';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
-import { getAtHomeServices } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 
 const QUERY_DEBOUNCE_MS = 120;
 
@@ -84,6 +84,7 @@ function HighlightUntyped({ text, query }: { text: string; query: string }) {
 export function SearchSheet() {
   const navigate = useNavigate();
   const { isSearchOpen, closeSearch, openServiceDetail } = useCart();
+  const { getAtHomeServices } = useCatalog();
   const [query, setQuery] = useState('');
   const [debounced, setDebounced] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -150,7 +151,7 @@ export function SearchSheet() {
         s.name.toLowerCase().includes(debounced) ||
         s.description.toLowerCase().includes(debounced),
     );
-  }, [debounced]);
+  }, [debounced, getAtHomeServices]);
 
   const hasAny = categoryResults.length > 0 || serviceResults.length > 0;
 

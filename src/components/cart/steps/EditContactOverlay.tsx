@@ -131,11 +131,16 @@ export function EditContactOverlay() {
   };
 
   const onSave = (values: ContactFormValues) => {
+    if (!account) {
+      // EditContact is only reachable from a logged-in surface — guard
+      // here so we never construct a tokenless LightAccount.
+      closeContactEdit();
+      return;
+    }
     saveLightAccount({
+      ...account,
       name: values.name,
       phone: values.phone,
-      addresses: account?.addresses ?? [],
-      createdAt: account?.createdAt ?? Date.now(),
     });
     closeContactEdit();
   };

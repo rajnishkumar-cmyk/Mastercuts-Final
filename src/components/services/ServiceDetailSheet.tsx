@@ -10,12 +10,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
-import {
-  getRitual,
-  getService,
-  getServicesForRitual,
-  getTherapistsForRitual,
-} from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { pickServiceImage } from '@/lib/booking/types';
 import { useAudience } from '@/components/services/useAudience';
 import { cn } from '@/lib/utils';
@@ -31,25 +26,27 @@ export function ServiceDetailSheet() {
     removeItem,
   } = useCart();
   const open = surface === 'service-detail' && !!serviceDetail;
+  const { getRitual, getService, getServicesForRitual, getTherapistsForRitual } =
+    useCatalog();
 
   const service = useMemo(
     () => (serviceDetail ? getService(serviceDetail.serviceId) : undefined),
-    [serviceDetail]
+    [serviceDetail, getService]
   );
   const ritual = useMemo(
     () => (serviceDetail ? getRitual(serviceDetail.ritualId) : undefined),
-    [serviceDetail]
+    [serviceDetail, getRitual]
   );
   const therapists = useMemo(
     () => (serviceDetail ? getTherapistsForRitual(serviceDetail.ritualId) : []),
-    [serviceDetail]
+    [serviceDetail, getTherapistsForRitual]
   );
   const relatedServices = useMemo(() => {
     if (!serviceDetail) return [];
     return getServicesForRitual(serviceDetail.ritualId).filter(
       (s) => s.id !== serviceDetail.serviceId
     );
-  }, [serviceDetail]);
+  }, [serviceDetail, getServicesForRitual]);
 
   const cartItem = cart.items.find((i) => i.serviceId === serviceDetail?.serviceId);
   const inCart = !!cartItem;

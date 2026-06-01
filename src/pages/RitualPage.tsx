@@ -11,13 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { RitualServiceRow } from '@/components/sections/RitualServiceRow';
 import { useCart, formatDuration } from '@/components/cart/CartProvider';
-import {
-  getRitual,
-  getServicesForRitual,
-  getTherapistsForRitual,
-  getPackagesForRitual,
-  rituals,
-} from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { Footer } from '@/components/layout/Footer';
 
 function RitualNotFound() {
@@ -42,14 +36,30 @@ export function RitualPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { openCart } = useCart();
+  const {
+    rituals,
+    getRitual,
+    getServicesForRitual,
+    getTherapistsForRitual,
+    getPackagesForRitual,
+  } = useCatalog();
 
-  const ritual = useMemo(() => (id ? getRitual(id) : undefined), [id]);
-  const services = useMemo(() => (id ? getServicesForRitual(id) : []), [id]);
-  const therapists = useMemo(() => (id ? getTherapistsForRitual(id) : []), [id]);
-  const ritualPackages = useMemo(() => (id ? getPackagesForRitual(id) : []), [id]);
+  const ritual = useMemo(() => (id ? getRitual(id) : undefined), [id, getRitual]);
+  const services = useMemo(
+    () => (id ? getServicesForRitual(id) : []),
+    [id, getServicesForRitual]
+  );
+  const therapists = useMemo(
+    () => (id ? getTherapistsForRitual(id) : []),
+    [id, getTherapistsForRitual]
+  );
+  const ritualPackages = useMemo(
+    () => (id ? getPackagesForRitual(id) : []),
+    [id, getPackagesForRitual]
+  );
   const otherRituals = useMemo(
     () => rituals.filter((r) => r.id !== id),
-    [id]
+    [id, rituals]
   );
 
   useEffect(() => {

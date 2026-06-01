@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Plus, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCart } from './CartProvider';
-import { getService } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -23,6 +23,7 @@ export function AddToCartButton({
   className,
 }: Props) {
   const { addToCart, removeItem, cart } = useCart();
+  const { getService } = useCatalog();
   const [justAdded, setJustAdded] = useState(false);
   const cartItem = cart.items.find((i) => i.serviceId === serviceId);
   const inCart = !!cartItem;

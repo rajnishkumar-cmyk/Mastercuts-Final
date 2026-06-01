@@ -4,14 +4,14 @@ import { Bell, Check } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { useCart, useCartTotals, formatDuration } from '@/components/cart/CartProvider';
 import {
-  getSlotsForDate,
   groupSlotsByPeriod,
   toDateKey,
   isDateClosed,
   isDatePast,
   isTherapistBusyOnDate,
 } from '@/lib/booking/availability';
-import { getTherapist } from '@/lib/booking/catalog';
+import { useAvailability } from '@/lib/booking/useAvailability';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { WaitlistSheet, type WaitlistContext } from '@/components/cart/WaitlistSheet';
 import { cn } from '@/lib/utils';
 
@@ -38,6 +38,7 @@ export function Step1DateTime({ onContinue }: Props) {
     removeWaitlistRequest,
   } = useCart();
   const { totalDuration } = useCartTotals();
+  const { getTherapist } = useCatalog();
   const reduce = useReducedMotion();
   const slotsHeadingRef = useRef<HTMLParagraphElement | null>(null);
   const [waitlistContext, setWaitlistContext] = useState<WaitlistContext | null>(null);
@@ -51,10 +52,8 @@ export function Step1DateTime({ onContinue }: Props) {
   );
 
   const dateKey = date ? toDateKey(date) : null;
-  const slots = useMemo(
-    () => (dateKey ? getSlotsForDate(dateKey, totalDuration) : []),
-    [dateKey, totalDuration]
-  );
+  const availability = useAvailability(dateKey, totalDuration);
+  const slots = availability.slots;
   const grouped = useMemo(() => groupSlotsByPeriod(slots), [slots]);
 
   const onPickDate = (d: Date | undefined) => {

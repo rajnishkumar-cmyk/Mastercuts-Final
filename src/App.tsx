@@ -8,6 +8,7 @@ import { AtHomePage } from './pages/AtHomePage';
 import { WellnessHubPage } from './pages/WellnessHubPage';
 import { TermsPage } from './pages/TermsPage';
 import { CartProvider } from './components/cart/CartProvider';
+import { CatalogProvider } from './lib/booking/CatalogProvider';
 import { CartDrawer } from './components/cart/CartDrawer';
 import { CartCheckoutOverlay } from './components/cart/CartCheckoutOverlay';
 import { CartStrip } from './components/cart/CartStrip';
@@ -25,8 +26,9 @@ import { EditContactOverlay } from './components/cart/steps/EditContactOverlay';
 function App() {
   return (
     <BrowserRouter>
-      <CartProvider>
-        <div className="min-h-screen pb-16 lg:pb-0">
+      <CatalogProvider>
+        <CartProvider>
+          <div className="min-h-screen pb-16 lg:pb-0">
           <Navigation />
 
           <Routes>
@@ -66,8 +68,9 @@ function App() {
               },
             }}
           />
-        </div>
-      </CartProvider>
+          </div>
+        </CartProvider>
+      </CatalogProvider>
     </BrowserRouter>
   );
 }

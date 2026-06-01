@@ -3,7 +3,7 @@ import { forwardRef, useRef, useState, useEffect, useCallback, useMemo, type Com
 import { useNavigate } from 'react-router-dom';
 import { ArrowUpRight, Flower2, HandHeart, Scissors, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getAtHomeServices } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import type { ServiceAudience } from '@/lib/booking/types';
 import { useAudience } from '@/components/services/useAudience';
 import { AudienceToggle } from '@/components/services/AudienceToggle';
@@ -28,7 +28,12 @@ interface Category {
   imageGents: string;
   /** Image used when audience is 'ladies' or 'unisex'. */
   imageLadies: string;
-  matches: (serviceId: string) => boolean;
+  /**
+   * Returns true if a Service belongs in this category. Matches on `ritualId`
+   * (stable slug from the adapter) rather than `id`, because the bookable
+   * service id is now a backend UUID and no longer carries a category prefix.
+   */
+  matches: (service: { id: string; ritualId: string }) => boolean;
 }
 
 // NOTE: titles and tagline (eyebrow) here must stay in sync with
@@ -45,7 +50,7 @@ const CATEGORIES: Category[] = [
     icon: Sun,
     imageGents: '/assets/Images/Ra%20at%20home.jpeg',
     imageLadies: '/assets/Images/Ra%20at%20home.jpeg',
-    matches: (id) => id.startsWith('signature-'),
+    matches: (s) => s.ritualId === 'signature-rituals',
   },
   {
     id: 'massage',
@@ -57,7 +62,7 @@ const CATEGORIES: Category[] = [
     icon: HandHeart,
     imageGents: '/assets/New%20Images%20/Ra%20at%20home%20Gentlemen%20Body%20Ritual.jpg',
     imageLadies: '/assets/New%20Images%20/Ra%20at%20home%20Ladies%20Body%20Ritual.jpg',
-    matches: (id) => id.startsWith('somatic-'),
+    matches: (s) => s.ritualId === 'somatic-recovery',
   },
   {
     id: 'nails',
@@ -70,7 +75,7 @@ const CATEGORIES: Category[] = [
     imageGents:
       '/assets/Images/young-hispanic-man-relaxed-having-manicure-session-beauty-center.jpg',
     imageLadies: '/assets/Images/manicure-process.jpg',
-    matches: (id) => id.startsWith('alchemic-'),
+    matches: (s) => s.ritualId === 'alchemic-aesthetics',
   },
   {
     id: 'threading',
@@ -82,7 +87,7 @@ const CATEGORIES: Category[] = [
     icon: Scissors,
     imageGents: '/assets/New%20Images%20/Ra%20at%20home%20Gents%20Threading.jpg',
     imageLadies: '/assets/New%20Images%20/Ra%20at%20home%20Ladies%20Threading%20Ritual.jpg',
-    matches: (id) => id.startsWith('velvet-threading-'),
+    matches: (s) => s.ritualId === 'velvet-smooth',
   },
 ];
 
@@ -134,6 +139,7 @@ export function RaAtHomeSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
   const [audience, setAudience] = useAudience();
+  const { getAtHomeServices } = useCatalog();
   const reduceMotion = useReducedMotion();
 
   // Refs for the two horizontal chip rows + their per-chip buttons. Used to
@@ -277,9 +283,9 @@ export function RaAtHomeSection() {
   const servicesForCategory = useCallback(
     (cat: Category) => {
       const all = getAtHomeServices(audience);
-      return all.filter((s) => cat.matches(s.id));
+      return all.filter((s) => cat.matches(s));
     },
-    [audience],
+    [audience, getAtHomeServices],
   );
 
   return (

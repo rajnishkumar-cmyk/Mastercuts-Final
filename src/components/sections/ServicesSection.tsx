@@ -3,11 +3,7 @@ import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  rituals,
-  getServicesForRitual,
-  packages,
-} from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { useAudience } from '@/components/services/useAudience';
 import { AudienceToggle } from '@/components/services/AudienceToggle';
 import {
@@ -17,9 +13,6 @@ import {
 } from '@/components/services/RitualChipRow';
 import { ServiceCard, JourneyCard } from '@/components/services/ServiceCard';
 
-// Desktop wipe animation only operates on rituals (not the Curated Journeys chip).
-const scrollRituals = rituals;
-
 const WIPE_START = 0.5;
 
 export function ServicesSection() {
@@ -27,6 +20,9 @@ export function ServicesSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
   const [audience, setAudience] = useAudience();
+  const { rituals, packages, getServicesForRitual } = useCatalog();
+  // Desktop wipe animation only operates on rituals (not the Curated Journeys chip).
+  const scrollRituals = rituals;
 
   // Mobile chip selection — defaults to first ritual
   const [mobileChipId, setMobileChipId] = useState<ChipId>(HOME_CHIPS[1]?.id ?? 'atelier');
@@ -100,7 +96,7 @@ export function ServicesSection() {
 
   const mobileRitual = useMemo(
     () => rituals.find((r) => r.id === mobileChipId),
-    [mobileChipId],
+    [mobileChipId, rituals],
   );
 
   return (

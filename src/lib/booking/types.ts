@@ -173,6 +173,11 @@ export interface LightAccount {
   phone: string;
   addresses: ServiceAddress[];
   createdAt: number;
+  // Backend auth — populated after a successful OTP verify. Older cached
+  // accounts (pre-auth integration) won't have these and are treated as
+  // logged-out by the storage loader.
+  token: string;
+  customerId: string;
 }
 
 export interface BookingRecord {

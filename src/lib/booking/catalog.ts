@@ -1,5 +1,9 @@
 import type { Ritual, Service, ServiceAudience, Therapist, Package } from './types';
 
+// HARDCODED_* aliases (declared at the bottom of this file) expose the same
+// arrays under semantic names for the API-backed catalog adapter. The legacy
+// `services` / `rituals` / helper exports remain in place as fallbacks and
+// for the parts of the app that haven't been migrated to useCatalog().
 export const rituals: Ritual[] = [
   {
     id: 'atelier',
@@ -1038,3 +1042,11 @@ export function getJourneyTotals(journey: Package): JourneyTotals {
     savingsAed: totalPriceFull - totalPriceDiscounted,
   };
 }
+
+// --- API-catalog interop aliases ---------------------------------------
+// Same data, semantic names. catalogAdapter.ts reads from these so the
+// "what's hardcoded" intent is explicit at the import site.
+export const HARDCODED_RITUALS = rituals;
+export const HARDCODED_SERVICES = services;
+export const HARDCODED_THERAPISTS = therapists;
+export const HARDCODED_PACKAGES = packages;

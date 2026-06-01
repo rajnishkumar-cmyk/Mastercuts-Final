@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentType } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { Flower2, HandHeart, Scissors, Sun } from 'lucide-react';
-import { getAtHomeServices } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { useAudience } from '@/components/services/useAudience';
 import { AudienceToggle } from '@/components/services/AudienceToggle';
 import { ServiceCard } from '@/components/services/ServiceCard';
@@ -22,7 +22,12 @@ interface Group {
   tagline: string;
   description: string;
   icon: IconComponent;
-  matches: (serviceId: string) => boolean;
+  /**
+   * Returns true if a Service belongs in this group. Matches on `ritualId`
+   * (a stable slug set by the adapter) rather than `id`, because the bookable
+   * service id is now a backend UUID and no longer carries a category prefix.
+   */
+  matches: (service: { id: string; ritualId: string }) => boolean;
 }
 
 const GROUPS: Group[] = [
@@ -34,9 +39,7 @@ const GROUPS: Group[] = [
     description:
       'A focused 45-minute introduction to the Ra approach — choose this to meet the studio for the first time.',
     icon: Sun,
-    // Future signature intros (Glow Intro, Atelier Intro) should share the
-    // 'signature-' id prefix to surface here.
-    matches: (id) => id.startsWith('signature-'),
+    matches: (s) => s.ritualId === 'signature-rituals',
   },
   {
     id: 'massage',
@@ -46,7 +49,7 @@ const GROUPS: Group[] = [
     description:
       'Signature, deep tissue, Balinese and Swedish — brought into your home.',
     icon: HandHeart,
-    matches: (id) => id.startsWith('somatic-'),
+    matches: (s) => s.ritualId === 'somatic-recovery',
   },
   {
     id: 'nails',
@@ -55,7 +58,7 @@ const GROUPS: Group[] = [
     tagline: 'Coming soon',
     description: 'Manicure, pedicure and care rituals, launching ahead of full studio opening.',
     icon: Flower2,
-    matches: (id) => id.startsWith('alchemic-'),
+    matches: (s) => s.ritualId === 'alchemic-aesthetics',
   },
   {
     id: 'threading',
@@ -64,7 +67,7 @@ const GROUPS: Group[] = [
     tagline: 'Coming soon',
     description: 'Precise brow, lip and full-face shaping, launching ahead of full studio opening.',
     icon: Scissors,
-    matches: (id) => id.startsWith('velvet-threading-'),
+    matches: (s) => s.ritualId === 'velvet-smooth',
   },
 ];
 
@@ -80,12 +83,13 @@ export function AtHomePage() {
   const chipRefs = useRef<Record<GroupId, HTMLButtonElement | null>>({} as never);
   const reduceMotion = useReducedMotion();
 
-  const services = useMemo(() => getAtHomeServices(audience), [audience]);
+  const { getAtHomeServices } = useCatalog();
+  const services = useMemo(() => getAtHomeServices(audience), [audience, getAtHomeServices]);
 
   const grouped = useMemo(() => {
     return GROUPS.map((g) => ({
       group: g,
-      items: services.filter((s) => g.matches(s.id)),
+      items: services.filter((s) => g.matches(s)),
     }));
   }, [services]);
 

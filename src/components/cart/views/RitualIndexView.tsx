@@ -1,7 +1,7 @@
 import { ArrowLeft, X, ArrowUpRight, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../CartProvider';
-import { rituals, getServicesForRitual, journeys } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { DrawerStickyFooter } from './DrawerStickyFooter';
 
 interface Props {
@@ -13,6 +13,7 @@ interface Props {
 export function RitualIndexView({ onClose, canGoBack, onBack }: Props) {
   const { closeAll } = useCart();
   const navigate = useNavigate();
+  const { rituals, journeys, getServicesForRitual } = useCatalog();
 
   const goToRitual = (ritualId: string) => {
     closeAll();

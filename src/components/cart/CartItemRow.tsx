@@ -1,7 +1,7 @@
 import { X, Sparkles } from 'lucide-react';
 import type { CartItem } from '@/lib/booking/types';
 import { useCart, formatAed, formatDuration } from './CartProvider';
-import { getTherapistsForRitual, getTherapist, getService } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import {
   Select,
   SelectContent,
@@ -16,6 +16,7 @@ interface Props {
 
 export function CartItemRow({ item }: Props) {
   const { removeItem, updateTherapistPref, openServiceDetail } = useCart();
+  const { getTherapistsForRitual, getTherapist, getService } = useCatalog();
   const isJourney = !!item.journeyId;
 
   if (isJourney) {

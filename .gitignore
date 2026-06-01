@@ -1,1 +1,5 @@
 node_modules
+
+# Local env overrides — never commit secrets or per-developer config.
+.env.local
+.env.*.local

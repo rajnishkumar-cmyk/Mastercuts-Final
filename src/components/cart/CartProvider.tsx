@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import type { Cart, CartItem, DraftCheckout, GuestDetails, GuestProfile, LightAccount, BookingRecord, RitualId, ServiceAddress, WaitlistRequest } from '@/lib/booking/types';
 import { pickServiceImage } from '@/lib/booking/types';
 import { useAudience } from '@/components/services/useAudience';
-import { getService, getJourney, getJourneyTotals } from '@/lib/booking/catalog';
+import { useCatalog } from '@/lib/booking/CatalogProvider';
 import {
   CART_KEY,
   loadCart,
@@ -23,6 +23,8 @@ import {
   clearWaitlist,
 } from '@/lib/booking/storage';
 import { toDateKey } from '@/lib/booking/availability';
+import { createBooking } from '@/lib/api/bookings';
+import { ApiError, NetworkError } from '@/lib/api/errors';
 
 const SELF_GUEST_ID = 'self';
 
@@ -123,7 +125,7 @@ interface CartContextValue {
 
   // checkout state
   updateDraftCheckout: (draft: Partial<DraftCheckout>) => void;
-  confirmBooking: () => BookingRecord;
+  confirmBooking: () => Promise<BookingRecord>;
   getSelectedAddress: () => ServiceAddress | null;
 
   // account
@@ -145,6 +147,7 @@ function makeRef(): string {
 }
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { getService, getJourney, getJourneyTotals } = useCatalog();
   const [cart, setCart] = useState<Cart>(emptyCart);
   const [account, setAccount] = useState<LightAccount | null>(null);
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
@@ -274,7 +277,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       });
       return added;
     },
-    []
+    [getService]
   );
 
   const addJourneyToCart = useCallback<CartContextValue['addJourneyToCart']>(
@@ -323,7 +326,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       });
       return added;
     },
-    []
+    [getService, getJourney, getJourneyTotals]
   );
 
   const removeItem = useCallback((itemId: string) => {
@@ -486,7 +489,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return account.addresses.find((a) => a.id === addressId) ?? null;
   }, [cart, account]);
 
-  const confirmBooking = useCallback((): BookingRecord => {
+  const confirmBooking = useCallback(async (): Promise<BookingRecord> => {
     const items = cart.items;
     if (items.length === 0) {
       throw new Error('Cannot confirm — cart is empty');
@@ -500,6 +503,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (!account) {
       throw new Error('Cannot confirm — no account');
     }
+    if (!account.token) {
+      throw new Error('Cannot confirm — not signed in (no auth token)');
+    }
 
     const address = getSelectedAddress();
 
@@ -508,6 +514,57 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       phone: account.phone,
       address: address ?? undefined,
     };
+
+    // Build the API payload. Journey items (synthetic `journey:<id>` ids)
+    // expand into their constituent serviceIds so the backend gets the real
+    // bookable ids. Regular cart items pass through as-is.
+    const serviceIds: string[] = [];
+    for (const item of items) {
+      if (item.journeyServiceIds && item.journeyServiceIds.length > 0) {
+        serviceIds.push(...item.journeyServiceIds);
+      } else {
+        serviceIds.push(item.serviceId);
+      }
+    }
+
+    // Address is a structured ServiceAddress on the frontend; the backend
+    // accepts an opaque string today. Serialise to a one-line label.
+    const addressLine = address
+      ? [address.flatVilla, address.landmark, address.displayAddress]
+          .filter(Boolean)
+          .join(', ')
+      : undefined;
+
+    let apiResult;
+    try {
+      apiResult = await createBooking(
+        {
+          service_ids: serviceIds,
+          date,
+          slot_time: time,
+          customer_name: account.name || guest.name,
+          customer_address: addressLine,
+        },
+        account.token,
+      );
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.status === 409) {
+          toast.error('That slot just filled up — pick another time.');
+        } else if (err.status === 400) {
+          toast.error(err.message || 'Booking details were rejected.');
+        } else if (err.status === 401) {
+          toast.error('Session expired. Please sign in again.');
+        } else {
+          toast.error(`Booking failed (${err.status}): ${err.message}`);
+        }
+      } else if (err instanceof NetworkError) {
+        toast.error(err.message);
+      } else {
+        toast.error('Booking failed. Please try again.');
+      }
+      throw err;
+    }
 
     const subtotal = items.reduce((s, i) => s + i.price, 0);
 
@@ -523,13 +580,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     const requiresConfirmation = !!cart.draftCheckout?.outsideImperialAvenue;
 
+    // Use the API booking_token as the user-facing reference. Keep cart
+    // items snapshot locally so SuccessState can show line-item detail
+    // (the API only returns the per-service snapshot, not the cart-level
+    // guest/variant labels we want to render back).
     const booking: BookingRecord = {
-      reference: makeRef(),
+      reference: apiResult.booking.booking_token,
       items,
       date,
       time,
-      totalDuration: items.reduce((s, i) => s + i.durationMin, 0),
-      totalPrice: subtotal,
+      totalDuration: apiResult.booking.total_duration_min,
+      totalPrice: apiResult.booking.total_price || subtotal,
       guest,
       createdAt: Date.now(),
       status: 'confirmed',
