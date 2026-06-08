@@ -16,6 +16,17 @@ import { ServiceCard, JourneyCard } from '@/components/services/ServiceCard';
 // users into Ra at Home during the transition.
 const SALON_OPEN = false;
 
+// Curated Journeys is hidden from Explore per client review (June 2026).
+// Flip to true to bring the section + chip back; HOME_CHIPS and JourneyPage
+// remain wired so re-enabling is a one-line change.
+const SHOW_CURATED_JOURNEYS = false;
+
+// Module-level so the reference is stable across renders (keeps
+// exhaustive-deps happy in the spy and deep-link effects).
+const VISIBLE_CHIPS = SHOW_CURATED_JOURNEYS
+  ? HOME_CHIPS
+  : HOME_CHIPS.filter((c) => c.id !== 'curated-journeys');
+
 // Extra breathing room between the bottom of the sticky filter bar and
 // the heading of the section it "reveals". Keeps the heading from kissing
 // the filter on smooth scroll.
@@ -25,7 +36,7 @@ export function ExplorePage() {
   const { hash } = useLocation();
   const navigate = useNavigate();
   const [audience, setAudience] = useAudience();
-  const [activeId, setActiveId] = useState<ChipId>('curated-journeys');
+  const [activeId, setActiveId] = useState<ChipId>(VISIBLE_CHIPS[0].id);
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [searchHidden, setSearchHidden] = useState(false);
@@ -58,7 +69,7 @@ export function ExplorePage() {
               In-salon services
             </p>
             <h1 className="font-serif text-4xl lg:text-5xl text-text-primary leading-[1.05] mb-5">
-              Our <span className="italic">salon</span> is renovating.
+              Our salon is <span className="italic">transforming</span>.
             </h1>
             <p className="text-sm lg:text-base text-text-secondary leading-relaxed mb-10 max-w-md mx-auto">
               While the new studio is being thoughtfully prepared, our at-home
@@ -147,7 +158,7 @@ export function ExplorePage() {
   useLayoutEffect(() => {
     if (!hash) return;
     const id = hash.replace('#', '') as ChipId;
-    if (!HOME_CHIPS.some((c) => c.id === id)) return;
+    if (!VISIBLE_CHIPS.some((c) => c.id === id)) return;
     // Wait a frame for layout + image loads
     const raf = requestAnimationFrame(() => {
       setActiveId(id);
@@ -163,8 +174,8 @@ export function ExplorePage() {
     const compute = () => {
       const filterBottom = filterRef.current?.getBoundingClientRect().bottom ?? 180;
       const threshold = filterBottom + SCROLL_BREATHING + 4;
-      let candidate: ChipId = HOME_CHIPS[0].id;
-      for (const chip of HOME_CHIPS) {
+      let candidate: ChipId = VISIBLE_CHIPS[0].id;
+      for (const chip of VISIBLE_CHIPS) {
         const el = sectionRefs.current[chip.id];
         if (!el) continue;
         const top = el.getBoundingClientRect().top;
@@ -260,6 +271,7 @@ export function ExplorePage() {
         {/* Chip row hides while searching to keep the focus on results */}
         {!isSearching && (
           <RitualChipRow
+            chips={VISIBLE_CHIPS}
             activeId={activeId}
             onChange={handleChipChange}
             variant="light"
@@ -268,31 +280,33 @@ export function ExplorePage() {
       </div>
 
       {/* ───────── Curated Journeys ───────── */}
-      <section
-        ref={setSectionRef('curated-journeys')}
-        id="curated-journeys"
-        className={`px-6 lg:px-16 pt-10 pb-14 ${isSearching ? 'hidden' : ''}`}
-        style={{ scrollMarginTop: 'calc(var(--explore-filter-h, 180px) + 12px)' }}
-      >
-        <div className="mx-auto max-w-lg">
-          <div className="mb-6 space-y-2">
-            <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold">
-              Packages
-            </p>
-            <h2 className="font-serif text-3xl lg:text-4xl text-text-primary leading-[1.05]">
-              <span className="italic text-text-primary/85">Curated</span> Journeys
-            </h2>
-            <p className="text-text-secondary text-sm lg:text-base leading-6 max-w-prose">
-              Half-day and full-day packages, thoughtfully assembled so every transition is calm.
-            </p>
+      {SHOW_CURATED_JOURNEYS && (
+        <section
+          ref={setSectionRef('curated-journeys')}
+          id="curated-journeys"
+          className={`px-6 lg:px-16 pt-10 pb-14 ${isSearching ? 'hidden' : ''}`}
+          style={{ scrollMarginTop: 'calc(var(--explore-filter-h, 180px) + 12px)' }}
+        >
+          <div className="mx-auto max-w-lg">
+            <div className="mb-6 space-y-2">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-accent-gold">
+                Packages
+              </p>
+              <h2 className="font-serif text-3xl lg:text-4xl text-text-primary leading-[1.05]">
+                <span className="italic text-text-primary/85">Curated</span> Journeys
+              </h2>
+              <p className="text-text-secondary text-sm lg:text-base leading-6 max-w-prose">
+                Half-day and full-day packages, thoughtfully assembled so every transition is calm.
+              </p>
+            </div>
+            <div className="space-y-4">
+              {packages.map((pkg) => (
+                <JourneyCard key={pkg.id} journey={pkg} />
+              ))}
+            </div>
           </div>
-          <div className="space-y-4">
-            {packages.map((pkg) => (
-              <JourneyCard key={pkg.id} journey={pkg} />
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ───────── Every ritual, in chip order ───────── */}
       {(() => {

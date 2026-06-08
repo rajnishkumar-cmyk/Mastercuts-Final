@@ -38,8 +38,7 @@ interface Slide {
     /** Origin for the transform above. Defaults to 'top left'. */
     transformOrigin?: string;
   };
-  /** Brand mark shown at the top of the mobile slide. Defaults to the
-   *  Mastercuts mark; Ra-branded slides use the Ra emblem. */
+  /** Brand mark shown at the top of the slide — Ra emblem across all slides. */
   topMark: string;
   /** Per-slide display duration in ms. Video slides should approximate the
    *  video length so the loop doesn't show before transitioning. */
@@ -131,9 +130,9 @@ export function HeroSection() {
       tagline:
         'Where considered care, refined technique, and quiet hospitality come together — for those who notice the difference.',
       media: { type: 'video', src: '/assets/Images/Hero%20Final.mp4' },
-      topMark: '/assets/Logo/mastercut-mark.png',
+      topMark: '/assets/Logo/ra-emblem.png',
       durationMs: 24000,
-      primaryCta: { label: 'Book an Experience', onClick: openExplorePicker },
+      primaryCta: { label: 'Reserve your Experience', onClick: openExplorePicker },
       secondaryCta: { label: 'Our story', onClick: handleScrollToAbout },
     },
     {
@@ -141,18 +140,18 @@ export function HeroSection() {
       title: 'Curated rituals,',
       titleItalic: 'at home',
       tagline:
-        'Wellness brought to the comfort and privacy of your home, by our DHA-certified therapists.',
+        'Curated wellness and beauty rituals brought to the comfort and privacy of your home by trained and certified professionals.',
       media: { type: 'image', src: '/assets/Images/Ra%20at%20home.jpeg' },
       topMark: '/assets/Logo/ra-emblem.png',
-      primaryCta: { label: 'Book Ra at Home', onClick: () => openAudiencePicker('/at-home') },
+      primaryCta: { label: 'Enter Ra at Home', onClick: () => openAudiencePicker('/at-home') },
       secondaryCta: { label: 'Step inside Ra at Home', onClick: () => navigate('/at-home') },
     },
     {
       id: 'wellness-hub',
-      title: 'An urban sanctuary for',
-      titleItalic: 'stillness & renewal',
+      title: 'A journey to',
+      titleItalic: 'stillness and renewal',
       tagline:
-        'Science-led wellness, quietly delivered — sessions designed to slow the day and restore the self.',
+        'An urban sanctuary for longevity, restoration and elevated wellbeing — where science-led wellness meets stillness, healing and renewal.',
       media: {
         type: 'image',
         src: '/assets/New%20Images%20/Ra%20Wellness%20hub%20new.jpg',
@@ -319,7 +318,7 @@ export function HeroSection() {
                 <motion.img
                   key={slide.id + '-mobile-mark'}
                   src={slide.topMark}
-                  alt={slide.id === 'sanctuary' ? 'Mastercuts' : 'Ra'}
+                  alt="Ra"
                   initial={{ opacity: 0, scale: 0.92 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.92 }}
@@ -460,7 +459,7 @@ export function HeroSection() {
             <motion.img
               key={slide.id + '-desktop-mark'}
               src={slide.topMark}
-              alt={slide.id === 'sanctuary' ? 'Mastercuts' : 'Ra'}
+              alt="Ra"
               initial={{ opacity: 0, scale: 0.92 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.92 }}

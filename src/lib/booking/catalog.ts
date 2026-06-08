@@ -999,11 +999,14 @@ export function getFrequentlyAddedSuggestions(cartServiceIds: string[], limit = 
     if (svc) cartRitualIds.add(svc.ritualId);
   }
 
-  // Gather candidates: services from the same rituals, not already in cart
+  // Gather candidates: services from the same rituals, not already in cart.
+  // Only services flagged `frequentlyAdded: true` are eligible. This list
+  // will grow as the catalog matures — flagging is the only change needed.
   const sameRitual: Service[] = [];
   const crossRitual: Service[] = [];
 
   for (const svc of services) {
+    if (!svc.frequentlyAdded) continue;
     if (cartIdSet.has(svc.id)) continue;
     if (cartRitualIds.has(svc.ritualId)) {
       sameRitual.push(svc);

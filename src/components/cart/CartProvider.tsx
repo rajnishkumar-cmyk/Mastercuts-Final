@@ -740,6 +740,12 @@ export function formatAed(value: number): string {
   return `AED ${value.toLocaleString('en-AE')}`;
 }
 
+// 2-decimal variant for VAT-inclusive payment breakdowns, where the
+// derived subtotal and VAT have fractional values.
+export function formatAedPrecise(value: number): string {
+  return `AED ${value.toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 export function formatDuration(min: number): string {
   if (min < 60) return `${min} min`;
   const h = Math.floor(min / 60);

@@ -26,21 +26,21 @@ const testimonials: Testimonial[] = [
   },
   {
     id: 3,
-    quote: "Very professional staff and the ambience is amazing at Mastercuts. Ruby did a great full body massage and my hair colour came out exactly as I wanted. I was very happy with the services and would definitely recommend to my friends. Thank you Mastercuts!",
+    quote: "Very professional staff and the ambience is amazing at Mastercuts. I did deep tissue massage and my hair colour came out exactly as I wanted. I was very happy with the services and would definitely recommend to my friends. Thank you Mastercuts!",
     author: "Samantha Samson",
     role: "Designer",
     service: "Hair Colour & Body Massage"
   },
   {
     id: 4,
-    quote: "I visited your salon a few days back. Very professional staff with a neat and clean environment — Nilofar was so helpful during my visit. The ambience and interior were mesmerising. I will visit soon again and recommend everyone in my friends and family to get your services. Thank you so much.",
+    quote: "Very professional staff with a neat and clean environment — staff was so helpful during my visit. The ambience and interior were mesmerising. I will visit soon again and recommend everyone in my friends and family to get your services. Thank you so much.",
     author: "Ahsan Ali Ahmad",
     role: "Celebrity Makeup Artist",
     service: "Salon Experience"
   },
   {
     id: 5,
-    quote: "Great men's haircut by Allistair. Covered parking and easy access in and out.",
+    quote: "Great men's haircut. Covered parking and easy access in and out.",
     author: "Zein Mocke",
     role: "Writer / Producer",
     service: "Men's Grooming"

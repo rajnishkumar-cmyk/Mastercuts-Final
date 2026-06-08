@@ -92,8 +92,8 @@ export function DesktopMenu({ open, onClose }: DesktopMenuProps) {
                 className="flex items-center group"
               >
                 <img
-                  src="/assets/Logo/mastercut-wordmark.png"
-                  alt="Mastercuts"
+                  src="/assets/Logo/ra-emblem.png"
+                  alt="Ra"
                   className="h-9 transition-transform duration-300 group-hover:scale-105 object-contain"
                 />
               </button>

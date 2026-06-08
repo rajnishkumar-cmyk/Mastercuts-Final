@@ -54,6 +54,10 @@ export interface Service {
   location?: ServiceLocation;
   requiresConsultation?: boolean;
   variants?: ServiceVariant[];
+  // True if this service is eligible to appear in the cart's
+  // "Frequently added together" section. Currently scoped narrowly per
+  // client direction; future services can opt in by setting this flag.
+  frequentlyAdded?: boolean;
 }
 
 export function pickServiceImage(

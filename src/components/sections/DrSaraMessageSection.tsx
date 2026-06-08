@@ -38,24 +38,22 @@ export function DrSaraMessageSection() {
               A note from our founder
             </p>
             <h2 className="font-serif text-4xl lg:text-6xl text-white leading-[1.02] mb-8">
-              Dr <span className="italic">Sara</span>
+              Dr. <span className="italic">Sara</span> Khorakiwala
             </h2>
 
             <div className="h-px w-12 bg-accent-gold mb-8" />
 
             <p className="font-serif text-xl lg:text-2xl text-white leading-[1.45] mb-6">
-              Welcome. You are our guest — and that single idea shapes
-              everything that happens next.
+              Welcome. You are not simply a client here — you are our guest,
+              and that belief shapes every experience we create.
             </p>
 
             <p className="text-sm lg:text-base text-white/70 leading-relaxed mb-6 max-w-prose">
-              For decades, we have believed that true care extends beyond
-              appearance — it lives in how you are listened to, how your time
-              is held, how your privacy is protected. As Mastercuts evolves
-              into Ra, I am personally overseeing every choice so the next
-              chapter is worthy of the trust you have placed in us. You will
-              leave feeling more like yourself than when you arrived. That is
-              the only promise I make.
+              For decades, Mastercuts has believed true care extends beyond
+              appearance — it lives in how you are received, understood and
+              restored. As we evolve into Ra, I remain personally involved in
+              shaping an experience grounded in discretion, intention and
+              genuine wellbeing.
             </p>
 
             <p className="font-serif italic text-base text-white/90">
