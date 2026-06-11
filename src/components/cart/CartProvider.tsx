@@ -327,11 +327,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 
   const removeItem = useCallback((itemId: string) => {
-    setCart((prev) => ({
-      ...prev,
-      items: prev.items.filter((i) => i.id !== itemId),
-      updatedAt: Date.now(),
-    }));
+    setCart((prev) => {
+      let items = prev.items.filter((i) => i.id !== itemId);
+      // Add-ons cannot stand alone — if no parent massage remains in the cart,
+      // drop any orphaned add-on lines too.
+      const hasParentMassage = items.some((i) => {
+        const svc = getService(i.serviceId);
+        return !!svc && svc.ritualId === 'somatic-recovery' && !svc.addOn;
+      });
+      if (!hasParentMassage) {
+        items = items.filter((i) => !getService(i.serviceId)?.addOn);
+      }
+      return { ...prev, items, updatedAt: Date.now() };
+    });
   }, []);
 
   const updateTherapistPref = useCallback((itemId: string, therapistPref: string | 'any') => {

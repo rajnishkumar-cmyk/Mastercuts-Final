@@ -21,13 +21,13 @@ const OPTIONS: {
     key: 'ladies',
     label: 'Ladies',
     tagline: 'Experiences for',
-    image: '/assets/New Images /woman-having-hair-treatment-latino-hair-salon.jpg',
+    image: '/assets/New Images /Experience-for-ladies.jpeg',
   },
   {
     key: 'gentlemen',
     label: 'Gentlemen',
     tagline: 'Experiences for',
-    image: '/assets/New Images /back-view-man-hair-salon.jpg',
+    image: '/assets/New Images /Experience-for-Gents.jpeg',
   },
 ];
 

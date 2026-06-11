@@ -396,9 +396,9 @@ export const services: Service[] = [
       'A curated wellness experience combining the flowing techniques of Balinese massage, the restorative depth of targeted pressure therapy and the calming warmth of heated stones. Enhanced by aromatic essential oils, each movement is designed to release tension, improve circulation and restore physical and emotional balance. The journey concludes with a focused scalp, neck and shoulder massage, leaving the body deeply relaxed, the mind quieted and the senses completely renewed.',
     durationMin: 90,
     price: 475,
-    image: '/assets/Massage Ritual Images/Ra signature massage ladies.jpg',
-    imageGents: '/assets/Massage Ritual Images/Ra signature massage Men.jpg',
-    imageLadies: '/assets/Massage Ritual Images/Ra signature massage ladies.jpg',
+    image: '/assets/Massage Ritual new Images/Ra Signature Massage Ladies.jpeg',
+    imageGents: '/assets/Massage Ritual new Images/Ra Signature Massage Gents.jpeg',
+    imageLadies: '/assets/Massage Ritual new Images/Ra Signature Massage Ladies.jpeg',
     audience: 'unisex',
     location: 'both',
   },
@@ -412,9 +412,9 @@ export const services: Service[] = [
       'A targeted body therapy designed to release deep muscular tension and restore physical balance. Slow, focused techniques work into areas of tightness to ease fatigue, improve circulation and support mobility. Warm therapeutic oils and concentrated pressure help relax the body while calming the mind. Gentle attention to the shoulders, neck and scalp enhances the experience, leaving you feeling lighter, restored and deeply rebalanced.',
     durationMin: 60,
     price: 320,
-    image: '/assets/Massage Ritual Images/Deep Tissue massage Ladies.jpg',
-    imageGents: '/assets/Massage Ritual Images/Deep tissue massage men.jpg',
-    imageLadies: '/assets/Massage Ritual Images/Deep Tissue massage Ladies.jpg',
+    image: '/assets/Massage Ritual new Images/The Deep Tissue Therapy Ladies.jpeg',
+    imageGents: '/assets/Massage Ritual new Images/The Deep Tissue Therapy Gents.jpeg',
+    imageLadies: '/assets/Massage Ritual new Images/The Deep Tissue Therapy Ladies.jpeg',
     audience: 'unisex',
     location: 'both',
     variants: [
@@ -451,16 +451,91 @@ export const services: Service[] = [
     detail:
       'Experience deep relaxation with our Swedish Massage, a timeless therapy designed to ease muscle tension, improve circulation and calm the mind. Using gentle to medium pressure techniques combined with smooth, flowing strokes, this treatment helps reduce stress, relieve body fatigue and restore overall balance. Perfect for those seeking relaxation and wellness, this massage promotes a sense of lightness, comfort and renewed energy, leaving your body refreshed and the mind free of tensions.',
     durationMin: 60,
-    price: 285,
-    image: '/assets/Massage Ritual Images/Soft serinity massage ladies.jpg',
-    imageGents: '/assets/Massage Ritual Images/Soft serinity massage men.jpg',
-    imageLadies: '/assets/Massage Ritual Images/Soft serinity massage ladies.jpg',
+    price: 305,
+    image: '/assets/Massage Ritual new Images/The Soft Serenity Massage Ladies.jpeg',
+    imageGents: '/assets/Massage Ritual new Images/The Soft Serenity Massage Gents.jpeg',
+    imageLadies: '/assets/Massage Ritual new Images/The Soft Serenity Massage Ladies.jpeg',
     audience: 'unisex',
     location: 'both',
     variants: [
-      { id: '60', label: '60 minutes', durationMin: 60, price: 285 },
+      { id: '60', label: '60 minutes', durationMin: 60, price: 305 },
       { id: '90', label: '90 minutes', durationMin: 90, price: 415 },
     ],
+  },
+  {
+    id: 'somatic-sensory',
+    ritualId: 'somatic-recovery',
+    name: 'The Sensory Body Therapy',
+    description:
+      'Rebalance with a deeply calming massage using custom oils and rhythmic touch.',
+    detail:
+      'Experience the ultimate sensory body massage, a curated journey designed to restore emotional and physical harmony. Custom-blended essential oils are chosen to calm, uplift or restore, while flowing rhythmic techniques and gentle pressure quiet the mind and dissolve tension. With focused attention on the shoulders, neck and scalp, this treatment softens the body and fosters deep relaxation. Leave with a lighter mind, a soothed body and a lasting sense of well-being.',
+    durationMin: 60,
+    price: 360,
+    image: '/assets/Massage Ritual new Images/The Sensory Body Therapy Ladies.jpeg',
+    imageGents: '/assets/Massage Ritual new Images/The Sensory Body Therapy Gents.jpeg',
+    imageLadies: '/assets/Massage Ritual new Images/The Sensory Body Therapy Ladies.jpeg',
+    audience: 'unisex',
+    location: 'both',
+    variants: [
+      { id: '60', label: '60 minutes', durationMin: 60, price: 360 },
+      { id: '90', label: '90 minutes', durationMin: 90, price: 510 },
+    ],
+  },
+  {
+    id: 'somatic-scalp',
+    ritualId: 'somatic-recovery',
+    name: 'Ra Serenity Scalp Therapy',
+    description:
+      'Nourishing scalp oil therapy with shoulder massage for deep relaxation and calm.',
+    detail:
+      'A deeply restorative scalp experience designed to calm the mind and release built-up tension. Nourishing oils are applied using slow, rhythmic techniques that stimulate circulation while conditioning the scalp. The experience extends into a focused shoulder and neck massage, easing tightness and encouraging a sense of lightness throughout the upper body. Gentle pressure-point techniques enhance relaxation, creating a quiet moment of reset. The result is a nourished scalp, softened hair and a profound sense of calm and restoration.',
+    durationMin: 45,
+    price: 230,
+    image: '/assets/Massage Ritual new Images/Ra Serenity Scalp Therapy Ladies.jpeg',
+    imageGents: '/assets/Massage Ritual new Images/Ra Serenity Scalp Therapy Gents.jpeg',
+    imageLadies: '/assets/Massage Ritual new Images/Ra Serenity Scalp Therapy Ladies.jpeg',
+    audience: 'unisex',
+    location: 'both',
+  },
+  // Add-on enhancements — NOT independently bookable. Surface in the cart only
+  // once a parent massage (ritual 'somatic-recovery') is present.
+  {
+    id: 'somatic-hotstone',
+    ritualId: 'somatic-recovery',
+    name: 'Hot Stone Enhancement',
+    description:
+      'Heated stones ease tension, relax muscles and deepen your massage experience.',
+    detail:
+      'A 20-minute thermal enhancement designed to complement your Deep Tissue Therapy, Balinese Therapy, Soft Serenity Massage or Sensory Body Therapy. Smooth heated stones are applied with slow, flowing movements across targeted areas of the body, allowing warmth to penetrate deeply into the muscles. This calming addition helps improve circulation, soften tension and elevate the overall massage experience, leaving the body feeling lighter, soothed and deeply relaxed.',
+    durationMin: 20,
+    price: 60,
+    // Reuses the Soft Serenity imagery per client direction (no bespoke
+    // Hot Stone shot). Tracks the Soft Serenity files, so it updates when
+    // those are refreshed.
+    image: '/assets/Massage Ritual new Images/The Soft Serenity Massage Ladies.jpeg',
+    imageGents: '/assets/Massage Ritual new Images/The Soft Serenity Massage Gents.jpeg',
+    imageLadies: '/assets/Massage Ritual new Images/The Soft Serenity Massage Ladies.jpeg',
+    audience: 'unisex',
+    location: 'both',
+    addOn: true,
+  },
+  {
+    id: 'somatic-cupping',
+    ritualId: 'somatic-recovery',
+    name: 'Cupping Enhancement',
+    description:
+      'Targeted cupping therapy to release tension and support muscle recovery.',
+    detail:
+      'A targeted add-on designed to release deep muscle tension and improve circulation. Gentle suction techniques help stimulate recovery, reduce tightness and support overall body balance. Integrated into your massage experience, this enhancement leaves the body feeling lighter, restored and deeply relieved.',
+    durationMin: 15,
+    price: 60,
+    image: '/assets/Massage Ritual new Images/Cupping Enhancement Ladies.jpeg',
+    imageGents: '/assets/Massage Ritual new Images/Cupping Enhancement Gents.jpeg',
+    imageLadies: '/assets/Massage Ritual new Images/Cupping Enhancement Ladies.jpeg',
+    audience: 'unisex',
+    location: 'both',
+    addOn: true,
   },
   // Signature Rituals — the awareness ritual; a 45-minute Ra introduction.
   // ID prefix 'signature-' is matched by the Signature group in AtHomePage.
@@ -478,7 +553,7 @@ export const services: Service[] = [
       'Focused deep tissue work',
     ],
     durationMin: 45,
-    price: 305,
+    price: 285,
     image: '/assets/Massage Ritual Images/Ra signature introduction Ladies.jpg',
     imageGents: '/assets/Massage Ritual Images/Ra signature introduction Men.jpg',
     imageLadies: '/assets/Massage Ritual Images/Ra signature introduction Ladies.jpg',
@@ -950,6 +1025,7 @@ export function getServicesForRitual(
 ): Service[] {
   return services.filter((s) => {
     if (s.ritualId !== ritualId) return false;
+    if (s.addOn) return false; // add-ons are never independently bookable
     if (!audience || audience === 'unisex') return true;
     return s.audience === audience || s.audience === 'unisex';
   });
@@ -960,6 +1036,7 @@ export function getServicesForRitual(
 // transition-period operations.
 export function getAtHomeServices(audience?: ServiceAudience): Service[] {
   return services.filter((s) => {
+    if (s.addOn) return false; // add-ons are never independently bookable
     const loc = s.location ?? 'salon';
     if (loc === 'salon') return false;
     if (!audience || audience === 'unisex') return true;
@@ -1027,6 +1104,20 @@ export function getFrequentlyAddedSuggestions(cartServiceIds: string[], limit = 
   }
 
   return result;
+}
+
+// Enhancement add-ons (Hot Stone, Cupping) cannot be booked on their own.
+// They surface in the cart only once a parent massage is present. Ungated:
+// any Body Ritual massage ('somatic-recovery', non-add-on) in the cart makes
+// every add-on available. Returns add-ons not already in the cart.
+export function getAddOnSuggestions(cartServiceIds: string[]): Service[] {
+  const cartIdSet = new Set(cartServiceIds);
+  const hasParentMassage = cartServiceIds.some((id) => {
+    const svc = getService(id);
+    return !!svc && svc.ritualId === 'somatic-recovery' && !svc.addOn;
+  });
+  if (!hasParentMassage) return [];
+  return services.filter((s) => s.addOn && !cartIdSet.has(s.id));
 }
 
 export function getJourneyTotals(journey: Package): JourneyTotals {

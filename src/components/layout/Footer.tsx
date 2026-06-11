@@ -131,7 +131,7 @@ export function Footer() {
                   onClick={() => goToSalon('gentlemen')}
                   className="text-white hover:text-white/70 transition-colors duration-200 text-left"
                 >
-                  Mastercuts For Gents
+                  Gents' Studio
                 </button>
               </li>
               <li>
@@ -140,7 +140,7 @@ export function Footer() {
                   onClick={() => goToSalon('ladies')}
                   className="text-white hover:text-white/70 transition-colors duration-200 text-left"
                 >
-                  Mastercuts For Ladies
+                  Ladies' Studio
                 </button>
               </li>
               <li>

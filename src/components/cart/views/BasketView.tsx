@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart, useCartTotals, formatAed, formatAedPrecise, formatDuration } from '../CartProvider';
 import { CartItemRow } from '../CartItemRow';
 import { FrequentlyAddedSection } from '../FrequentlyAddedSection';
+import { AddOnSection } from '../AddOnSection';
 import { cn } from '@/lib/utils';
 
 function formatDateLabel(key: string): string {
@@ -138,6 +139,9 @@ export function BasketView({ onClose, onContinue }: Props) {
             {cart.items.map((item) => (
               <CartItemRow key={item.id} item={item} />
             ))}
+
+            {/* Enhancement add-ons — only when a parent massage is in cart */}
+            <AddOnSection />
 
             {/* Frequently added together */}
             <FrequentlyAddedSection />

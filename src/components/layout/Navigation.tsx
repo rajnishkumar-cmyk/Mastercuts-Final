@@ -8,6 +8,7 @@ import { useCart } from '@/components/cart/CartProvider';
 import { CartIcon } from '@/components/cart/CartIcon';
 import { useAudience } from '@/components/services/useAudience';
 import { DesktopMenu } from './DesktopMenu';
+import { BrandLockup } from './BrandLockup';
 
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -153,12 +154,11 @@ export function Navigation() {
 
       <div className={`w-full px-6 lg:px-12 transition-[padding] duration-300 ${darkChrome ? 'py-4' : 'py-6'}`}>
         <nav className="flex items-center justify-between gap-6">
-          {/* Logo — Ra emblem only, across all contexts */}
+          {/* Logo — Ra by Mastercuts lockup, across all contexts */}
           <Link to="/" className="flex items-center group shrink-0">
-            <img
-              src="/assets/Logo/ra-emblem.png"
-              alt="Ra"
-              className="h-12 lg:h-14 transition-transform duration-300 group-hover:scale-105 object-contain"
+            <BrandLockup
+              tone="light"
+              className="transition-transform duration-300 group-hover:scale-105"
             />
           </Link>
 
@@ -194,7 +194,7 @@ export function Navigation() {
                       className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
                     >
                       <span className="text-sm text-white/80 group-hover:text-white">
-                        Mastercuts For <span className="italic">Gents</span>
+                        Gents' <span className="italic">Studio</span>
                       </span>
                       <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60">
                         In salon
@@ -206,7 +206,7 @@ export function Navigation() {
                       className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
                     >
                       <span className="text-sm text-white/80 group-hover:text-white">
-                        Mastercuts For <span className="italic">Ladies</span>
+                        Ladies' <span className="italic">Studio</span>
                       </span>
                       <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60">
                         In salon
@@ -328,11 +328,7 @@ export function Navigation() {
               >
                 <div className="flex flex-col h-full px-8 pt-8 pb-10">
                   <div className="flex-shrink-0 flex items-center justify-between mb-8">
-                    <img
-                      src="/assets/Logo/ra-emblem.png"
-                      alt="Ra"
-                      className="h-12 object-contain"
-                    />
+                    <BrandLockup tone="dark" />
                     <SheetClose className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-text-primary hover:bg-black/10 transition-colors duration-200">
                       <X className="w-5 h-5" />
                     </SheetClose>
@@ -393,7 +389,7 @@ export function Navigation() {
                           className="flex flex-col gap-0.5 group text-left"
                         >
                           <span className="text-xl font-serif text-text-primary group-hover:opacity-60 transition-opacity">
-                            Mastercuts For <span className="italic">Gents</span>
+                            Gents' <span className="italic">Studio</span>
                           </span>
                           <span className="text-[11px] uppercase tracking-[0.18em] text-text-muted group-hover:text-text-secondary transition-colors">
                             In salon
@@ -405,7 +401,7 @@ export function Navigation() {
                           className="flex flex-col gap-0.5 group text-left"
                         >
                           <span className="text-xl font-serif text-text-primary group-hover:opacity-60 transition-opacity">
-                            Mastercuts For <span className="italic">Ladies</span>
+                            Ladies' <span className="italic">Studio</span>
                           </span>
                           <span className="text-[11px] uppercase tracking-[0.18em] text-text-muted group-hover:text-text-secondary transition-colors">
                             In salon

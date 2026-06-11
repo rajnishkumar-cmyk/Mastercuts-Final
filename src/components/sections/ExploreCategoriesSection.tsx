@@ -3,7 +3,7 @@ import { useCart } from '@/components/cart/CartProvider';
 import { useAudience } from '@/components/services/useAudience';
 import { CategoryCard } from '@/components/services/CategoryCard';
 
-const IMG_AT_HOME = '/assets/Images/Ra at home.jpeg';
+const IMG_AT_HOME = '/assets/Images/Ra-at-home-new.jpeg';
 const IMG_GENTS = '/assets/New Images /Mastercuts Gentlemen New.JPG';
 const IMG_LADIES = '/assets/New Images /Mastercuts Ladies New.jpg';
 const IMG_WELLNESS = '/assets/New Images /Ra Wellness hub new.jpg';
@@ -57,11 +57,11 @@ export function ExploreCategoriesSection() {
             <span className="text-text-muted">( Coming soon )</span>
           </p>
 
-          {/* Mastercuts For Gents */}
+          {/* Gents' Studio */}
           <div className="col-span-6 lg:col-span-3">
             <CategoryCard
-              titleStart="Mastercuts For"
-              titleItalic="Gents"
+              titleStart="Gents'"
+              titleItalic="Studio"
               image={IMG_GENTS}
               aspectClass="aspect-[5/6]"
               gradient="heavy"
@@ -69,11 +69,11 @@ export function ExploreCategoriesSection() {
             />
           </div>
 
-          {/* Mastercuts For Ladies */}
+          {/* Ladies' Studio */}
           <div className="col-span-6 lg:col-span-3">
             <CategoryCard
-              titleStart="Mastercuts For"
-              titleItalic="Ladies"
+              titleStart="Ladies'"
+              titleItalic="Studio"
               image={IMG_LADIES}
               aspectClass="aspect-[5/6]"
               gradient="heavy"
