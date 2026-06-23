@@ -54,6 +54,15 @@ export interface Service {
   location?: ServiceLocation;
   requiresConsultation?: boolean;
   variants?: ServiceVariant[];
+  // True if this service is eligible to appear in the cart's
+  // "Frequently added together" section. Currently scoped narrowly per
+  // client direction; future services can opt in by setting this flag.
+  frequentlyAdded?: boolean;
+  // True for enhancement add-ons (e.g. Hot Stone, Cupping) that cannot be
+  // booked on their own. Excluded from every standalone booking surface; they
+  // surface in the cart only once a parent massage (ritual 'somatic-recovery')
+  // is present, and are removed if the last parent massage leaves the cart.
+  addOn?: boolean;
 }
 
 export function pickServiceImage(

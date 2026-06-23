@@ -8,6 +8,7 @@ import { useCart } from '@/components/cart/CartProvider';
 import { CartIcon } from '@/components/cart/CartIcon';
 import { useAudience } from '@/components/services/useAudience';
 import { DesktopMenu } from './DesktopMenu';
+import { BrandLockup } from './BrandLockup';
 
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -24,9 +25,6 @@ export function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === '/';
-  const isRaContext =
-    location.pathname.startsWith('/at-home') ||
-    location.pathname.startsWith('/wellness-hub');
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -156,36 +154,12 @@ export function Navigation() {
 
       <div className={`w-full px-6 lg:px-12 transition-[padding] duration-300 ${darkChrome ? 'py-4' : 'py-6'}`}>
         <nav className="flex items-center justify-between gap-6">
-          {/* Logo — Ra emblem + wordmark lockup on Ra contexts, Mastercuts wordmark elsewhere */}
-          <Link to="/" className="flex items-center gap-3 group shrink-0">
-            {isRaContext ? (
-              <>
-                <img
-                  src="/assets/Logo/ra-emblem.png"
-                  alt="Ra by Mastercuts"
-                  className="h-12 lg:h-14 transition-transform duration-300 group-hover:scale-105 object-contain"
-                />
-                <span
-                  className="flex flex-col leading-none"
-                  aria-hidden="true"
-                >
-                  <span className="font-serif text-xl lg:text-2xl text-white">
-                    Ra
-                  </span>
-                  <span className="mt-1 text-[9px] lg:text-[10px] uppercase tracking-[0.22em] text-white/60">
-                    by mastercuts
-                  </span>
-                </span>
-              </>
-            ) : (
-              <img
-                src="/assets/Logo/mastercut-wordmark.png"
-                alt="Mastercuts"
-                className={`h-7 lg:h-9 transition-all duration-300 group-hover:scale-105 object-contain ${
-                  darkChrome ? 'brightness-0 invert' : ''
-                }`}
-              />
-            )}
+          {/* Logo — Ra by Mastercuts lockup, across all contexts */}
+          <Link to="/" className="flex items-center group shrink-0">
+            <BrandLockup
+              tone="light"
+              className="transition-transform duration-300 group-hover:scale-105"
+            />
           </Link>
 
           {/* Desktop primary nav — 4 dedicated items, center-flexed */}
@@ -220,7 +194,7 @@ export function Navigation() {
                       className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
                     >
                       <span className="text-sm text-white/80 group-hover:text-white">
-                        Mastercuts For <span className="italic">Gents</span>
+                        Gents' <span className="italic">Studio</span>
                       </span>
                       <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60">
                         In salon
@@ -232,7 +206,7 @@ export function Navigation() {
                       className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
                     >
                       <span className="text-sm text-white/80 group-hover:text-white">
-                        Mastercuts For <span className="italic">Ladies</span>
+                        Ladies' <span className="italic">Studio</span>
                       </span>
                       <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60">
                         In salon
@@ -354,30 +328,7 @@ export function Navigation() {
               >
                 <div className="flex flex-col h-full px-8 pt-8 pb-10">
                   <div className="flex-shrink-0 flex items-center justify-between mb-8">
-                    {isRaContext ? (
-                      <div className="flex items-center gap-3">
-                        <img
-                          src="/assets/Logo/ra-emblem.png"
-                          alt="Ra by Mastercuts"
-                          className="h-12 object-contain"
-                        />
-                        <span
-                          className="flex flex-col leading-none"
-                          aria-hidden="true"
-                        >
-                          <span className="font-serif text-xl text-text-primary">Ra</span>
-                          <span className="mt-1 text-[9px] uppercase tracking-[0.22em] text-text-secondary">
-                            by mastercuts
-                          </span>
-                        </span>
-                      </div>
-                    ) : (
-                      <img
-                        src="/assets/Logo/mastercut-wordmark.png"
-                        alt="Mastercuts"
-                        className="h-7 object-contain"
-                      />
-                    )}
+                    <BrandLockup tone="dark" />
                     <SheetClose className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-text-primary hover:bg-black/10 transition-colors duration-200">
                       <X className="w-5 h-5" />
                     </SheetClose>
@@ -438,7 +389,7 @@ export function Navigation() {
                           className="flex flex-col gap-0.5 group text-left"
                         >
                           <span className="text-xl font-serif text-text-primary group-hover:opacity-60 transition-opacity">
-                            Mastercuts For <span className="italic">Gents</span>
+                            Gents' <span className="italic">Studio</span>
                           </span>
                           <span className="text-[11px] uppercase tracking-[0.18em] text-text-muted group-hover:text-text-secondary transition-colors">
                             In salon
@@ -450,7 +401,7 @@ export function Navigation() {
                           className="flex flex-col gap-0.5 group text-left"
                         >
                           <span className="text-xl font-serif text-text-primary group-hover:opacity-60 transition-opacity">
-                            Mastercuts For <span className="italic">Ladies</span>
+                            Ladies' <span className="italic">Studio</span>
                           </span>
                           <span className="text-[11px] uppercase tracking-[0.18em] text-text-muted group-hover:text-text-secondary transition-colors">
                             In salon

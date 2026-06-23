@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 
 const STATS = [
-  { value: '4', label: 'Senior therapists' },
-  { value: '6', label: 'Junior therapists' },
+  { value: '4', label: 'DHA-Certified Therapists' },
+  { value: '7', label: 'Specialists in Wellness Hair & Nail Care' },
   { value: '5+', label: 'Years min experience, per therapist' },
 ];
 
@@ -15,8 +15,8 @@ export function StatsTeamSection() {
             Our team
           </p>
           <h2 className="font-serif text-4xl lg:text-6xl text-text-primary leading-[1.02]">
-            Senior and junior therapists, all{' '}
-            <span className="italic">DHA-certified</span>.
+            <span className="italic">DHA-Certified</span> Therapists, Expert
+            Nail Artisans &amp; Professional Hairstylists
           </h2>
         </div>
 
@@ -44,9 +44,6 @@ export function StatsTeamSection() {
           Beyond credentials, every therapist brings a minimum of five years
           of hands-on experience — paired with training in our methodology of
           slow consultation, intentional technique, and an unhurried finish.
-          Junior therapists shadow senior team members for a full year before
-          they take a chair of their own, so every treatment carries the same
-          considered care.
         </p>
       </div>
     </section>

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { X, ArrowRight, ArrowUpRight, Pencil, User, MapPin, Clock, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useCart, useCartTotals, formatAed, formatDuration } from '../CartProvider';
+import { useCart, useCartTotals, formatAed, formatAedPrecise, formatDuration } from '../CartProvider';
 import { CartItemRow } from '../CartItemRow';
 import { FrequentlyAddedSection } from '../FrequentlyAddedSection';
+import { AddOnSection } from '../AddOnSection';
 import { cn } from '@/lib/utils';
 
 function formatDateLabel(key: string): string {
@@ -49,8 +50,11 @@ export function BasketView({ onClose, onContinue }: Props) {
   const hasTimeSlot = !!(cart.draftCheckout?.date && cart.draftCheckout?.time);
   const isFinalState = hasAddress && hasTimeSlot;
 
-  const vat = Math.round(totalPrice * 0.05);
-  const grandTotal = totalPrice + vat;
+  // Catalog prices are VAT-inclusive (UAE 5%). Derive subtotal + VAT
+  // from the inclusive total so menu prices and the cart total match.
+  const subtotal = totalPrice / 1.05;
+  const vat = totalPrice - subtotal;
+  const grandTotal = totalPrice;
   const canPay = isFinalState && policyAccepted && !submitting;
 
   const handlePay = async () => {
@@ -139,6 +143,9 @@ export function BasketView({ onClose, onContinue }: Props) {
               <CartItemRow key={item.id} item={item} />
             ))}
 
+            {/* Enhancement add-ons — only when a parent massage is in cart */}
+            <AddOnSection />
+
             {/* Frequently added together */}
             <FrequentlyAddedSection />
 
@@ -172,7 +179,7 @@ export function BasketView({ onClose, onContinue }: Props) {
                   </span>
                   <div className="min-w-0">
                     <p className="text-[10px] uppercase tracking-[0.18em] text-text-secondary mb-0.5">
-                      Booking for
+                      Reservation for
                     </p>
                     <p className="text-sm text-text-primary truncate">
                       {account.name ? `${account.name} · ` : ''}{account.phone}
@@ -218,11 +225,11 @@ export function BasketView({ onClose, onContinue }: Props) {
 
               <div className="flex items-baseline justify-between mb-2">
                 <span className="text-xs uppercase tracking-wider text-text-secondary">Subtotal</span>
-                <span className="text-sm text-text-primary tabular-nums">{formatAed(totalPrice)}</span>
+                <span className="text-sm text-text-primary tabular-nums">{formatAedPrecise(subtotal)}</span>
               </div>
               <div className="flex items-baseline justify-between mb-3 pb-3 border-b border-black/10">
                 <span className="text-xs uppercase tracking-wider text-text-secondary">VAT (5%)</span>
-                <span className="text-sm text-text-primary tabular-nums">{formatAed(vat)}</span>
+                <span className="text-sm text-text-primary tabular-nums">{formatAedPrecise(vat)}</span>
               </div>
               <div className="flex items-baseline justify-between mb-2">
                 <span className="text-xs uppercase tracking-wider text-text-primary font-medium">Total</span>
@@ -337,7 +344,7 @@ export function BasketView({ onClose, onContinue }: Props) {
                     : 'bg-black/10 text-text-muted cursor-not-allowed',
                 )}
               >
-                {submitting ? 'Confirming...' : `Book an Experience · ${formatAed(grandTotal)}`}
+                {submitting ? 'Confirming...' : `Reserve your experience · ${formatAed(grandTotal)}`}
               </button>
             </>
           ) : hasAddress ? (

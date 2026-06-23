@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
 import { useRef, useState } from 'react';
 
-const LONG_TEXT_WORDS = "to help every guest leave looking better, feeling lighter, and living more fully — through considered rituals, attentive technique, and care offered with quiet warmth.".split(' ');
+const LONG_TEXT_WORDS = "to help every guest feel restored, confident and more connected to themselves through thoughtful rituals, skilled hands and care delivered with genuine warmth.".split(' ');
 
 export function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -56,8 +56,8 @@ export function AboutSection() {
           >
             <div className="aspect-[3/4] flex items-center justify-center">
               <img
-                src="/assets/Logo/mastercut-mark.png"
-                alt="Mastercuts"
+                src="/assets/Logo/ra-emblem.png"
+                alt="Ra"
                 className="w-full h-full object-contain"
               />
             </div>
@@ -86,7 +86,7 @@ export function AboutSection() {
                     i < revealedCount ? 'text-text-primary' : 'text-text-primary/20'
                   }`}
                 >
-                  {word === 'considered' ? <em>{word}</em> : word}{' '}
+                  {word === 'thoughtful' ? <em>{word}</em> : word}{' '}
                 </span>
               ))}
             </p>
@@ -98,13 +98,13 @@ export function AboutSection() {
       {/* ── Mobile: simple stacked layout ── */}
       <div className="lg:hidden px-6 py-24 space-y-12">
         <p className="text-sm text-text-secondary">
-          With decades of combined experience and ongoing advanced education, our
-          team delivers care rooted in knowledge, precision, and an unwavering
-          dedication to excellence.
+          Decades of thoughtful care, delivered with warmth, discretion and
+          quiet precision — so each visit feels deeply personal, restorative
+          and genuinely attentive.
         </p>
 
         <div className="aspect-[3/4] flex items-center justify-center w-full max-w-xs mx-auto">
-          <img src="/assets/Logo/mastercut-mark.png" alt="Mastercuts" className="w-full h-full object-contain" />
+          <img src="/assets/Logo/ra-emblem.png" alt="Ra" className="w-full h-full object-contain" />
         </div>
 
         <h2 className="font-serif text-5xl text-text-primary leading-tight">
@@ -112,9 +112,9 @@ export function AboutSection() {
         </h2>
 
         <p className="font-serif text-3xl text-text-primary leading-tight">
-          to help every guest leave looking better, feeling lighter, and living
-          more fully — through <em>considered</em> rituals, attentive technique,
-          and care offered with quiet warmth.
+          to help every guest feel restored, confident and more connected to
+          themselves through <em>thoughtful</em> rituals, skilled hands and
+          care delivered with genuine warmth.
         </p>
       </div>
 

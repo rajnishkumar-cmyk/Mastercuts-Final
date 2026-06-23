@@ -330,11 +330,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 
   const removeItem = useCallback((itemId: string) => {
-    setCart((prev) => ({
-      ...prev,
-      items: prev.items.filter((i) => i.id !== itemId),
-      updatedAt: Date.now(),
-    }));
+    setCart((prev) => {
+      let items = prev.items.filter((i) => i.id !== itemId);
+      // Add-ons cannot stand alone — if no parent massage remains in the cart,
+      // drop any orphaned add-on lines too.
+      const hasParentMassage = items.some((i) => {
+        const svc = getService(i.serviceId);
+        return !!svc && svc.ritualId === 'somatic-recovery' && !svc.addOn;
+      });
+      if (!hasParentMassage) {
+        items = items.filter((i) => !getService(i.serviceId)?.addOn);
+      }
+      return { ...prev, items, updatedAt: Date.now() };
+    });
   }, []);
 
   const updateTherapistPref = useCallback((itemId: string, therapistPref: string | 'any') => {
@@ -799,6 +807,12 @@ export function useCartTotals() {
 
 export function formatAed(value: number): string {
   return `AED ${value.toLocaleString('en-AE')}`;
+}
+
+// 2-decimal variant for VAT-inclusive payment breakdowns, where the
+// derived subtotal and VAT have fractional values.
+export function formatAedPrecise(value: number): string {
+  return `AED ${value.toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 export function formatDuration(min: number): string {

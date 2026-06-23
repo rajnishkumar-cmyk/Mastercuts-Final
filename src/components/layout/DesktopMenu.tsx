@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Phone } from 'lucide-react';
+import { BrandLockup } from './BrandLockup';
 
 interface DesktopMenuProps {
   open: boolean;
@@ -91,10 +92,9 @@ export function DesktopMenu({ open, onClose }: DesktopMenuProps) {
                 onClick={() => handleNavClick('/')}
                 className="flex items-center group"
               >
-                <img
-                  src="/assets/Logo/mastercut-wordmark.png"
-                  alt="Mastercuts"
-                  className="h-9 transition-transform duration-300 group-hover:scale-105 object-contain"
+                <BrandLockup
+                  tone="dark"
+                  className="transition-transform duration-300 group-hover:scale-105"
                 />
               </button>
 

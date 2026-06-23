@@ -153,7 +153,7 @@ export function ServiceDetailSheet() {
               <div className="lg:sticky lg:top-6">
                 <div className="border border-black/10 rounded-2xl p-6 lg:p-7 bg-white">
                   <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary mb-3">
-                    Book this service
+                    Reserve this service
                   </p>
                   <div className="flex items-baseline gap-4 mb-6">
                     <span className="font-serif text-4xl lg:text-5xl text-text-primary">
@@ -300,7 +300,7 @@ export function ServiceDetailSheet() {
                     {
                       icon: Hourglass,
                       title: 'Unhurried time',
-                      body: 'Sessions never overlap. The room is yours.',
+                      body: 'Dedicated wellness sessions delivered with care, privacy and unhurried attention.',
                     },
                     {
                       icon: Leaf,

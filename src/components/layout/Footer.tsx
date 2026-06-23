@@ -94,7 +94,7 @@ export function Footer() {
               />
               {/* Label — dark on mobile (matches filled state), white→dark on hover at sm+ */}
               <span className="relative z-10 font-serif text-2xl italic text-text-primary sm:text-white sm:group-hover:text-text-primary transition-colors duration-300">
-                Book an Experience
+                Schedule your Ritual
               </span>
             </button>
           </motion.div>
@@ -131,7 +131,7 @@ export function Footer() {
                   onClick={() => goToSalon('gentlemen')}
                   className="text-white hover:text-white/70 transition-colors duration-200 text-left"
                 >
-                  Mastercuts For Gents
+                  Gents' Studio
                 </button>
               </li>
               <li>
@@ -140,7 +140,7 @@ export function Footer() {
                   onClick={() => goToSalon('ladies')}
                   className="text-white hover:text-white/70 transition-colors duration-200 text-left"
                 >
-                  Mastercuts For Ladies
+                  Ladies' Studio
                 </button>
               </li>
               <li>
@@ -258,7 +258,7 @@ export function Footer() {
                 </p>
                 <p className="text-white/80 text-xs leading-snug">{STUDIO_HOURS}</p>
                 <p className="text-[10px] uppercase tracking-[0.18em] text-white/40 pt-2">
-                  At-home hours (transition)
+                  Ra at Home hours
                 </p>
                 <p className="text-white/80 text-xs leading-snug">{AT_HOME_HOURS}</p>
               </div>
