@@ -27,7 +27,6 @@
  * make it into the final catalog.
  */
 import type {
-  ApiChannel,
   ApiService,
   ApiSubCategory,
   ServicesResponse,

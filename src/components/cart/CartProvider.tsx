@@ -139,13 +139,6 @@ const emptyCart: Cart = { items: [], updatedAt: Date.now() };
 const BASKET_VIEW: DrawerView = { name: 'basket' };
 const RITUAL_INDEX_VIEW: DrawerView = { name: 'ritual-index' };
 
-function makeRef(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let out = '';
-  for (let i = 0; i < 6; i++) out += chars[Math.floor(Math.random() * chars.length)];
-  return `RA-${out}`;
-}
-
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const { getService, getJourney, getJourneyTotals } = useCatalog();
   const [cart, setCart] = useState<Cart>(emptyCart);
@@ -557,14 +550,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       );
     } catch (err) {
       if (err instanceof ApiError) {
-        if (err.status === 409) {
+        if (err.statusCode === 409) {
           toast.error('That slot just filled up — pick another time.');
-        } else if (err.status === 400) {
+        } else if (err.statusCode === 400) {
           toast.error(err.message || 'Booking details were rejected.');
-        } else if (err.status === 401) {
+        } else if (err.statusCode === 401) {
           toast.error('Session expired. Please sign in again.');
         } else {
-          toast.error(`Booking failed (${err.status}): ${err.message}`);
+          toast.error(`Booking failed (${err.statusCode}): ${err.message}`);
         }
       } else if (err instanceof NetworkError) {
         toast.error(err.message);

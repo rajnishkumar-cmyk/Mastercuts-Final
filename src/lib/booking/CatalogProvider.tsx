@@ -118,7 +118,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
         if (controller.signal.aborted) return;
         const message =
           err instanceof ApiError
-            ? `Catalog API ${err.status}: ${err.message}`
+            ? `Catalog API ${err.statusCode}: ${err.message}`
             : err instanceof NetworkError
               ? err.message
               : 'Failed to load services catalog';

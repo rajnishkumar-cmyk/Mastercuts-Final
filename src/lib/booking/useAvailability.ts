@@ -110,7 +110,7 @@ export function useAvailability(
         if (controller.signal.aborted) return;
         const message =
           err instanceof ApiError
-            ? `Availability API ${err.status}: ${err.message}`
+            ? `Availability API ${err.statusCode}: ${err.message}`
             : err instanceof NetworkError
               ? err.message
               : 'Failed to load availability';
