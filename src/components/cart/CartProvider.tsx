@@ -38,7 +38,7 @@ type Surface =
   | 'explore-picker'
   | 'wellness-hub';
 
-export type CheckoutStep = 'none' | 'phone-login' | 'otp-verify' | 'address' | 'date-time';
+export type CheckoutStep = 'none' | 'email-login' | 'otp-verify' | 'address' | 'date-time';
 
 export type DrawerView =
   | { name: 'basket' }
@@ -544,6 +544,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           date,
           slot_time: time,
           customer_name: account.name || guest.name,
+          customer_email: account.email || undefined,
+          customer_mobile: account.phone || guest.phone || undefined,
           customer_address: addressLine,
         },
         account.token,
@@ -645,7 +647,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const openCheckout = useCallback(() => {
     if (!account) {
-      setCheckoutStep('phone-login');
+      setCheckoutStep('email-login');
     } else if (account.addresses.length > 0) {
       // Auto-select first saved address and skip to date-time
       const firstAddr = account.addresses[0];
@@ -667,7 +669,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
   const openLogin = useCallback(() => {
     setSurface('login');
-    setCheckoutStep('phone-login');
+    setCheckoutStep('email-login');
   }, []);
   const openProfile = useCallback(() => setSurface('profile'), []);
   const openAudiencePicker = useCallback((destination = '/explore') => {

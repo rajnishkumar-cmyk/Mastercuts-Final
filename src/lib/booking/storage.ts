@@ -69,7 +69,7 @@ export function cartWasExpired(): boolean {
 
 export function loadAccount(): LightAccount | null {
   if (!storageAvailable) return null;
-  const raw = safeParse<Partial<LightAccount> & { email?: string }>(
+  const raw = safeParse<Partial<LightAccount>>(
     window.localStorage.getItem(ACCOUNT_KEY),
   );
   if (!raw) return null;
@@ -87,7 +87,7 @@ export function loadAccount(): LightAccount | null {
 
   // Defensive migrations for older valid-but-incomplete shapes.
   if (!Array.isArray(raw.addresses)) raw.addresses = [];
-  delete raw.email;
+  if (typeof raw.email !== 'string') raw.email = '';
 
   return raw as LightAccount;
 }

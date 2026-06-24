@@ -45,13 +45,18 @@ export interface BookingRecord {
 }
 
 export interface NotifyResult {
-  channel: 'whatsapp' | 'sms' | 'none';
+  channel: 'whatsapp' | 'sms' | 'email' | 'none' | 'skipped';
   error?: string;
 }
 
 export interface CreateBookingResponse {
   booking: BookingRecord;
-  notify: { customer: NotifyResult; admin: NotifyResult };
+  notify: {
+    customer: NotifyResult;
+    customerEmail?: NotifyResult;
+    admin: NotifyResult;
+    adminEmail?: NotifyResult;
+  };
 }
 
 export interface CreateBookingPayload {
@@ -60,6 +65,7 @@ export interface CreateBookingPayload {
   slot_time: string;
   customer_name?: string;
   customer_email?: string;
+  customer_mobile?: string;
   customer_gender?: string;
   customer_address?: string;
   notes?: string;

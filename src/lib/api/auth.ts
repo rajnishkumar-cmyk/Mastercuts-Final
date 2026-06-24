@@ -1,24 +1,23 @@
 /**
- * Auth API — talks to the mastercuts-customer-login Lambda.
+ * Auth API — talks to the mastercuts-customer-login Lambda (email-primary).
  *
  * Endpoints (see lambdas/mastercuts-customer-login/index.mjs):
- *   POST /auth/send-otp     { name, mobileNumber }                       → { channel }
- *   POST /auth/resend-otp   { name, mobileNumber }                       → { channel }
- *   POST /auth/verify-otp   { name, mobileNumber, otp }                  → { token, customer }
- *   GET  /auth/me           (Bearer)                                     → { claims }
+ *   POST /auth/send-otp     { email, mobileNumber?, name? }        → { channel }
+ *   POST /auth/resend-otp   { email, mobileNumber?, name? }        → { channel }
+ *   POST /auth/verify-otp   { email, otp, mobileNumber?, name? }   → { token, customer }
+ *   GET  /auth/me           (Bearer)                               → { claims }
  *
  * Notes:
- *   - `name` is sent as an empty string on Phase 1 — the UI collects it on
- *     a later step (post-OTP profile). The Lambda accepts empty names.
- *   - `mobileNumber` is the normalized E.164-ish string from
- *     `lib/phone.ts` — never the raw input. That keeps OTP lookups
- *     deterministic across "+91 98xxx" / "+919xxxx" formatting variations.
- *   - All four functions throw `ApiError` / `NetworkError` on failure; the
- *     caller renders the message inline.
+ *   - `email` is the login identity and the OTP lookup key (normalised
+ *     lowercase via lib/email.ts). OTP is delivered email-first; `mobileNumber`,
+ *     when supplied, is the SMS-fallback target and the saved contact number.
+ *     The contact field stays `mobileNumber` to match the legacy auth contract.
+ *   - `name` is optional — collected on a later step; the Lambda accepts empty.
+ *   - All functions throw `ApiError` / `NetworkError` on failure.
  */
 import { apiClient } from './client';
 
-export type OtpChannel = 'whatsapp' | 'sms' | 'none';
+export type OtpChannel = 'email' | 'sms' | 'whatsapp' | 'none';
 
 export interface SendOtpResponse {
   channel: OtpChannel;
@@ -29,13 +28,15 @@ export interface VerifyOtpResponse {
   customer: {
     id: string;
     name: string;
-    mobile: string;
+    email: string;
+    mobile: string | null;
   };
 }
 
 export interface AuthClaims {
   customer_id: string;
-  mobileNumber: string;
+  email: string;
+  mobileNumber: string | null;
   name: string;
   partner_id: string;
   iat?: number;
@@ -47,8 +48,10 @@ export interface MeResponse {
 }
 
 interface OtpRequestBody {
-  name: string;
-  mobileNumber: string;
+  email: string;
+  // Contact phone; field name matches the legacy auth contract.
+  mobileNumber?: string;
+  name?: string;
 }
 
 interface VerifyOtpBody extends OtpRequestBody {
@@ -56,27 +59,30 @@ interface VerifyOtpBody extends OtpRequestBody {
 }
 
 export function sendOtp(
-  mobileNumber: string,
+  email: string,
+  phone = '',
   name = '',
 ): Promise<SendOtpResponse> {
-  const body: OtpRequestBody = { name, mobileNumber };
+  const body: OtpRequestBody = { email, mobileNumber: phone, name };
   return apiClient.post<SendOtpResponse>('/auth/send-otp', body);
 }
 
 export function resendOtp(
-  mobileNumber: string,
+  email: string,
+  phone = '',
   name = '',
 ): Promise<SendOtpResponse> {
-  const body: OtpRequestBody = { name, mobileNumber };
+  const body: OtpRequestBody = { email, mobileNumber: phone, name };
   return apiClient.post<SendOtpResponse>('/auth/resend-otp', body);
 }
 
 export function verifyOtp(
-  mobileNumber: string,
+  email: string,
   otp: string,
+  phone = '',
   name = '',
 ): Promise<VerifyOtpResponse> {
-  const body: VerifyOtpBody = { name, mobileNumber, otp };
+  const body: VerifyOtpBody = { email, otp, mobileNumber: phone, name };
   return apiClient.post<VerifyOtpResponse>('/auth/verify-otp', body);
 }
 

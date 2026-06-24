@@ -3,17 +3,17 @@ import { ArrowLeft, X } from 'lucide-react';
 import { useCart } from './CartProvider';
 import type { CheckoutStep } from './CartProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { PhoneLoginStep } from './steps/PhoneLoginStep';
+import { EmailLoginStep } from './steps/EmailLoginStep';
 import { OtpVerifyStep } from './steps/OtpVerifyStep';
 import { AddressStep } from './steps/AddressStep';
 import { DateTimeStep } from './steps/DateTimeStep';
 
 function getPrevStep(current: CheckoutStep, _hasAccount: boolean): CheckoutStep | null {
   switch (current) {
-    case 'phone-login':
+    case 'email-login':
       return null; // back to basket
     case 'otp-verify':
-      return 'phone-login';
+      return 'email-login';
     case 'address':
       return null; // back to basket
     case 'date-time':
@@ -25,7 +25,7 @@ function getPrevStep(current: CheckoutStep, _hasAccount: boolean): CheckoutStep 
 
 function getStepLabel(step: CheckoutStep): string {
   switch (step) {
-    case 'phone-login':
+    case 'email-login':
     case 'otp-verify':
       return 'Login';
     case 'address':
@@ -52,7 +52,7 @@ function getVisualStep(step: CheckoutStep, hasAccount: boolean): number {
   }
   // New user: login=1, address=2, time=3
   switch (step) {
-    case 'phone-login':
+    case 'email-login':
     case 'otp-verify':
       return 1;
     case 'address':
@@ -185,7 +185,7 @@ export function CartCheckoutOverlay({ mode = 'embedded' }: OverlayProps = {}) {
 
             {/* Step content */}
             <div className="flex-1 overflow-hidden">
-              {checkoutStep === 'phone-login' && <PhoneLoginStep />}
+              {checkoutStep === 'email-login' && <EmailLoginStep />}
               {checkoutStep === 'otp-verify' && <OtpVerifyStep />}
               {checkoutStep === 'address' && <AddressStep />}
               {checkoutStep === 'date-time' && <DateTimeStep />}

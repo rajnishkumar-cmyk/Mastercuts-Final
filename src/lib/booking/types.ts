@@ -179,6 +179,8 @@ export interface Cart {
 
 export interface LightAccount {
   name: string;
+  // Email is the login identity (OTP target). Phone is the contact number.
+  email: string;
   phone: string;
   addresses: ServiceAddress[];
   createdAt: number;

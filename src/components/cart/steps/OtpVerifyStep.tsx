@@ -1,9 +1,8 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { useCart } from '../CartProvider';
 import { cn } from '@/lib/utils';
-import { formatPhoneForDisplay } from '@/lib/phone';
 import {
   resendOtp,
   verifyOtp,
@@ -11,13 +10,19 @@ import {
 } from '@/lib/api/auth';
 import { toErrorMessage } from '@/lib/api/errors';
 import { authConfig } from '@/lib/authConfig';
-import { LOGIN_PHONE_KEY, LOGIN_CHANNEL_KEY } from './PhoneLoginStep';
+import {
+  LOGIN_EMAIL_KEY,
+  LOGIN_PHONE_KEY,
+  LOGIN_CHANNEL_KEY,
+} from './EmailLoginStep';
 
 const OTP_LENGTH = authConfig.otpLength;
 const RESEND_COOLDOWN_SEC = authConfig.resendCooldownSec;
 
 function channelCopy(channel: OtpChannel): string {
   switch (channel) {
+    case 'email':
+      return 'Check your email inbox (and spam).';
     case 'whatsapp':
       return 'Check your WhatsApp messages.';
     case 'sms':
@@ -31,16 +36,19 @@ export function OtpVerifyStep() {
   const { saveLightAccount, setCheckoutStep, surface, closeAll, account } =
     useCart();
 
-  // Read handoff from PhoneLoginStep on mount. We snapshot into state so
-  // the values stay stable across re-renders (and so a stale tab can't
-  // start verifying with a phone the user changed in a different tab).
+  // Read handoff from EmailLoginStep on mount. We snapshot into state so the
+  // values stay stable across re-renders (and so a stale tab can't start
+  // verifying with an email the user changed in a different tab).
+  const [email] = useState<string>(
+    () => sessionStorage.getItem(LOGIN_EMAIL_KEY) ?? '',
+  );
   const [phone] = useState<string>(
     () => sessionStorage.getItem(LOGIN_PHONE_KEY) ?? '',
   );
   const [channel] = useState<OtpChannel>(
     () =>
       (sessionStorage.getItem(LOGIN_CHANNEL_KEY) as OtpChannel | null) ??
-      'whatsapp',
+      'email',
   );
 
   const [otp, setOtp] = useState('');
@@ -49,13 +57,11 @@ export function OtpVerifyStep() {
   const [error, setError] = useState<string | null>(null);
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN_SEC);
 
-  const displayPhone = useMemo(() => formatPhoneForDisplay(phone), [phone]);
-
-  // If we somehow landed here without a phone (e.g. user reloaded mid-flow
+  // If we somehow landed here without an email (e.g. user reloaded mid-flow
   // after sessionStorage was wiped), bounce back to the entry step.
   useEffect(() => {
-    if (!phone) setCheckoutStep('phone-login');
-  }, [phone, setCheckoutStep]);
+    if (!email) setCheckoutStep('email-login');
+  }, [email, setCheckoutStep]);
 
   // Resend cooldown ticker.
   useEffect(() => {
@@ -65,25 +71,27 @@ export function OtpVerifyStep() {
   }, [cooldown]);
 
   const handleVerify = useCallback(async () => {
-    if (otp.length !== OTP_LENGTH || verifying || !phone) return;
+    if (otp.length !== OTP_LENGTH || verifying || !email) return;
     setVerifying(true);
     setError(null);
 
     try {
-      const result = await verifyOtp(phone, otp);
+      const result = await verifyOtp(email, otp, phone);
 
       // Persist auth into the LightAccount. We keep existing addresses
       // when the user is already logged in and is just re-authenticating
       // (rare in Phase 1 but cheap to support).
       saveLightAccount({
         name: result.customer.name ?? account?.name ?? '',
-        phone: result.customer.mobile,
+        email: result.customer.email ?? email,
+        phone: result.customer.mobile ?? phone ?? account?.phone ?? '',
         addresses: account?.addresses ?? [],
         createdAt: account?.createdAt ?? Date.now(),
         token: result.token,
         customerId: result.customer.id,
       });
 
+      sessionStorage.removeItem(LOGIN_EMAIL_KEY);
       sessionStorage.removeItem(LOGIN_PHONE_KEY);
       sessionStorage.removeItem(LOGIN_CHANNEL_KEY);
 
@@ -104,6 +112,7 @@ export function OtpVerifyStep() {
     }
   }, [
     otp,
+    email,
     phone,
     verifying,
     saveLightAccount,
@@ -125,11 +134,11 @@ export function OtpVerifyStep() {
   }, [otp]);
 
   const handleResend = async () => {
-    if (cooldown > 0 || resending || !phone) return;
+    if (cooldown > 0 || resending || !email) return;
     setResending(true);
     setError(null);
     try {
-      await resendOtp(phone);
+      await resendOtp(email, phone);
       setCooldown(RESEND_COOLDOWN_SEC);
       toast.success('OTP resent');
     } catch (err) {
@@ -152,7 +161,7 @@ export function OtpVerifyStep() {
         </h2>
         <p className="text-sm text-text-secondary mb-8">
           We sent a {OTP_LENGTH}-digit code to{' '}
-          <span className="text-text-primary">{displayPhone}</span>.{' '}
+          <span className="text-text-primary">{email}</span>.{' '}
           {channelCopy(channel)}
         </p>
 
