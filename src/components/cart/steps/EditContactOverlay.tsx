@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { X } from 'lucide-react';
@@ -10,6 +10,7 @@ import { useCart } from '../CartProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { isValidPhone, normalizePhone } from '@/lib/phone';
+import { PhoneNumberInput } from '@/components/ui/phone-input';
 import { updateProfile } from '@/lib/api/auth';
 import { toErrorMessage } from '@/lib/api/errors';
 
@@ -37,6 +38,7 @@ interface BodyProps {
 function Body({ defaults, onSave, onClose, submitting }: BodyProps) {
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isValid },
@@ -96,12 +98,16 @@ function Body({ defaults, onSave, onClose, submitting }: BodyProps) {
             <label className="block text-xs uppercase tracking-wider text-text-secondary mb-2">
               Mobile
             </label>
-            <input
-              {...register('phone')}
-              placeholder="+971 50 123 4567"
-              inputMode="tel"
-              autoComplete="tel"
-              className="w-full bg-transparent border-b border-black/15 py-2.5 text-text-primary focus:border-text-primary outline-none transition-colors"
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field }) => (
+                <PhoneNumberInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  invalid={!!errors.phone}
+                />
+              )}
             />
             {errors.phone && (
               <p className="text-xs text-red-600 mt-1">{errors.phone.message}</p>

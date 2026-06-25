@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, Phone } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { useCart } from '../CartProvider';
 import { cn } from '@/lib/utils';
 import { isValidEmail, normalizeEmail } from '@/lib/email';
 import { isValidPhone, normalizePhone } from '@/lib/phone';
+import { PhoneNumberInput } from '@/components/ui/phone-input';
 import { sendOtp, type OtpChannel } from '@/lib/api/auth';
 import { toErrorMessage } from '@/lib/api/errors';
 
@@ -38,6 +39,7 @@ export function EmailLoginStep() {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<LoginFormValues>({
@@ -124,21 +126,22 @@ export function EmailLoginStep() {
             >
               Mobile number
             </label>
-            <div className="relative">
-              <Phone className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
-              <input
-                id="phone-input"
-                {...register('phone')}
-                placeholder="+971 50 123 4567"
-                inputMode="tel"
-                autoComplete="tel"
-                disabled={submitting}
-                aria-invalid={!!errors.phone}
-                className="w-full bg-transparent border-b border-black/15 py-2.5 pl-6 text-text-primary focus:border-text-primary outline-none transition-colors disabled:opacity-60"
-              />
-            </div>
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field }) => (
+                <PhoneNumberInput
+                  id="phone-input"
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={submitting}
+                  invalid={!!errors.phone}
+                  describedById={errors.phone ? 'phone-input-error' : undefined}
+                />
+              )}
+            />
             {errors.phone && (
-              <p className="text-xs text-red-600 mt-1" role="alert">
+              <p id="phone-input-error" className="text-xs text-red-600 mt-1" role="alert">
                 {errors.phone.message}
               </p>
             )}
