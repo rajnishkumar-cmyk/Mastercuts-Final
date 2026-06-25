@@ -89,3 +89,20 @@ export function verifyOtp(
 export function getMe(token: string): Promise<MeResponse> {
   return apiClient.get<MeResponse>('/auth/me', { token });
 }
+
+export interface UpdateProfileResponse {
+  customer: {
+    id: string;
+    name: string;
+    email: string | null;
+    mobile: string | null;
+  };
+}
+
+/** Update the signed-in customer's contact details (name + mobile). */
+export function updateProfile(
+  token: string,
+  fields: { name?: string; mobileNumber?: string },
+): Promise<UpdateProfileResponse> {
+  return apiClient.put<UpdateProfileResponse>('/auth/me', fields, { token });
+}

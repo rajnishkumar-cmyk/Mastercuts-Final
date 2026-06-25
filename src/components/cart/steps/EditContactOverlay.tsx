@@ -1,22 +1,28 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { X } from 'lucide-react';
+import { toast } from 'sonner';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useCart } from '../CartProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { isValidPhone, normalizePhone } from '@/lib/phone';
+import { updateProfile } from '@/lib/api/auth';
+import { toErrorMessage } from '@/lib/api/errors';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Please enter your name'),
   phone: z
     .string()
-    .regex(
-      /^\+971\s?\d{2}\s?\d{3}\s?\d{4}$|^05\d\s?\d{3}\s?\d{4}$/,
-      'Please enter a valid UAE mobile number'
-    ),
+    .min(1, 'Mobile number is required')
+    .refine((v) => isValidPhone(v), {
+      // Same validator as the login step: accepts UAE, India, and generic
+      // international "+<cc>…" numbers — not UAE-only.
+      message: 'Enter a valid mobile number with country code',
+    }),
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
@@ -25,9 +31,10 @@ interface BodyProps {
   defaults: ContactFormValues;
   onSave: (values: ContactFormValues) => void;
   onClose: () => void;
+  submitting: boolean;
 }
 
-function Body({ defaults, onSave, onClose }: BodyProps) {
+function Body({ defaults, onSave, onClose, submitting }: BodyProps) {
   const {
     register,
     handleSubmit,
@@ -87,7 +94,7 @@ function Body({ defaults, onSave, onClose }: BodyProps) {
 
           <div>
             <label className="block text-xs uppercase tracking-wider text-text-secondary mb-2">
-              Mobile (UAE)
+              Mobile
             </label>
             <input
               {...register('phone')}
@@ -106,15 +113,15 @@ function Body({ defaults, onSave, onClose }: BodyProps) {
       <div className="px-6 pt-3 pb-6">
         <button
           type="submit"
-          disabled={!isValid}
+          disabled={!isValid || submitting}
           className={cn(
             'w-full rounded-full py-3.5 text-sm font-medium transition-colors',
-            isValid
+            isValid && !submitting
               ? 'bg-bg-dark text-white hover:bg-bg-darker'
               : 'bg-black/10 text-text-muted cursor-not-allowed'
           )}
         >
-          Save
+          {submitting ? 'Saving…' : 'Save'}
         </button>
       </div>
     </form>
@@ -124,25 +131,43 @@ function Body({ defaults, onSave, onClose }: BodyProps) {
 export function EditContactOverlay() {
   const { account, saveLightAccount, isContactEditOpen, closeContactEdit } = useCart();
   const isMobile = useIsMobile();
+  const [submitting, setSubmitting] = useState(false);
 
   const defaults: ContactFormValues = {
     name: account?.name ?? '',
     phone: account?.phone ?? '',
   };
 
-  const onSave = (values: ContactFormValues) => {
+  const onSave = async (values: ContactFormValues) => {
     if (!account) {
       // EditContact is only reachable from a logged-in surface — guard
       // here so we never construct a tokenless LightAccount.
       closeContactEdit();
       return;
     }
-    saveLightAccount({
-      ...account,
-      name: values.name,
-      phone: values.phone,
-    });
-    closeContactEdit();
+    const mobileNumber = normalizePhone(values.phone) ?? values.phone;
+    setSubmitting(true);
+    try {
+      // Persist to the backend (PUT /auth/me) first, then mirror the
+      // server's response into the local LightAccount.
+      const { customer } = await updateProfile(account.token, {
+        name: values.name,
+        mobileNumber,
+      });
+      saveLightAccount({
+        ...account,
+        name: customer.name ?? values.name,
+        phone: customer.mobile ?? mobileNumber,
+      });
+      toast.success('Details updated');
+      closeContactEdit();
+    } catch (err) {
+      toast.error(
+        toErrorMessage(err, 'Could not update your details. Please try again.'),
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (isMobile) {
@@ -154,7 +179,7 @@ export function EditContactOverlay() {
           className="bg-bg-primary border-none p-0 w-full max-w-full rounded-t-3xl h-auto max-h-[88vh] z-[90]"
         >
           <div className="absolute top-3 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-black/20" />
-          <Body defaults={defaults} onSave={onSave} onClose={closeContactEdit} />
+          <Body defaults={defaults} onSave={onSave} onClose={closeContactEdit} submitting={submitting} />
         </SheetContent>
       </Sheet>
     );
@@ -166,7 +191,7 @@ export function EditContactOverlay() {
         showCloseButton={false}
         className="bg-bg-primary border-none p-0 sm:max-w-md w-[calc(100%-2rem)] overflow-hidden rounded-2xl shadow-2xl z-[90]"
       >
-        <Body defaults={defaults} onSave={onSave} onClose={closeContactEdit} />
+        <Body defaults={defaults} onSave={onSave} onClose={closeContactEdit} submitting={submitting} />
       </DialogContent>
     </Dialog>
   );
