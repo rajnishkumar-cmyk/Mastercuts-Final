@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell, X, LogOut, User as UserIcon, Users, ChevronRight } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
@@ -215,7 +216,6 @@ export function ProfileDrawer() {
     bookingsLoading,
     bookingsError,
     refreshBookings,
-    openCart,
     signOut,
     openLogin,
     guestProfiles,
@@ -223,6 +223,7 @@ export function ProfileDrawer() {
     removeWaitlistRequest,
   } = useCart();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const open = surface === 'profile';
   const side = isMobile ? 'bottom' : 'right';
   const [selected, setSelected] = useState<CardBooking | null>(null);
@@ -230,6 +231,11 @@ export function ProfileDrawer() {
   const handleSignIn = () => {
     closeAll();
     setTimeout(openLogin, 220);
+  };
+
+  const handleBookNow = () => {
+    closeAll();
+    navigate('/at-home');
   };
 
   // Pull fresh server bookings whenever the profile opens.
@@ -415,10 +421,7 @@ export function ProfileDrawer() {
                     No upcoming visits.{' '}
                     <button
                       type="button"
-                      onClick={() => {
-                        closeAll();
-                        setTimeout(openCart, 200);
-                      }}
+                      onClick={handleBookNow}
                       className="underline hover:no-underline"
                     >
                       Book one now
