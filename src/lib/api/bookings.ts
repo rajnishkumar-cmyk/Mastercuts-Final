@@ -96,3 +96,15 @@ export function getBooking(
     signal,
   });
 }
+
+export interface ListBookingsResponse {
+  bookings: BookingRecord[];
+}
+
+/** List the signed-in customer's bookings (newest first). */
+export function listBookings(
+  token: string,
+  signal?: AbortSignal,
+): Promise<ListBookingsResponse> {
+  return apiClient.get<ListBookingsResponse>('/bookings', { token, signal });
+}

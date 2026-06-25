@@ -23,8 +23,12 @@ import {
   clearWaitlist,
 } from '@/lib/booking/storage';
 import { toDateKey } from '@/lib/booking/availability';
-import { createBooking } from '@/lib/api/bookings';
-import { ApiError, NetworkError } from '@/lib/api/errors';
+import {
+  createBooking,
+  listBookings,
+  type BookingRecord as ApiBooking,
+} from '@/lib/api/bookings';
+import { ApiError, NetworkError, toErrorMessage } from '@/lib/api/errors';
 
 const SELF_GUEST_ID = 'self';
 
@@ -131,6 +135,12 @@ interface CartContextValue {
   // account
   saveLightAccount: (account: LightAccount) => void;
   signOut: () => void;
+
+  // server-fetched bookings (source of truth when signed in)
+  remoteBookings: ApiBooking[] | null;
+  bookingsLoading: boolean;
+  bookingsError: string | null;
+  refreshBookings: () => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -144,6 +154,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<Cart>(emptyCart);
   const [account, setAccount] = useState<LightAccount | null>(null);
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
+  const [remoteBookings, setRemoteBookings] = useState<ApiBooking[] | null>(null);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [bookingsError, setBookingsError] = useState<string | null>(null);
   const [surface, setSurface] = useState<Surface>('none');
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>('none');
   const [bookingResult, setBookingResult] = useState<BookingRecord | null>(null);
@@ -621,7 +634,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     clearGuests();
     setWaitlistRequests([]);
     clearWaitlist();
+    setRemoteBookings(null);
+    setBookingsError(null);
   }, []);
+
+  // Fetch the customer's bookings from the server (source of truth when signed
+  // in). Local bookings remain an offline fallback if this fails.
+  const refreshBookings = useCallback(async () => {
+    const token = account?.token;
+    if (!token) {
+      setRemoteBookings(null);
+      return;
+    }
+    setBookingsLoading(true);
+    setBookingsError(null);
+    try {
+      const { bookings: list } = await listBookings(token);
+      setRemoteBookings(list);
+    } catch (err) {
+      setBookingsError(toErrorMessage(err, 'Could not load your bookings.'));
+    } finally {
+      setBookingsLoading(false);
+    }
+  }, [account?.token]);
+
+  // Auto-load on login / token change; clear on sign-out.
+  useEffect(() => {
+    if (account?.token) void refreshBookings();
+    else setRemoteBookings(null);
+  }, [account?.token, refreshBookings]);
 
   // openCart picks a sensible default based on cart state, and when opening
   // directly into a ritual-services view it prepends ritual-index so the back
@@ -723,6 +764,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     cart,
     account,
     bookings,
+    remoteBookings,
+    bookingsLoading,
+    bookingsError,
+    refreshBookings,
     surface,
     serviceDetail,
     checkoutStep,
