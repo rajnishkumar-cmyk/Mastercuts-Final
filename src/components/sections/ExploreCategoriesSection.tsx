@@ -4,9 +4,9 @@ import { useAudience } from '@/components/services/useAudience';
 import { CategoryCard } from '@/components/services/CategoryCard';
 
 const IMG_AT_HOME = '/assets/Images/Ra-at-home-new.jpeg';
-const IMG_GENTS = '/assets/New Images /Mastercuts Gentlemen New.JPG';
-const IMG_LADIES = '/assets/New Images /Mastercuts Ladies New.jpg';
-const IMG_WELLNESS = '/assets/New Images /Ra Wellness hub new.jpg';
+const IMG_GENTS = '/assets/New Images/Mastercuts Gentlemen New.JPG';
+const IMG_LADIES = '/assets/New Images/Mastercuts Ladies New.jpg';
+const IMG_WELLNESS = '/assets/New Images/Ra Wellness hub new.jpg';
 
 export function ExploreCategoriesSection() {
   const navigate = useNavigate();

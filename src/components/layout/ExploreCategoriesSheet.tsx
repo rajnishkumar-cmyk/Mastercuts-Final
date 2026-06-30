@@ -73,14 +73,14 @@ function Body({ onClose }: { onClose: () => void }) {
           <CategoryCard
             titleStart="Gents'"
             titleItalic="Studio"
-            image="/assets/New Images /Mastercuts Gentlemen New.JPG"
+            image="/assets/New Images/Mastercuts Gentlemen New.JPG"
             aspectClass="aspect-[23/25] lg:aspect-[113/100]"
             onClick={() => handleSalon('gentlemen')}
           />
           <CategoryCard
             titleStart="Ladies'"
             titleItalic="Studio"
-            image="/assets/New Images /Mastercuts Ladies New.jpg"
+            image="/assets/New Images/Mastercuts Ladies New.jpg"
             aspectClass="aspect-[23/25] lg:aspect-[113/100]"
             onClick={() => handleSalon('ladies')}
           />
@@ -96,7 +96,7 @@ function Body({ onClose }: { onClose: () => void }) {
           eyebrow="By invitation only"
           titleStart="Ra Wellness"
           titleItalic="Hub"
-          image="/assets/New Images /Ra Wellness hub new.jpg"
+          image="/assets/New Images/Ra Wellness hub new.jpg"
           aspectClass="aspect-[2/1] lg:aspect-[5/2]"
           raBadge
           titleAlign="center"

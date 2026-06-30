@@ -21,13 +21,13 @@ const OPTIONS: {
     key: 'ladies',
     label: 'Ladies',
     tagline: 'Experiences for',
-    image: '/assets/New Images /Experience-for-ladies.jpeg',
+    image: '/assets/New Images/Experience-for-ladies.jpeg',
   },
   {
     key: 'gentlemen',
     label: 'Gentlemen',
     tagline: 'Experiences for',
-    image: '/assets/New Images /Experience-for-Gents.jpeg',
+    image: '/assets/New Images/Experience-for-Gents.jpeg',
   },
 ];
 
