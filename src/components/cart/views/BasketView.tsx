@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart, useCartTotals, formatAed, formatAedPrecise, formatDuration } from '../CartProvider';
 import { CartItemRow } from '../CartItemRow';
 import { FrequentlyAddedSection } from '../FrequentlyAddedSection';
-import { AddOnSection } from '../AddOnSection';
+import { computeVatBreakdown, serviceVat } from '@/lib/booking/pricing';
 import { cn } from '@/lib/utils';
 
 function formatDateLabel(key: string): string {
@@ -50,10 +50,9 @@ export function BasketView({ onClose, onContinue }: Props) {
   const hasTimeSlot = !!(cart.draftCheckout?.date && cart.draftCheckout?.time);
   const isFinalState = hasAddress && hasTimeSlot;
 
-  // Catalog prices are VAT-inclusive (UAE 5%). Derive subtotal + VAT
-  // from the inclusive total so menu prices and the cart total match.
-  const subtotal = totalPrice / 1.05;
-  const vat = totalPrice - subtotal;
+  // Catalog prices are VAT-inclusive (UAE 5%). VAT is shown per service line
+  // (serviceVat); the net subtotal and grand total are the sums.
+  const { subtotal } = computeVatBreakdown(cart.items.map((i) => i.price));
   const grandTotal = totalPrice;
   const canPay = isFinalState && policyAccepted && !submitting;
 
@@ -136,12 +135,15 @@ export function BasketView({ onClose, onContinue }: Props) {
               </div>
             )}
 
-            {cart.items.map((item) => (
-              <CartItemRow key={item.id} item={item} />
-            ))}
-
-            {/* Enhancement add-ons — only when a parent massage is in cart */}
-            <AddOnSection />
+            {cart.items
+              .filter((item) => !item.parentItemId)
+              .map((item) => (
+                <CartItemRow
+                  key={item.id}
+                  item={item}
+                  addOns={cart.items.filter((c) => c.parentItemId === item.id)}
+                />
+              ))}
 
             {/* Frequently added together */}
             <FrequentlyAddedSection />
@@ -200,36 +202,34 @@ export function BasketView({ onClose, onContinue }: Props) {
                 Payment breakdown
               </p>
 
-              {/* Service line items */}
-              <ul className="space-y-2 mb-3 pb-3 border-b border-black/10">
+              {/* Service line items — VAT shown per service (inclusive). */}
+              <ul className="space-y-2.5 mb-3 pb-3 border-b border-black/10">
                 {cart.items.map((item) => (
-                  <li
-                    key={item.id}
-                    className="flex items-baseline justify-between gap-3"
-                  >
-                    <span className="min-w-0 flex-1 text-sm text-text-primary truncate">
-                      {item.name}
-                      {item.variantLabel && (
-                        <span className="text-text-secondary"> · {item.variantLabel}</span>
-                      )}
-                    </span>
-                    <span className="shrink-0 text-sm text-text-primary tabular-nums">
-                      {formatAed(item.price)}
-                    </span>
+                  <li key={item.id}>
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="min-w-0 flex-1 text-sm text-text-primary truncate">
+                        {item.name}
+                        {item.variantLabel && (
+                          <span className="text-text-secondary"> · {item.variantLabel}</span>
+                        )}
+                      </span>
+                      <span className="shrink-0 text-sm text-text-primary tabular-nums">
+                        {formatAed(item.price)}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-text-secondary/80 tabular-nums mt-0.5">
+                      incl. 5% VAT · {formatAedPrecise(serviceVat(item.price))}
+                    </p>
                   </li>
                 ))}
               </ul>
 
-              <div className="flex items-baseline justify-between mb-2">
-                <span className="text-xs uppercase tracking-wider text-text-secondary">Subtotal</span>
+              <div className="flex items-baseline justify-between mb-3 pb-3 border-b border-black/10">
+                <span className="text-xs uppercase tracking-wider text-text-secondary">Subtotal (net)</span>
                 <span className="text-sm text-text-primary tabular-nums">{formatAedPrecise(subtotal)}</span>
               </div>
-              <div className="flex items-baseline justify-between mb-3 pb-3 border-b border-black/10">
-                <span className="text-xs uppercase tracking-wider text-text-secondary">VAT (5%)</span>
-                <span className="text-sm text-text-primary tabular-nums">{formatAedPrecise(vat)}</span>
-              </div>
               <div className="flex items-baseline justify-between mb-2">
-                <span className="text-xs uppercase tracking-wider text-text-primary font-medium">Total</span>
+                <span className="text-xs uppercase tracking-wider text-text-primary font-medium">Total (incl. VAT)</span>
                 <span className="font-serif text-2xl text-text-primary tabular-nums">{formatAed(grandTotal)}</span>
               </div>
               <div className="flex items-baseline justify-between mb-2">

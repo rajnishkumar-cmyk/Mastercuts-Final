@@ -103,6 +103,18 @@ export function addBooking(booking: BookingRecord): void {
   window.localStorage.setItem(BOOKINGS_KEY, JSON.stringify(list));
 }
 
+export function updateBooking(
+  reference: string,
+  patch: Partial<BookingRecord>
+): BookingRecord[] {
+  if (!storageAvailable) return [];
+  const list = loadBookings().map((b) =>
+    b.reference === reference ? { ...b, ...patch } : b
+  );
+  window.localStorage.setItem(BOOKINGS_KEY, JSON.stringify(list));
+  return list;
+}
+
 export function clearBookings(): void {
   if (!storageAvailable) return;
   window.localStorage.removeItem(BOOKINGS_KEY);

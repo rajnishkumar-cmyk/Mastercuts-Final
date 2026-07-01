@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Plus, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCart } from './CartProvider';
-import { getService } from '@/lib/booking/catalog';
+import { getService, getAddOnsForService } from '@/lib/booking/catalog';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -22,7 +22,7 @@ export function AddToCartButton({
   tone = 'dark',
   className,
 }: Props) {
-  const { addToCart, removeItem, cart } = useCart();
+  const { addToCart, removeItem, cart, openAddonPicker } = useCart();
   const [justAdded, setJustAdded] = useState(false);
   const cartItem = cart.items.find((i) => i.serviceId === serviceId);
   const inCart = !!cartItem;
@@ -34,6 +34,11 @@ export function AddToCartButton({
       removeItem(cartItem.id);
       const svc = getService(serviceId);
       toast.info(`${svc?.name ?? 'Service'} removed`);
+      return;
+    }
+    // Add-ons available → let the guest choose them in the picker sheet first.
+    if (getAddOnsForService(serviceId).length > 0) {
+      openAddonPicker(serviceId);
       return;
     }
     const ok = addToCart(serviceId, 'any', variantId);

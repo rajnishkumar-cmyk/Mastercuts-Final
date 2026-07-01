@@ -63,6 +63,10 @@ export interface Service {
   // surface in the cart only once a parent massage (ritual 'somatic-recovery')
   // is present, and are removed if the last parent massage leaves the cart.
   addOn?: boolean;
+  // For add-on services only: parent massage ids this add-on does NOT apply
+  // to. e.g. Hot Stone excludes the Ra Signature Massage. Absent = applies to
+  // every massage.
+  addOnExcludes?: string[];
 }
 
 export function pickServiceImage(
@@ -116,6 +120,10 @@ export interface CartItem {
   // Which saved guest this service is for. Defaults to the self profile
   // when omitted (e.g. items added pre-login).
   forGuestId?: string;
+  // Set on add-on line items (Hot Stone / Cupping) to link them to the
+  // parent massage line they were attached to. Removing the parent removes
+  // its linked add-ons.
+  parentItemId?: string;
 }
 
 export interface GuestProfile {
@@ -194,6 +202,8 @@ export interface BookingRecord {
   guest: GuestDetails;
   createdAt: number;
   status: 'confirmed' | 'cancelled';
+  // Set when the booking is cancelled by the guest.
+  cancelledAt?: number;
   serviceLocation: 'at-home';
   paymentMethod: 'card' | 'apple-pay';
   // True when the booking address is outside Imperial Avenue Residences

@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { Check, Calendar, Share2, MapPin } from 'lucide-react';
 import type { BookingRecord } from '@/lib/booking/types';
-import { formatAed, formatDuration } from '@/components/cart/CartProvider';
+import { formatAed, formatAedPrecise, formatDuration } from '@/components/cart/CartProvider';
+import { computeVatBreakdown, serviceVat } from '@/lib/booking/pricing';
 
 interface Props {
   booking: BookingRecord;
@@ -28,6 +29,9 @@ function formatTimeLabel(time: string): string {
 
 export function SuccessState({ booking, onDone }: Props) {
   const firstName = booking.guest.name.split(' ')[0] ?? 'friend';
+  // Prices are VAT-inclusive; VAT is shown per service line, net subtotal is
+  // the sum (the total the guest pays is unchanged).
+  const { subtotal } = computeVatBreakdown(booking.items.map((i) => i.price));
 
   return (
     <div className="flex-1 overflow-y-auto bg-bg-primary">
@@ -107,27 +111,28 @@ export function SuccessState({ booking, onDone }: Props) {
             </div>
           )}
 
-          <div className="border-t border-white/10 pt-4 space-y-2">
+          <div className="border-t border-white/10 pt-4 space-y-2.5">
             {booking.items.map((item) => (
-              <div key={item.id} className="flex items-start justify-between gap-3">
-                <p className="text-sm text-white/80 truncate">{item.name}</p>
-                <p className="text-sm text-white/60 shrink-0">{formatDuration(item.durationMin)}</p>
+              <div key={item.id}>
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-sm text-white/80 truncate">{item.name}</p>
+                  <p className="text-sm text-white/80 shrink-0">{formatAed(item.price)}</p>
+                </div>
+                <p className="text-[11px] text-white/40">
+                  {formatDuration(item.durationMin)} · incl. 5% VAT {formatAedPrecise(serviceVat(item.price))}
+                </p>
               </div>
             ))}
           </div>
 
           <div className="border-t border-white/10 pt-4 space-y-1.5">
-            <div className="flex items-baseline justify-between">
-              <span className="text-xs uppercase tracking-wider text-white/50">Subtotal</span>
-              <span className="text-sm text-white/80">{formatAed(booking.totalPrice)}</span>
+            <div className="flex items-baseline justify-between pb-2 border-b border-white/10">
+              <span className="text-xs uppercase tracking-wider text-white/50">Subtotal (net)</span>
+              <span className="text-sm text-white/80">{formatAedPrecise(subtotal)}</span>
             </div>
-            <div className="flex items-baseline justify-between">
-              <span className="text-xs uppercase tracking-wider text-white/50">VAT (5%)</span>
-              <span className="text-sm text-white/80">{formatAed(Math.round(booking.totalPrice * 0.05))}</span>
-            </div>
-            <div className="flex items-baseline justify-between pt-2 border-t border-white/10">
-              <span className="text-xs uppercase tracking-wider text-white">Total</span>
-              <span className="font-serif text-2xl">{formatAed(booking.totalPrice + Math.round(booking.totalPrice * 0.05))}</span>
+            <div className="flex items-baseline justify-between pt-1">
+              <span className="text-xs uppercase tracking-wider text-white">Total (incl. VAT)</span>
+              <span className="font-serif text-2xl">{formatAed(booking.totalPrice)}</span>
             </div>
             <p className="text-[10px] text-white/40 leading-relaxed pt-1">
               All prices in AED. Includes 5% VAT.

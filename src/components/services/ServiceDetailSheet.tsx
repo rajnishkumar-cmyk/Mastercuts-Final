@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { X, Plus, Check, ArrowUpRight, HeartHandshake, Hourglass, Leaf } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Accordion,
   AccordionContent,
@@ -15,6 +16,7 @@ import {
   getService,
   getServicesForRitual,
   getTherapistsForRitual,
+  getAddOnsForService,
 } from '@/lib/booking/catalog';
 import { pickServiceImage } from '@/lib/booking/types';
 import { useAudience } from '@/components/services/useAudience';
@@ -29,6 +31,7 @@ export function ServiceDetailSheet() {
     cart,
     addToCart,
     removeItem,
+    addAddOnToItem,
   } = useCart();
   const open = surface === 'service-detail' && !!serviceDetail;
 
@@ -50,6 +53,12 @@ export function ServiceDetailSheet() {
       (s) => s.id !== serviceDetail.serviceId
     );
   }, [serviceDetail]);
+  // Add-ons offered for this massage (Cupping on all; Hot Stone on all but
+  // Ra Signature). Empty for non-massages.
+  const applicableAddOns = useMemo(
+    () => (serviceDetail ? getAddOnsForService(serviceDetail.serviceId) : []),
+    [serviceDetail]
+  );
 
   const cartItem = cart.items.find((i) => i.serviceId === serviceDetail?.serviceId);
   const inCart = !!cartItem;
@@ -66,6 +75,21 @@ export function ServiceDetailSheet() {
   useEffect(() => {
     setSelectedVariantId(cartItem?.variantId ?? defaultVariantId);
   }, [cartItem?.variantId, defaultVariantId, serviceDetail?.serviceId]);
+
+  // Pending add-on selection (used before the massage is in the cart). Seeded
+  // once per open from the cart's existing add-on child lines.
+  const [selectedAddOnIds, setSelectedAddOnIds] = useState<string[]>([]);
+  useEffect(() => {
+    const parent = cart.items.find((i) => i.serviceId === serviceDetail?.serviceId);
+    setSelectedAddOnIds(
+      parent
+        ? cart.items.filter((i) => i.parentItemId === parent.id).map((i) => i.serviceId)
+        : []
+    );
+    // Seed only when the sheet opens for a different service; while in-cart the
+    // checkbox state is derived live from the cart instead.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serviceDetail?.serviceId]);
 
   if (!service || !ritual || !serviceDetail) return null;
 
@@ -86,9 +110,33 @@ export function ServiceDetailSheet() {
       removeItem(cartItem.id);
       return;
     }
-    const added = addToCart(service.id, 'any', selectedVariantId);
+    const added = addToCart(service.id, 'any', selectedVariantId, selectedAddOnIds);
     if (added) closeServiceDetail();
   };
+
+  // Add-on checkbox state. In-cart: derived live from the cart's child lines
+  // and toggling adds/removes the linked line immediately. Pre-cart: toggling
+  // updates the pending selection applied on "Add to cart".
+  const cartChildAddOnIds = cartItem
+    ? cart.items.filter((i) => i.parentItemId === cartItem.id).map((i) => i.serviceId)
+    : [];
+  const isAddOnChecked = (id: string) =>
+    inCart ? cartChildAddOnIds.includes(id) : selectedAddOnIds.includes(id);
+  const toggleAddOn = (id: string) => {
+    if (inCart && cartItem) {
+      const child = cart.items.find(
+        (i) => i.parentItemId === cartItem.id && i.serviceId === id
+      );
+      if (child) removeItem(child.id);
+      else addAddOnToItem(cartItem.id, id);
+    } else {
+      setSelectedAddOnIds((prev) =>
+        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      );
+    }
+  };
+  const chosenAddOns = applicableAddOns.filter((a) => isAddOnChecked(a.id));
+  const addOnTotal = chosenAddOns.reduce((s, a) => s + a.price, 0);
 
   return (
     <Sheet open={open} onOpenChange={(v) => (v ? null : closeServiceDetail())}>
@@ -203,6 +251,40 @@ export function ServiceDetailSheet() {
                     </div>
                   )}
 
+                  {applicableAddOns.length > 0 && (
+                    <div className="mb-6">
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-text-muted mb-3">
+                        Enhance your ritual
+                      </p>
+                      <div className="space-y-2">
+                        {applicableAddOns.map((a) => (
+                          <label
+                            key={a.id}
+                            className="flex items-center gap-3 cursor-pointer rounded-xl border border-black/10 px-3.5 py-3 hover:border-black/25 transition-colors"
+                          >
+                            <Checkbox
+                              checked={isAddOnChecked(a.id)}
+                              onCheckedChange={() => toggleAddOn(a.id)}
+                            />
+                            <img
+                              src={pickServiceImage(a, audience)}
+                              alt=""
+                              className="w-11 h-11 rounded-lg object-cover shrink-0"
+                            />
+                            <span className="flex-1 min-w-0">
+                              <span className="block text-sm text-text-primary leading-tight">
+                                {a.name}
+                              </span>
+                              <span className="block text-[11px] text-text-secondary">
+                                {formatDuration(a.durationMin)} · +{formatAed(a.price)}
+                              </span>
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <Button
                     onClick={handleCta}
                     className={cn(
@@ -228,6 +310,12 @@ export function ServiceDetailSheet() {
                       </>
                     )}
                   </Button>
+
+                  {!inCart && chosenAddOns.length > 0 && (
+                    <p className="mt-3 text-[11px] text-text-secondary text-center">
+                      + {chosenAddOns.length} add-on{chosenAddOns.length > 1 ? 's' : ''} · +{formatAed(addOnTotal)}
+                    </p>
+                  )}
 
                   <p className="mt-4 text-[11px] text-text-muted text-center leading-relaxed">
                     No payment now — settle when your therapist arrives at your home. Free cancellation up to 4 hours before.

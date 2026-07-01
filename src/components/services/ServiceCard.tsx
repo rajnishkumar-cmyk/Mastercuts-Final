@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
 import type { Service, Package } from '@/lib/booking/types';
 import { pickServiceImage } from '@/lib/booking/types';
-import { getJourneyTotals } from '@/lib/booking/catalog';
+import { getJourneyTotals, getAddOnsForService } from '@/lib/booking/catalog';
 import { useAudience } from '@/components/services/useAudience';
 import { cn } from '@/lib/utils';
 
@@ -20,7 +20,7 @@ export function ServiceCard({
   label,
   className,
 }: ServiceCardProps) {
-  const { openServiceDetail, addToCart, removeItem, cart } = useCart();
+  const { openServiceDetail, openAddonPicker, addToCart, removeItem, cart } = useCart();
   const [audience] = useAudience();
   const serviceImage = pickServiceImage(service, audience);
 
@@ -40,6 +40,12 @@ export function ServiceCard({
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    // Add-ons available → open the compact add-on picker (which also handles
+    // duration for variant massages). Otherwise fall back to prior behaviour.
+    if (getAddOnsForService(service.id).length > 0) {
+      openAddonPicker(service.id);
+      return;
+    }
     if (hasVariants) {
       openServiceDetail(service.id, service.ritualId);
       return;

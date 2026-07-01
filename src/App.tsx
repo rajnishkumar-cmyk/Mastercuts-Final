@@ -7,6 +7,7 @@ import { ExplorePage } from './pages/ExplorePage';
 import { AtHomePage } from './pages/AtHomePage';
 import { WellnessHubPage } from './pages/WellnessHubPage';
 import { TermsPage } from './pages/TermsPage';
+import { BookingDetailPage } from './pages/BookingDetailPage';
 import { CartProvider } from './components/cart/CartProvider';
 import { CartDrawer } from './components/cart/CartDrawer';
 import { CartCheckoutOverlay } from './components/cart/CartCheckoutOverlay';
@@ -18,6 +19,7 @@ import { ExploreCategoriesSheet } from './components/layout/ExploreCategoriesShe
 import { WellnessHubSheet } from './components/layout/WellnessHubSheet';
 import { BottomNav } from './components/layout/BottomNav';
 import { ServiceDetailSheet } from './components/services/ServiceDetailSheet';
+import { AddonPickerSheet } from './components/services/AddonPickerSheet';
 import { WelcomeAnnouncement } from './components/layout/WelcomeAnnouncement';
 import { SearchSheet } from './components/layout/SearchSheet';
 import { EditContactOverlay } from './components/cart/steps/EditContactOverlay';
@@ -35,6 +37,7 @@ function App() {
             <Route path="/at-home" element={<AtHomePage />} />
             <Route path="/wellness-hub" element={<WellnessHubPage />} />
             <Route path="/journeys/:id" element={<JourneyPage />} />
+            <Route path="/bookings/:reference" element={<BookingDetailPage />} />
             <Route path="/terms" element={<TermsPage />} />
           </Routes>
 
@@ -48,6 +51,7 @@ function App() {
           <EditContactOverlay />
           <WellnessHubSheet />
           <ServiceDetailSheet />
+          <AddonPickerSheet />
           <CartStrip />
           <BottomNav />
           <WelcomeAnnouncement />

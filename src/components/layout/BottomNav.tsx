@@ -56,7 +56,8 @@ export function BottomNav() {
   };
 
   // Hide when a surface is open so the drawer/checkout owns the bottom area
-  const hidden = surface !== 'none';
+  // Also hide on the full-screen booking detail page, which owns the viewport.
+  const hidden = surface !== 'none' || location.pathname.startsWith('/bookings/');
 
   return (
     <motion.nav

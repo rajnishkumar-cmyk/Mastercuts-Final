@@ -12,9 +12,11 @@ import {
 
 interface Props {
   item: CartItem;
+  // Add-on child lines (Hot Stone / Cupping) attached to this item.
+  addOns?: CartItem[];
 }
 
-export function CartItemRow({ item }: Props) {
+export function CartItemRow({ item, addOns }: Props) {
   const { removeItem, updateTherapistPref, openServiceDetail } = useCart();
   const isJourney = !!item.journeyId;
 
@@ -112,6 +114,29 @@ export function CartItemRow({ item }: Props) {
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
+
+        {addOns && addOns.length > 0 && (
+          <ul className="mt-3 space-y-1.5">
+            {addOns.map((a) => (
+              <li
+                key={a.id}
+                className="flex items-center justify-between gap-2 text-xs"
+              >
+                <span className="text-text-secondary truncate">
+                  + {a.name} · {formatAed(a.price)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeItem(a.id)}
+                  aria-label={`Remove ${a.name}`}
+                  className="shrink-0 w-6 h-6 rounded-full bg-black/5 flex items-center justify-center text-text-secondary hover:bg-black/10 hover:text-text-primary transition-colors"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
         <div className="mt-3 space-y-2">
           <Select

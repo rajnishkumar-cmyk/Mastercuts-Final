@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import type { Cart, CartItem, DraftCheckout, GuestDetails, GuestProfile, LightAccount, BookingRecord, RitualId, ServiceAddress, WaitlistRequest } from '@/lib/booking/types';
+import type { Cart, CartItem, DraftCheckout, GuestDetails, GuestProfile, LightAccount, BookingRecord, RitualId, Service, ServiceAddress, WaitlistRequest } from '@/lib/booking/types';
 import { pickServiceImage } from '@/lib/booking/types';
 import { useAudience } from '@/components/services/useAudience';
 import { getService, getJourney, getJourneyTotals } from '@/lib/booking/catalog';
@@ -14,6 +14,7 @@ import {
   clearAccount,
   loadBookings,
   addBooking,
+  updateBooking,
   cartWasExpired,
   loadGuests,
   saveGuests,
@@ -32,6 +33,7 @@ type Surface =
   | 'profile'
   | 'audience-picker'
   | 'service-detail'
+  | 'addon-picker'
   | 'login'
   | 'explore-picker'
   | 'wellness-hub';
@@ -56,6 +58,8 @@ interface CartContextValue {
   bookings: BookingRecord[];
   surface: Surface;
   serviceDetail: ServiceDetailContext | null;
+  // Service whose add-ons are being chosen in the compact add-on picker sheet.
+  addonPickerServiceId: string | null;
 
   // checkout overlay state
   checkoutStep: CheckoutStep;
@@ -94,14 +98,17 @@ interface CartContextValue {
   openWellnessHub: () => void;
   openServiceDetail: (serviceId: string, ritualId: RitualId) => void;
   closeServiceDetail: () => void;
+  openAddonPicker: (serviceId: string) => void;
+  closeAddonPicker: () => void;
   closeAll: () => void;
   pushDrawerView: (view: DrawerView) => void;
   popDrawerView: () => void;
 
   // cart actions
-  addToCart: (serviceId: string, therapistPref?: string | 'any', variantId?: string) => boolean;
+  addToCart: (serviceId: string, therapistPref?: string | 'any', variantId?: string, addOnIds?: string[]) => boolean;
   addJourneyToCart: (journeyId: string) => boolean;
   removeItem: (itemId: string) => void;
+  addAddOnToItem: (parentItemId: string, addOnServiceId: string) => void;
   updateTherapistPref: (itemId: string, therapistPref: string | 'any') => void;
   clearAll: () => void;
 
@@ -124,6 +131,7 @@ interface CartContextValue {
   // checkout state
   updateDraftCheckout: (draft: Partial<DraftCheckout>) => void;
   confirmBooking: () => BookingRecord;
+  cancelBooking: (reference: string) => void;
   getSelectedAddress: () => ServiceAddress | null;
 
   // account
@@ -157,6 +165,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [drawerStack, setDrawerStack] = useState<DrawerView[]>([]);
   const [serviceDetail, setServiceDetail] = useState<ServiceDetailContext | null>(null);
+  const [addonPickerServiceId, setAddonPickerServiceId] = useState<string | null>(null);
   const [audiencePickerDestination, setAudiencePickerDestination] = useState<string>('/explore');
   const [guestProfiles, setGuestProfiles] = useState<GuestProfile[]>([]);
   const [waitlistRequests, setWaitlistRequests] = useState<WaitlistRequest[]>([]);
@@ -229,7 +238,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [surface]);
 
   const addToCart = useCallback<CartContextValue['addToCart']>(
-    (serviceId, therapistPref = 'any', variantId) => {
+    (serviceId, therapistPref = 'any', variantId, addOnIds) => {
       const service = getService(serviceId);
       if (!service) {
         toast.error('Service not found');
@@ -264,15 +273,62 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           variantLabel: effectiveVariantLabel,
           addedAt: Date.now(),
         };
+        // Attach any chosen add-ons (Hot Stone / Cupping) as child lines
+        // linked to this parent massage via parentItemId.
+        const children: CartItem[] = (addOnIds ?? [])
+          .map((id) => getService(id))
+          .filter((s): s is Service => !!s && !!s.addOn)
+          .map((s) => ({
+            id: crypto.randomUUID(),
+            serviceId: s.id,
+            ritualId: s.ritualId,
+            name: s.name,
+            durationMin: s.durationMin,
+            price: s.price,
+            image: pickServiceImage(s, audienceRef.current),
+            therapistPref,
+            addedAt: Date.now(),
+            parentItemId: item.id,
+          }));
         added = true;
         toast.success(
           effectiveVariantLabel
             ? `Added · ${service.name} · ${effectiveVariantLabel}`
             : `Added · ${service.name}`
         );
-        return { ...prev, items: [...prev.items, item], updatedAt: Date.now() };
+        return { ...prev, items: [...prev.items, item, ...children], updatedAt: Date.now() };
       });
       return added;
+    },
+    []
+  );
+
+  // Attach a single add-on to an existing parent massage line (used when the
+  // guest toggles an add-on in the detail sheet while the massage is already
+  // in the cart). No-op if that add-on is already attached to the parent.
+  const addAddOnToItem = useCallback<CartContextValue['addAddOnToItem']>(
+    (parentItemId, addOnServiceId) => {
+      const svc = getService(addOnServiceId);
+      if (!svc || !svc.addOn) return;
+      setCart((prev) => {
+        const dup = prev.items.some(
+          (i) => i.parentItemId === parentItemId && i.serviceId === addOnServiceId
+        );
+        if (dup || prev.items.length >= 10) return prev;
+        const child: CartItem = {
+          id: crypto.randomUUID(),
+          serviceId: svc.id,
+          ritualId: svc.ritualId,
+          name: svc.name,
+          durationMin: svc.durationMin,
+          price: svc.price,
+          image: pickServiceImage(svc, audienceRef.current),
+          therapistPref: 'any',
+          addedAt: Date.now(),
+          parentItemId,
+        };
+        return { ...prev, items: [...prev.items, child], updatedAt: Date.now() };
+      });
     },
     []
   );
@@ -328,7 +384,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const removeItem = useCallback((itemId: string) => {
     setCart((prev) => {
-      let items = prev.items.filter((i) => i.id !== itemId);
+      let items = prev.items.filter((i) => i.id !== itemId && i.parentItemId !== itemId);
       // Add-ons cannot stand alone — if no parent massage remains in the cart,
       // drop any orphaned add-on lines too.
       const hasParentMassage = items.some((i) => {
@@ -553,6 +609,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return booking;
   }, [cart, account, paymentMethod, getSelectedAddress, guestProfiles]);
 
+  const cancelBooking = useCallback((reference: string) => {
+    updateBooking(reference, { status: 'cancelled', cancelledAt: Date.now() });
+    setBookings((prev) =>
+      prev.map((b) =>
+        b.reference === reference
+          ? { ...b, status: 'cancelled' as const, cancelledAt: Date.now() }
+          : b
+      )
+    );
+  }, []);
+
   const saveLightAccount = useCallback((next: LightAccount) => {
     saveAccount(next);
     setAccount(next);
@@ -639,6 +706,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setSurface('none');
     setServiceDetail(null);
   }, []);
+  const openAddonPicker = useCallback((serviceId: string) => {
+    setAddonPickerServiceId(serviceId);
+    setSurface('addon-picker');
+  }, []);
+  const closeAddonPicker = useCallback(() => {
+    setSurface('none');
+    setAddonPickerServiceId(null);
+  }, []);
   const closeAll = useCallback(() => {
     setSurface('none');
     setDrawerStack([]);
@@ -669,6 +744,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     bookings,
     surface,
     serviceDetail,
+    addonPickerServiceId,
     checkoutStep,
     setCheckoutStep,
     bookingResult,
@@ -697,12 +773,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     openWellnessHub,
     openServiceDetail,
     closeServiceDetail,
+    openAddonPicker,
+    closeAddonPicker,
     closeAll,
     pushDrawerView,
     popDrawerView,
     addToCart,
     addJourneyToCart,
     removeItem,
+    addAddOnToItem,
     updateTherapistPref,
     clearAll,
     guestProfiles,
@@ -717,6 +796,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     hasWaitlistFor,
     updateDraftCheckout,
     confirmBooking,
+    cancelBooking,
     getSelectedAddress,
     saveLightAccount,
     signOut,

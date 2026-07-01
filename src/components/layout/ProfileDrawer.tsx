@@ -1,7 +1,10 @@
-import { Bell, X, LogOut, User as UserIcon, Users } from 'lucide-react';
+import { Bell, X, LogOut, User as UserIcon, Users, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
+import type { BookingRecord } from '@/lib/booking/types';
+import { cn } from '@/lib/utils';
 
 function formatDateLabel(key: string): string {
   const [Y, M, D] = key.split('-').map(Number);
@@ -27,6 +30,7 @@ export function ProfileDrawer() {
     removeWaitlistRequest,
   } = useCart();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const open = surface === 'profile';
   const side = isMobile ? 'bottom' : 'right';
 
@@ -44,6 +48,68 @@ export function ProfileDrawer() {
     const ts = new Date(`${b.date}T${b.time}`).getTime();
     return ts < now || b.status !== 'confirmed';
   });
+
+  const openBooking = (reference: string) => {
+    closeAll();
+    setTimeout(() => navigate(`/bookings/${reference}`), 180);
+  };
+
+  // Detailed, tappable booking card shared by Upcoming + Completed.
+  const renderBookingCard = (b: BookingRecord) => {
+    const start = new Date(`${b.date}T${b.time}`).getTime();
+    const isCancelled = b.status === 'cancelled';
+    const isUpcoming = b.status === 'confirmed' && start >= now;
+    const label = isCancelled ? 'Cancelled' : isUpcoming ? 'Upcoming' : 'Completed';
+    // Count parent services only (add-on lines are children of a massage).
+    const services = b.items.filter((i) => !i.parentItemId);
+    return (
+      <li key={b.reference}>
+        <button
+          type="button"
+          onClick={() => openBooking(b.reference)}
+          className="group w-full text-left flex gap-3 border border-black/10 rounded-xl p-3 hover:border-black/25 transition-colors"
+        >
+          <div className="w-16 h-16 rounded-lg overflow-hidden bg-circle-light shrink-0">
+            {services[0]?.image && (
+              <img src={services[0].image} alt="" className="w-full h-full object-cover" />
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between gap-2 mb-0.5">
+              <span className="font-serif text-base text-text-primary leading-tight truncate">
+                {formatDateLabel(b.date)}
+              </span>
+              <span className="text-xs text-text-secondary shrink-0">{b.time}</span>
+            </div>
+            <p className="text-xs text-text-secondary truncate mb-1.5">
+              {services[0]?.name}
+              {services.length > 1 ? ` +${services.length - 1} more` : ''}
+            </p>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs text-text-secondary">
+                {formatDuration(b.totalDuration)} · {formatAed(b.totalPrice)}
+              </span>
+              <span className="flex items-center gap-1 shrink-0">
+                <span
+                  className={cn(
+                    'text-[10px] uppercase tracking-[0.14em]',
+                    isCancelled
+                      ? 'text-red-500/70'
+                      : isUpcoming
+                        ? 'text-accent-gold'
+                        : 'text-text-muted'
+                  )}
+                >
+                  {label}
+                </span>
+                <ChevronRight className="w-3.5 h-3.5 text-text-muted group-hover:translate-x-0.5 transition-transform" />
+              </span>
+            </div>
+          </div>
+        </button>
+      </li>
+    );
+  };
 
   return (
     <Sheet open={open} onOpenChange={(v) => (v ? null : closeAll())}>
@@ -202,47 +268,17 @@ export function ProfileDrawer() {
                     </button>
                   </p>
                 ) : (
-                  <ul className="space-y-3">
-                    {upcoming.map((b) => (
-                      <li key={b.reference} className="border border-black/10 rounded-xl p-4">
-                        <div className="flex items-baseline justify-between mb-2">
-                          <span className="font-serif text-lg text-text-primary">
-                            {formatDateLabel(b.date)}
-                          </span>
-                          <span className="text-xs text-text-secondary">{b.time}</span>
-                        </div>
-                        <p className="text-xs text-text-secondary mb-1">
-                          {b.items.length} {b.items.length === 1 ? 'service' : 'services'} ·{' '}
-                          {formatDuration(b.totalDuration)}
-                        </p>
-                        <p className="text-xs text-text-secondary">
-                          Ref · <span className="text-text-primary">{b.reference}</span>
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
+                  <ul className="space-y-3">{upcoming.map(renderBookingCard)}</ul>
                 )}
               </section>
 
-              {/* Past */}
+              {/* Completed */}
               {past.length > 0 && (
                 <section>
                   <p className="text-[10px] uppercase tracking-[0.18em] text-text-secondary mb-3">
-                    Past visits
+                    Completed
                   </p>
-                  <ul className="space-y-2">
-                    {past.slice(0, 5).map((b) => (
-                      <li
-                        key={b.reference}
-                        className="flex items-baseline justify-between text-sm py-2 border-b border-black/10"
-                      >
-                        <span className="text-text-primary">{formatDateLabel(b.date)}</span>
-                        <span className="text-xs text-text-secondary">
-                          {formatAed(b.totalPrice)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                  <ul className="space-y-3">{past.map(renderBookingCard)}</ul>
                 </section>
               )}
 

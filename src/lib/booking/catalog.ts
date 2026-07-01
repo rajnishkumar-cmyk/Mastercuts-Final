@@ -519,6 +519,9 @@ export const services: Service[] = [
     audience: 'unisex',
     location: 'both',
     addOn: true,
+    // Offered on every massage except the Ra Signature (which already
+    // includes heated stones), per client direction.
+    addOnExcludes: ['somatic-signature-massage'],
   },
   {
     id: 'somatic-cupping',
@@ -1106,18 +1109,19 @@ export function getFrequentlyAddedSuggestions(cartServiceIds: string[], limit = 
   return result;
 }
 
-// Enhancement add-ons (Hot Stone, Cupping) cannot be booked on their own.
-// They surface in the cart only once a parent massage is present. Ungated:
-// any Body Ritual massage ('somatic-recovery', non-add-on) in the cart makes
-// every add-on available. Returns add-ons not already in the cart.
-export function getAddOnSuggestions(cartServiceIds: string[]): Service[] {
-  const cartIdSet = new Set(cartServiceIds);
-  const hasParentMassage = cartServiceIds.some((id) => {
-    const svc = getService(id);
-    return !!svc && svc.ritualId === 'somatic-recovery' && !svc.addOn;
-  });
-  if (!hasParentMassage) return [];
-  return services.filter((s) => s.addOn && !cartIdSet.has(s.id));
+// Enhancement add-ons (Hot Stone, Cupping) are chosen inside a massage's
+// detail sheet. Returns the add-ons applicable to a given parent massage:
+// the parent must be a Body Ritual massage ('somatic-recovery', non-add-on),
+// and an add-on is offered unless its `addOnExcludes` lists that parent.
+// (Cupping → every massage; Hot Stone → every massage except Ra Signature.)
+export function getAddOnsForService(serviceId: string): Service[] {
+  const parent = getService(serviceId);
+  if (!parent || parent.ritualId !== 'somatic-recovery' || parent.addOn) {
+    return [];
+  }
+  return services.filter(
+    (s) => s.addOn && !(s.addOnExcludes ?? []).includes(serviceId)
+  );
 }
 
 export function getJourneyTotals(journey: Package): JourneyTotals {
