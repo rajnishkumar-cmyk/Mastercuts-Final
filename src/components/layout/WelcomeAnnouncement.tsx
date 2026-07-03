@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { submitLead } from '@/lib/api/leads';
 
 const RA_EMBLEM = '/assets/Logo/ra-emblem.png';
 
@@ -56,6 +57,12 @@ export function WelcomeAnnouncement() {
     } catch {
       // storage may be blocked — still show success so we're not hostile
     }
+    // Fire-and-forget newsletter lead capture — best-effort, never blocks UX.
+    void submitLead({
+      source: 'NEWSLETTER',
+      email: trimmed,
+      lead_source: 'ra_relocation_newsletter',
+    }).catch(() => {});
     setSubmitted(true);
     setEmailError('');
   };

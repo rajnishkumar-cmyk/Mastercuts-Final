@@ -5,9 +5,18 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useCart } from '@/components/cart/CartProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { submitLead, type LeadInterest } from '@/lib/api/leads';
 
 const STORAGE_KEY = 'ra-membership-requests';
 const WHATSAPP_PHONE = '971564667165';
+
+// Map the form's interest keys to the backend leads enum.
+const INTEREST_TO_LEAD: Record<Interest, LeadInterest> = {
+  'hair-skin': 'HAIR_SKIN',
+  'wellness-recovery': 'WELLNESS_RECOVERY',
+  'bridal-special': 'BRIDAL_SPECIAL',
+  all: 'ALL',
+};
 
 const PHONE_REGEX = /^\+971\s?\d{2}\s?\d{3}\s?\d{4}$|^05\d\s?\d{3}\s?\d{4}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -83,6 +92,16 @@ function Body({ onClose }: BodyProps) {
       createdAt: Date.now(),
     };
     saveRequest(req);
+    // Fire-and-forget lead capture — best-effort, must not block the WhatsApp
+    // flow or surface errors to the user.
+    void submitLead({
+      source: 'WELLNESS_HUB',
+      name: req.name,
+      phone: req.phone,
+      email: req.email,
+      interest: INTEREST_TO_LEAD[req.interest],
+      lead_source: 'ra_wellness_hub',
+    }).catch(() => {});
     const url = buildWhatsAppLink(req);
     window.open(url, '_blank', 'noopener,noreferrer');
     setSubmitted(true);
