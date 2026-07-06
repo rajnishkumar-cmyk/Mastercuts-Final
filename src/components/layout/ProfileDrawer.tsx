@@ -35,10 +35,23 @@ interface CardBooking {
   services: CardService[];
 }
 
+// The shared Slot row now stores slot_time as canonical 12h ("hh:mm a"); older
+// rows may still be 24h ("HH:mm"). The drawer works internally in 24h (its date
+// math `new Date(`${date}T${time}`)` and locally-created bookings all assume
+// 24h), so normalise the remote value here.
+const to24h = (t: string): string => {
+  const s = (t ?? '').trim();
+  const m = s.match(/^(\d{1,2}):(\d{2})\s*([ap]m)$/i);
+  if (!m) return s; // already 24h (or unknown) → leave as-is
+  let h = Number(m[1]) % 12;
+  if (/pm/i.test(m[3])) h += 12;
+  return `${String(h).padStart(2, '0')}:${m[2]}`;
+};
+
 const fromRemote = (b: ApiBooking): CardBooking => ({
   reference: b.booking_token,
   date: b.date,
-  time: b.slot_time,
+  time: to24h(b.slot_time),
   price: b.total_price,
   totalDuration: b.total_duration_min,
   cancelled: !!b.is_cancelled,
