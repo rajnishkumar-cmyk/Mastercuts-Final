@@ -57,18 +57,6 @@ export function ExploreCategoriesSection() {
             <span className="text-text-muted">( Coming soon )</span>
           </p>
 
-          {/* Gents' Studio */}
-          <div className="col-span-6 lg:col-span-3">
-            <CategoryCard
-              titleStart="Gents'"
-              titleItalic="Studio"
-              image={IMG_GENTS}
-              aspectClass="aspect-[5/6]"
-              gradient="heavy"
-              onClick={() => handleSalon('gentlemen')}
-            />
-          </div>
-
           {/* Ladies' Studio */}
           <div className="col-span-6 lg:col-span-3">
             <CategoryCard
@@ -78,6 +66,18 @@ export function ExploreCategoriesSection() {
               aspectClass="aspect-[5/6]"
               gradient="heavy"
               onClick={() => handleSalon('ladies')}
+            />
+          </div>
+
+          {/* Gents' Studio */}
+          <div className="col-span-6 lg:col-span-3">
+            <CategoryCard
+              titleStart="Gents'"
+              titleItalic="Studio"
+              image={IMG_GENTS}
+              aspectClass="aspect-[5/6]"
+              gradient="heavy"
+              onClick={() => handleSalon('gentlemen')}
             />
           </div>
 

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { Bell, X, LogOut, User as UserIcon, Users, ChevronRight } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
 import type { BookingRecord } from '@/lib/booking/types';
@@ -26,7 +27,8 @@ interface CardService {
 
 /** Shape both the server and local records normalise into for cards. */
 interface CardBooking {
-  reference: string;
+  id: string; // slot id — the key DELETE /bookings/:id expects
+  reference: string; // booking_token — the user-facing reference
   date: string; // YYYY-MM-DD
   time: string; // HH:mm
   price: number;
@@ -49,6 +51,7 @@ const to24h = (t: string): string => {
 };
 
 const fromRemote = (b: ApiBooking): CardBooking => ({
+  id: b.id,
   reference: b.booking_token,
   date: b.date,
   time: to24h(b.slot_time),
@@ -63,6 +66,10 @@ const fromRemote = (b: ApiBooking): CardBooking => ({
 });
 
 const fromLocal = (b: BookingRecord): CardBooking => ({
+  // Local (optimistic) records only carry the booking_token; use it as the id
+  // fallback. Server cancellation keys on the real slot id, so cancel is only
+  // meaningful for remote records — the button is gated on Upcoming status.
+  id: b.reference,
   reference: b.reference,
   date: b.date,
   time: b.time,
@@ -96,22 +103,41 @@ function BookingCard({
       <button
         type="button"
         onClick={() => onSelect(b)}
-        className="w-full text-left border border-black/10 rounded-xl p-4 hover:bg-black/[0.02] transition-colors"
+        className={`w-full text-left border rounded-xl p-4 transition-colors ${
+          b.cancelled
+            ? 'border-rose-200 bg-rose-50/40 hover:bg-rose-50/70'
+            : 'border-black/10 hover:bg-black/[0.02]'
+        }`}
       >
-        <div className="flex items-baseline justify-between mb-2">
-          <span className="font-serif text-lg text-text-primary">
-            {formatDateLabel(b.date)}
+        <div className="flex items-baseline justify-between mb-2 gap-2">
+          <span className="flex items-center gap-2 min-w-0">
+            <span
+              className={`font-serif text-lg ${
+                b.cancelled ? 'text-text-secondary line-through' : 'text-text-primary'
+              }`}
+            >
+              {formatDateLabel(b.date)}
+            </span>
+            {b.cancelled && (
+              <span className="shrink-0 text-[9px] uppercase tracking-[0.14em] font-medium text-rose-600 bg-rose-100 rounded-full px-2 py-0.5">
+                Cancelled
+              </span>
+            )}
           </span>
-          <span className="text-xs text-text-secondary">{b.time}</span>
+          <span className="text-xs text-text-secondary shrink-0">{b.time}</span>
         </div>
         <div className="flex items-center justify-between">
           <span className="text-xs text-text-secondary">
             {count} {count === 1 ? 'service' : 'services'}
             {b.totalDuration ? ` · ${formatDuration(b.totalDuration)}` : ''}
           </span>
-          <span className="text-sm text-text-primary flex items-center gap-1.5">
+          <span
+            className={`text-sm flex items-center gap-1.5 ${
+              b.cancelled ? 'text-text-secondary line-through' : 'text-text-primary'
+            }`}
+          >
             {formatAed(b.price)}
-            <ChevronRight className="w-3.5 h-3.5 text-text-secondary" />
+            <ChevronRight className="w-3.5 h-3.5 text-text-secondary no-underline" />
           </span>
         </div>
       </button>
@@ -119,8 +145,85 @@ function BookingCard({
   );
 }
 
+/** Confirmation popup for cancelling a booking — on-brand, matches the drawer. */
+function CancelConfirmDialog({
+  booking,
+  open,
+  cancelling,
+  onConfirm,
+  onDismiss,
+}: {
+  booking: CardBooking;
+  open: boolean;
+  cancelling: boolean;
+  onConfirm: () => void;
+  onDismiss: () => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={(v) => (v || cancelling ? null : onDismiss())}>
+      <DialogContent
+        showCloseButton={false}
+        className="bg-bg-primary border-none p-0 sm:max-w-sm w-[calc(100%-2rem)] overflow-hidden rounded-2xl shadow-2xl z-[100]"
+      >
+        <div className="px-6 pt-7 pb-6">
+          <DialogTitle asChild>
+            <h2 className="font-serif text-2xl text-text-primary leading-[1.1] mb-2">
+              Cancel this <span className="italic">visit</span>?
+            </h2>
+          </DialogTitle>
+          <DialogDescription asChild>
+            <p className="text-sm text-text-secondary leading-relaxed mb-6">
+              Your booking on{' '}
+              <span className="text-text-primary">{formatDateLabel(booking.date)}</span>{' '}
+              at <span className="text-text-primary">{booking.time}</span> will be
+              released. This can’t be undone.
+            </p>
+          </DialogDescription>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onDismiss}
+              disabled={cancelling}
+              className="flex-1 rounded-full border border-black/15 py-3 text-sm font-medium text-text-primary hover:bg-black/[0.03] transition-colors disabled:opacity-50"
+            >
+              Keep it
+            </button>
+            <button
+              type="button"
+              onClick={onConfirm}
+              disabled={cancelling}
+              className="flex-1 rounded-full bg-bg-dark text-white py-3 text-sm font-medium hover:bg-bg-darker transition-colors disabled:opacity-60"
+            >
+              {cancelling ? 'Cancelling…' : 'Yes, cancel'}
+            </button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 /** Shared inner content for the detail popup (used in both Sheet + Dialog). */
 function BookingDetailBody({ b, onClose }: { b: CardBooking; onClose: () => void }) {
+  const { cancelBooking } = useCart();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const canCancel = statusLabel(b) === 'Upcoming';
+
+  const handleCancel = async () => {
+    setCancelling(true);
+    try {
+      await cancelBooking(b.id);
+      toast.success('Booking cancelled');
+      setConfirmOpen(false);
+      onClose();
+    } catch {
+      toast.error('Could not cancel your booking. Please try again.');
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <button
@@ -177,7 +280,27 @@ function BookingDetailBody({ b, onClose }: { b: CardBooking; onClose: () => void
         <p className="text-xs text-text-secondary">
           Ref · <span className="text-text-primary">{b.reference}</span>
         </p>
+
+        {canCancel && (
+          <button
+            type="button"
+            onClick={() => setConfirmOpen(true)}
+            className="mt-6 w-full rounded-full border border-rose-300 text-rose-600 py-3 text-sm font-medium hover:bg-rose-50 transition-colors"
+          >
+            Cancel booking
+          </button>
+        )}
       </div>
+
+      {canCancel && (
+        <CancelConfirmDialog
+          booking={b}
+          open={confirmOpen}
+          cancelling={cancelling}
+          onConfirm={handleCancel}
+          onDismiss={() => setConfirmOpen(false)}
+        />
+      )}
     </div>
   );
 }

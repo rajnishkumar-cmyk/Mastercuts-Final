@@ -71,18 +71,18 @@ function Body({ onClose }: { onClose: () => void }) {
         </p>
         <div className="grid grid-cols-2 gap-3">
           <CategoryCard
-            titleStart="Gents'"
-            titleItalic="Studio"
-            image="/assets/New Images/Mastercuts Gentlemen New.JPG"
-            aspectClass="aspect-[23/25] lg:aspect-[113/100]"
-            onClick={() => handleSalon('gentlemen')}
-          />
-          <CategoryCard
             titleStart="Ladies'"
             titleItalic="Studio"
             image="/assets/New Images/Mastercuts Ladies New.jpg"
             aspectClass="aspect-[23/25] lg:aspect-[113/100]"
             onClick={() => handleSalon('ladies')}
+          />
+          <CategoryCard
+            titleStart="Gents'"
+            titleItalic="Studio"
+            image="/assets/New Images/Mastercuts Gentlemen New.JPG"
+            aspectClass="aspect-[23/25] lg:aspect-[113/100]"
+            onClick={() => handleSalon('gentlemen')}
           />
         </div>
       </div>

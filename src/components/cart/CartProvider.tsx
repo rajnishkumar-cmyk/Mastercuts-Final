@@ -26,6 +26,7 @@ import { toDateKey } from '@/lib/booking/availability';
 import {
   createBooking,
   listBookings,
+  cancelBooking as cancelBookingApi,
   type BookingRecord as ApiBooking,
 } from '@/lib/api/bookings';
 import { ApiError, NetworkError, toErrorMessage } from '@/lib/api/errors';
@@ -141,6 +142,8 @@ interface CartContextValue {
   bookingsLoading: boolean;
   bookingsError: string | null;
   refreshBookings: () => void;
+  /** Cancel a future booking by its id, then refresh the server list. */
+  cancelBooking: (id: string) => Promise<void>;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -658,6 +661,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [account?.token]);
 
+  const cancelBooking = useCallback(
+    async (id: string) => {
+      const token = account?.token;
+      if (!token) throw new Error('Cannot cancel — not signed in');
+      await cancelBookingApi(id, token);
+      await refreshBookings();
+    },
+    [account?.token, refreshBookings],
+  );
+
   // Auto-load on login / token change; clear on sign-out.
   useEffect(() => {
     if (account?.token) void refreshBookings();
@@ -768,6 +781,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     bookingsLoading,
     bookingsError,
     refreshBookings,
+    cancelBooking,
     surface,
     serviceDetail,
     checkoutStep,

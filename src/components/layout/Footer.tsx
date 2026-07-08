@@ -128,19 +128,19 @@ export function Footer() {
               <li>
                 <button
                   type="button"
-                  onClick={() => goToSalon('gentlemen')}
+                  onClick={() => goToSalon('ladies')}
                   className="text-white hover:text-white/70 transition-colors duration-200 text-left"
                 >
-                  Gents' Studio
+                  Ladies' Studio
                 </button>
               </li>
               <li>
                 <button
                   type="button"
-                  onClick={() => goToSalon('ladies')}
+                  onClick={() => goToSalon('gentlemen')}
                   className="text-white hover:text-white/70 transition-colors duration-200 text-left"
                 >
-                  Ladies' Studio
+                  Gents' Studio
                 </button>
               </li>
               <li>

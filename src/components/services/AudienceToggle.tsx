@@ -22,8 +22,8 @@ export function AudienceToggle({
     : 'text-xs px-3 py-1';
 
   const options: { key: Exclude<ServiceAudience, 'unisex'>; label: string }[] = [
-    { key: 'gentlemen', label: 'Gentlemen' },
     { key: 'ladies', label: 'Ladies' },
+    { key: 'gentlemen', label: 'Gentlemen' },
   ];
 
   const isDark = variant === 'dark';

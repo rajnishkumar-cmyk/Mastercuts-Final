@@ -108,3 +108,23 @@ export function listBookings(
 ): Promise<ListBookingsResponse> {
   return apiClient.get<ListBookingsResponse>('/bookings', { token, signal });
 }
+
+export interface CancelBookingResponse {
+  booking: BookingRecord;
+}
+
+/**
+ * Cancel a future booking the caller owns. Backend marks the slot
+ * `is_cancelled` and frees its capacity. Idempotent — cancelling an
+ * already-cancelled booking resolves 200 with the same record.
+ */
+export function cancelBooking(
+  id: string,
+  token: string,
+  signal?: AbortSignal,
+): Promise<CancelBookingResponse> {
+  return apiClient.delete<CancelBookingResponse>(
+    `/bookings/${encodeURIComponent(id)}`,
+    { token, signal },
+  );
+}

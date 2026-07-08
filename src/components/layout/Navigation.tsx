@@ -190,11 +190,11 @@ export function Navigation() {
                   >
                     <button
                       type="button"
-                      onClick={() => goToSalon('gentlemen', () => setMastercutsOpen(false))}
+                      onClick={() => goToSalon('ladies', () => setMastercutsOpen(false))}
                       className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
                     >
                       <span className="text-sm text-white/80 group-hover:text-white">
-                        Gents' <span className="italic">Studio</span>
+                        Ladies' <span className="italic">Studio</span>
                       </span>
                       <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60">
                         In salon
@@ -202,11 +202,11 @@ export function Navigation() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => goToSalon('ladies', () => setMastercutsOpen(false))}
+                      onClick={() => goToSalon('gentlemen', () => setMastercutsOpen(false))}
                       className="w-full flex flex-col gap-0.5 px-5 py-3 hover:bg-white/10 transition-colors duration-200 group text-left"
                     >
                       <span className="text-sm text-white/80 group-hover:text-white">
-                        Ladies' <span className="italic">Studio</span>
+                        Gents' <span className="italic">Studio</span>
                       </span>
                       <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 group-hover:text-white/60">
                         In salon
@@ -385,11 +385,11 @@ export function Navigation() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => goToSalon('gentlemen', () => setMobileMenuOpen(false))}
+                          onClick={() => goToSalon('ladies', () => setMobileMenuOpen(false))}
                           className="flex flex-col gap-0.5 group text-left"
                         >
                           <span className="text-xl font-serif text-text-primary group-hover:opacity-60 transition-opacity">
-                            Gents' <span className="italic">Studio</span>
+                            Ladies' <span className="italic">Studio</span>
                           </span>
                           <span className="text-[11px] uppercase tracking-[0.18em] text-text-muted group-hover:text-text-secondary transition-colors">
                             In salon
@@ -397,11 +397,11 @@ export function Navigation() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => goToSalon('ladies', () => setMobileMenuOpen(false))}
+                          onClick={() => goToSalon('gentlemen', () => setMobileMenuOpen(false))}
                           className="flex flex-col gap-0.5 group text-left"
                         >
                           <span className="text-xl font-serif text-text-primary group-hover:opacity-60 transition-opacity">
-                            Ladies' <span className="italic">Studio</span>
+                            Gents' <span className="italic">Studio</span>
                           </span>
                           <span className="text-[11px] uppercase tracking-[0.18em] text-text-muted group-hover:text-text-secondary transition-colors">
                             In salon
