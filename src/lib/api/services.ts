@@ -46,6 +46,13 @@ export interface ApiService {
   price: number;
   currency: string;
   sort_order: number;
+  // Duration-variant grouping (backend `serializeService`). Rows sharing a
+  // `variant_group` are durations of the same logical service and collapse into
+  // one card; each keeps its own `id`/`price` so the booking payload is
+  // unchanged (the chosen variant's real id is what gets booked).
+  variant_group?: string;
+  variant_label?: string;
+  variant_sort?: number;
 }
 
 export interface ApiSubCategory {

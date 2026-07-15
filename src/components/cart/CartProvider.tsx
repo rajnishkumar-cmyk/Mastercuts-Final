@@ -540,7 +540,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (item.journeyServiceIds && item.journeyServiceIds.length > 0) {
         serviceIds.push(...item.journeyServiceIds);
       } else {
-        serviceIds.push(item.serviceId);
+        // Book the selected variant's REAL backend id. `serviceId` is now the
+        // stable variant_group slug (UI identity), so it is not bookable on its
+        // own — `variantId` carries the chosen duration's backend service id.
+        // Every cart item has a variantId (adapter always builds variants[]);
+        // the `?? serviceId` guard is a defensive fallback only.
+        serviceIds.push(item.variantId ?? item.serviceId);
       }
     }
 

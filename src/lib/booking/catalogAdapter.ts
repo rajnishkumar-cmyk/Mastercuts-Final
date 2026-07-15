@@ -32,7 +32,7 @@ import type {
   ServicesResponse,
 } from '../api/services';
 import { HARDCODED_RITUALS, HARDCODED_SERVICES } from './catalog';
-import type { Ritual, RitualId, Service } from './types';
+import type { Ritual, RitualId, Service, ServiceVariant } from './types';
 
 // Map a backend sub-category slug to the frontend ritual it belongs in.
 // We add an entry here when seeding a new sub-category; the adapter falls
@@ -70,56 +70,78 @@ interface EnrichmentResult {
 }
 
 /**
- * Build a frontend Service from an API service row, enriching with the
- * matching hardcoded entry where present.
+ * Build ONE frontend Service from a group of API rows that share a
+ * `variant_group` (the durations of a single logical service). The rows are
+ * turned into `variants[]`, and each variant's `id` is the REAL backend
+ * service id — that is what the booking payload sends, so picking "90 min"
+ * books the 90-min row. Single-row groups still get a one-entry `variants[]`
+ * so every cart item carries a bookable backend id in `variantId`.
+ *
+ * `Service.id` is the stable `variant_group` slug (the card's UI identity),
+ * NOT a bookable id — booking always goes through the selected variant.
  */
-function enrichService(
-  apiSvc: ApiService,
+function enrichServiceGroup(
+  groupKey: string,
+  rows: ApiService[],
   subCat: ApiSubCategory,
 ): EnrichmentResult {
-  const apiName = apiSvc.name;
-  const baseName = stripVariantSuffix(apiName);
+  // Order durations by variant_sort (fallback: duration). The first is the
+  // default shown on the card and used for quick-add.
+  const ordered = [...rows].sort(
+    (a, b) =>
+      (a.variant_sort ?? a.duration_min) - (b.variant_sort ?? b.duration_min),
+  );
+  const first = ordered[0];
+  const baseName = stripVariantSuffix(first.name);
   const normBase = normaliseName(baseName);
-  const normFull = normaliseName(apiName);
+
+  const variants: ServiceVariant[] = ordered.map((r) => ({
+    id: r.id, // real backend service id — the bookable identity
+    label: r.variant_label || `${r.duration_min} min`,
+    durationMin: r.duration_min,
+    price: r.price,
+  }));
 
   const subCatSlug = subCat.meta_information?.slug || subCat.id;
   const defaultRitual: RitualId =
     SUBCAT_SLUG_TO_RITUAL[subCatSlug] ?? FALLBACK_RITUAL;
 
-  // Try exact-name match first; then base-name match (variant-stripped).
+  // Match the hardcoded presentation entry by base (variant-stripped) name.
   const matched =
-    HARDCODED_SERVICES.find((h) => normaliseName(h.name) === normFull) ||
-    HARDCODED_SERVICES.find((h) => normaliseName(h.name) === normBase);
+    HARDCODED_SERVICES.find((h) => normaliseName(h.name) === normBase) ||
+    HARDCODED_SERVICES.find(
+      (h) => normaliseName(stripVariantSuffix(h.name)) === normBase,
+    );
 
   if (matched) {
     return {
       service: {
         ...matched,
-        // Backend is the source of truth for bookable identity + price/duration.
-        id: apiSvc.id,
-        name: apiSvc.name, // includes variant suffix when applicable
-        durationMin: apiSvc.duration_min,
-        price: apiSvc.price,
-        // Preserve hardcoded ritual mapping unless the sub-category overrides.
+        id: groupKey, // stable UI identity (variant_group slug)
+        name: baseName, // single card title, no duration suffix
+        durationMin: first.duration_min,
+        price: first.price,
+        // Override the hardcoded variants with backend-id-backed ones.
+        variants,
         ritualId: matched.ritualId,
       },
       ritualId: matched.ritualId,
     };
   }
 
-  // Unmatched API service — synthesise a minimal Service so it still books.
-  // Image and detail copy will be empty until someone adds the hardcoded entry.
+  // Unmatched — synthesise a minimal Service so it still renders + books.
   return {
     service: {
-      id: apiSvc.id,
-      name: apiSvc.name,
+      id: groupKey,
+      name: baseName,
       ritualId: defaultRitual,
-      description: apiSvc.description || '',
-      durationMin: apiSvc.duration_min,
-      price: apiSvc.price,
+      description: first.description || '',
+      durationMin: first.duration_min,
+      price: first.price,
       image: '',
       audience: 'unisex',
       location: 'home',
+      variants,
     },
     ritualId: defaultRitual,
   };
@@ -151,8 +173,20 @@ export function adaptCatalog(response: ServicesResponse): AdaptedCatalog {
       const subStatus = sub.meta_information?.status ?? 'active';
       if (subStatus !== 'active') continue;
 
+      // Group this sub-category's rows by variant_group (durations of the same
+      // logical service) so they collapse into a single card. Rows with no
+      // group fall back to their own id → a standalone single-variant card.
+      // Insertion order is preserved so grouping doesn't reshuffle the menu.
+      const groups = new Map<string, ApiService[]>();
       for (const apiSvc of sub.services) {
-        const { service, ritualId } = enrichService(apiSvc, sub);
+        const key = apiSvc.variant_group || apiSvc.id;
+        const arr = groups.get(key);
+        if (arr) arr.push(apiSvc);
+        else groups.set(key, [apiSvc]);
+      }
+
+      for (const [groupKey, rows] of groups) {
+        const { service, ritualId } = enrichServiceGroup(groupKey, rows, sub);
         services.push(service);
         ritualIdsSeen.add(ritualId);
         (ritualToChannel[ritualId] = ritualToChannel[ritualId] || []).push(
