@@ -102,6 +102,13 @@ function enrichServiceGroup(
     price: r.price,
   }));
 
+  // Add-on identity + eligibility are shared across a group's rows; read them
+  // off the representative row.
+  const isAddon = first.is_addon === true;
+  const addonGroups = Array.isArray(first.addon_groups)
+    ? first.addon_groups
+    : [];
+
   const subCatSlug = subCat.meta_information?.slug || subCat.id;
   const defaultRitual: RitualId =
     SUBCAT_SLUG_TO_RITUAL[subCatSlug] ?? FALLBACK_RITUAL;
@@ -123,6 +130,8 @@ function enrichServiceGroup(
         price: first.price,
         // Override the hardcoded variants with backend-id-backed ones.
         variants,
+        isAddon,
+        addonGroups,
         ritualId: matched.ritualId,
       },
       ritualId: matched.ritualId,
@@ -142,6 +151,8 @@ function enrichServiceGroup(
       audience: 'unisex',
       location: 'home',
       variants,
+      isAddon,
+      addonGroups,
     },
     ritualId: defaultRitual,
   };

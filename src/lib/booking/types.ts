@@ -54,6 +54,12 @@ export interface Service {
   location?: ServiceLocation;
   requiresConsultation?: boolean;
   variants?: ServiceVariant[];
+  // Add-on identity + eligibility (data-driven from service_dev via /services).
+  // `isAddon` services are hidden from the standalone grid and are only bookable
+  // as attachments; `addonGroups` lists the variant_group slugs of the add-ons
+  // this service offers inside its selection sheet.
+  isAddon?: boolean;
+  addonGroups?: string[];
   // True if this service is eligible to appear in the cart's
   // "Frequently added together" section. Currently scoped narrowly per
   // client direction; future services can opt in by setting this flag.
@@ -109,6 +115,10 @@ export interface CartItem {
   addedAt: number;
   variantId?: string;
   variantLabel?: string;
+  // Set on an add-on line: the cart-item id of the parent service it was
+  // attached to. Removing the parent cascades to its add-ons; at booking the
+  // link is sent to the backend (service_links) so history renders the grouping.
+  parentItemId?: string;
   unavailable?: boolean;
   // Journey bundle — present when this line item represents a curated journey
   journeyId?: string;

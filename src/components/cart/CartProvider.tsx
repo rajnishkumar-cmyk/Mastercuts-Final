@@ -28,6 +28,7 @@ import {
   listBookings,
   cancelBooking as cancelBookingApi,
   type BookingRecord as ApiBooking,
+  type ServiceLink,
 } from '@/lib/api/bookings';
 import { ApiError, NetworkError, toErrorMessage } from '@/lib/api/errors';
 
@@ -106,7 +107,7 @@ interface CartContextValue {
   popDrawerView: () => void;
 
   // cart actions
-  addToCart: (serviceId: string, therapistPref?: string | 'any', variantId?: string) => boolean;
+  addToCart: (serviceId: string, therapistPref?: string | 'any', variantId?: string, parentItemId?: string) => string | null;
   addJourneyToCart: (journeyId: string) => boolean;
   removeItem: (itemId: string) => void;
   updateTherapistPref: (itemId: string, therapistPref: string | 'any') => void;
@@ -241,11 +242,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [surface]);
 
   const addToCart = useCallback<CartContextValue['addToCart']>(
-    (serviceId, therapistPref = 'any', variantId) => {
+    (serviceId, therapistPref = 'any', variantId, parentItemId) => {
       const service = getService(serviceId);
       if (!service) {
         toast.error('Service not found');
-        return false;
+        return null;
       }
 
       // Resolve variant (if any) — variantId > default first variant > flat service values
@@ -257,6 +258,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const effectiveVariantId = selectedVariant?.id;
       const effectiveVariantLabel = selectedVariant?.label;
 
+      // Generate the id up front so we can return it — the caller links add-ons
+      // to their parent via this id (passed back in as parentItemId).
+      const newId = crypto.randomUUID();
       let added = false;
       setCart((prev) => {
         if (prev.items.length >= 10) {
@@ -264,7 +268,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           return prev;
         }
         const item: CartItem = {
-          id: crypto.randomUUID(),
+          id: newId,
           serviceId: service.id,
           ritualId: service.ritualId,
           name: service.name,
@@ -274,17 +278,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           therapistPref,
           variantId: effectiveVariantId,
           variantLabel: effectiveVariantLabel,
+          parentItemId,
           addedAt: Date.now(),
         };
         added = true;
-        toast.success(
-          effectiveVariantLabel
-            ? `Added · ${service.name} · ${effectiveVariantLabel}`
-            : `Added · ${service.name}`
-        );
+        // Add-ons are added alongside their parent — the parent's toast covers
+        // the action, so stay quiet for the attached add-on lines.
+        if (!parentItemId) {
+          toast.success(
+            effectiveVariantLabel
+              ? `Added · ${service.name} · ${effectiveVariantLabel}`
+              : `Added · ${service.name}`
+          );
+        }
         return { ...prev, items: [...prev.items, item], updatedAt: Date.now() };
       });
-      return added;
+      return added ? newId : null;
     },
     [getService]
   );
@@ -340,16 +349,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const removeItem = useCallback((itemId: string) => {
     setCart((prev) => {
-      let items = prev.items.filter((i) => i.id !== itemId);
-      // Add-ons cannot stand alone — if no parent massage remains in the cart,
-      // drop any orphaned add-on lines too.
-      const hasParentMassage = items.some((i) => {
-        const svc = getService(i.serviceId);
-        return !!svc && svc.ritualId === 'somatic-recovery' && !svc.addOn;
-      });
-      if (!hasParentMassage) {
-        items = items.filter((i) => !getService(i.serviceId)?.addOn);
-      }
+      // Remove the item and cascade to any add-ons attached to it — an add-on
+      // line can never outlive the parent service it was booked with.
+      const items = prev.items.filter(
+        (i) => i.id !== itemId && i.parentItemId !== itemId,
+      );
       return { ...prev, items, updatedAt: Date.now() };
     });
   }, []);
@@ -535,17 +539,30 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     // Build the API payload. Journey items (synthetic `journey:<id>` ids)
     // expand into their constituent serviceIds so the backend gets the real
     // bookable ids. Regular cart items pass through as-is.
+    // Book the selected variant's REAL backend id. `serviceId` is the stable
+    // variant_group slug (UI identity), so it is not bookable on its own —
+    // `variantId` carries the chosen duration's backend service id. Every cart
+    // item has a variantId (adapter always builds variants[]); the `?? serviceId`
+    // guard is a defensive fallback only.
+    const bookedId = (it: CartItem) => it.variantId ?? it.serviceId;
     const serviceIds: string[] = [];
+    const serviceLinks: ServiceLink[] = [];
     for (const item of items) {
       if (item.journeyServiceIds && item.journeyServiceIds.length > 0) {
         serviceIds.push(...item.journeyServiceIds);
-      } else {
-        // Book the selected variant's REAL backend id. `serviceId` is now the
-        // stable variant_group slug (UI identity), so it is not bookable on its
-        // own — `variantId` carries the chosen duration's backend service id.
-        // Every cart item has a variantId (adapter always builds variants[]);
-        // the `?? serviceId` guard is a defensive fallback only.
-        serviceIds.push(item.variantId ?? item.serviceId);
+        continue;
+      }
+      serviceIds.push(bookedId(item));
+      // Add-on line → record its parent's booked id so the backend persists the
+      // grouping (both still ship as flat service_ids for capacity/pricing).
+      if (item.parentItemId) {
+        const parent = items.find((i) => i.id === item.parentItemId);
+        if (parent) {
+          serviceLinks.push({
+            service_id: bookedId(item),
+            parent_service_id: bookedId(parent),
+          });
+        }
       }
     }
 
@@ -568,6 +585,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           customer_email: account.email || undefined,
           customer_mobile: account.phone || guest.phone || undefined,
           customer_address: addressLine,
+          service_links: serviceLinks.length > 0 ? serviceLinks : undefined,
         },
         account.token,
       );

@@ -65,6 +65,7 @@ export interface CatalogContextValue {
   getTherapistsForRitual: (ritualId: string) => Therapist[];
   getServicesForRitual: (ritualId: string, audience?: ServiceAudience) => Service[];
   getAtHomeServices: (audience?: ServiceAudience) => Service[];
+  getAddOnsForService: (service: Service) => Service[];
   getPackagesForRitual: (ritualId: string) => Package[];
   getJourney: (id: string) => Package | undefined;
   getFrequentlyAddedSuggestions: (cartServiceIds: string[], limit?: number) => Service[];
@@ -154,6 +155,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
       audience?: ServiceAudience,
     ): Service[] =>
       services.filter((s) => {
+        if (s.isAddon) return false; // add-ons never appear as standalone cards
         if (s.ritualId !== ritualId) return false;
         if (!audience || audience === 'unisex') return true;
         return s.audience === audience || s.audience === 'unisex';
@@ -161,11 +163,20 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
 
     const getAtHomeServices = (audience?: ServiceAudience): Service[] =>
       services.filter((s) => {
+        if (s.isAddon) return false; // add-ons never appear as standalone cards
         const loc = s.location ?? 'salon';
         if (loc === 'salon') return false;
         if (!audience || audience === 'unisex') return true;
         return s.audience === audience || s.audience === 'unisex';
       });
+
+    // Resolve the add-on Services a given service offers, from its addonGroups
+    // slugs. Add-ons live in the full `services` list (only the grid getters
+    // filter them out), so they resolve by id (= their variant_group slug).
+    const getAddOnsForService = (service: Service): Service[] =>
+      (service.addonGroups ?? [])
+        .map((slug) => services.find((s) => s.id === slug))
+        .filter((s): s is Service => !!s);
 
     const getPackagesForRitual = (ritualId: string): Package[] => {
       const idsForRitual = new Set(
@@ -247,6 +258,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
       getTherapistsForRitual,
       getServicesForRitual,
       getAtHomeServices,
+      getAddOnsForService,
       getPackagesForRitual,
       getJourney,
       getFrequentlyAddedSuggestions,

@@ -53,6 +53,10 @@ export interface ApiService {
   variant_group?: string;
   variant_label?: string;
   variant_sort?: number;
+  // Add-on identity + eligibility. `is_addon` rows are hidden from the grid;
+  // `addon_groups` lists the variant_group slugs of add-ons this service offers.
+  is_addon?: boolean;
+  addon_groups?: string[];
 }
 
 export interface ApiSubCategory {

@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useCart, useCartTotals, formatAed, formatAedPrecise, formatDuration } from '../CartProvider';
 import { CartItemRow } from '../CartItemRow';
 import { FrequentlyAddedSection } from '../FrequentlyAddedSection';
-import { AddOnSection } from '../AddOnSection';
 import { cn } from '@/lib/utils';
 
 function formatDateLabel(key: string): string {
@@ -139,12 +138,15 @@ export function BasketView({ onClose, onContinue }: Props) {
               </div>
             )}
 
-            {cart.items.map((item) => (
-              <CartItemRow key={item.id} item={item} />
-            ))}
-
-            {/* Enhancement add-ons — only when a parent massage is in cart */}
-            <AddOnSection />
+            {cart.items
+              .filter((item) => !item.parentItemId)
+              .map((item) => (
+                <CartItemRow
+                  key={item.id}
+                  item={item}
+                  addOns={cart.items.filter((c) => c.parentItemId === item.id)}
+                />
+              ))}
 
             {/* Frequently added together */}
             <FrequentlyAddedSection />
@@ -210,7 +212,15 @@ export function BasketView({ onClose, onContinue }: Props) {
                     key={item.id}
                     className="flex items-baseline justify-between gap-3"
                   >
-                    <span className="min-w-0 flex-1 text-sm text-text-primary truncate">
+                    <span
+                      className={cn(
+                        'min-w-0 flex-1 text-sm truncate',
+                        item.parentItemId
+                          ? 'pl-3 text-text-secondary'
+                          : 'text-text-primary',
+                      )}
+                    >
+                      {item.parentItemId ? '+ ' : ''}
                       {item.name}
                       {item.variantLabel && (
                         <span className="text-text-secondary"> · {item.variantLabel}</span>

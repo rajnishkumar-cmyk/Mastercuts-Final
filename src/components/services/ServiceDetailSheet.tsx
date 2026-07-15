@@ -26,8 +26,13 @@ export function ServiceDetailSheet() {
     removeItem,
   } = useCart();
   const open = surface === 'service-detail' && !!serviceDetail;
-  const { getRitual, getService, getServicesForRitual, getTherapistsForRitual } =
-    useCatalog();
+  const {
+    getRitual,
+    getService,
+    getServicesForRitual,
+    getTherapistsForRitual,
+    getAddOnsForService,
+  } = useCatalog();
 
   const service = useMemo(
     () => (serviceDetail ? getService(serviceDetail.serviceId) : undefined),
@@ -60,11 +65,31 @@ export function ServiceDetailSheet() {
     cartItem?.variantId ?? defaultVariantId
   );
 
+  // Eligible add-ons for this service (empty for add-ons themselves and for
+  // services with no addon_groups). Checkbox selection is local to the sheet
+  // and reset whenever a different service is opened.
+  const addOns = service ? getAddOnsForService(service) : [];
+  const [selectedAddOnIds, setSelectedAddOnIds] = useState<Set<string>>(
+    () => new Set()
+  );
+
   useEffect(() => {
     setSelectedVariantId(cartItem?.variantId ?? defaultVariantId);
   }, [cartItem?.variantId, defaultVariantId, serviceDetail?.serviceId]);
 
+  useEffect(() => {
+    setSelectedAddOnIds(new Set());
+  }, [serviceDetail?.serviceId]);
+
   if (!service || !ritual || !serviceDetail) return null;
+
+  const toggleAddOn = (id: string) =>
+    setSelectedAddOnIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
 
   const selectedVariant =
     variants.find((v) => v.id === selectedVariantId) ?? variants[0] ?? null;
@@ -83,8 +108,16 @@ export function ServiceDetailSheet() {
       removeItem(cartItem.id);
       return;
     }
-    const added = addToCart(service.id, 'any', selectedVariantId);
-    if (added) closeServiceDetail();
+    // Add the parent first; its returned cart-item id links the checked add-ons.
+    const parentItemId = addToCart(service.id, 'any', selectedVariantId);
+    if (parentItemId) {
+      for (const addOn of addOns) {
+        if (selectedAddOnIds.has(addOn.id)) {
+          addToCart(addOn.id, 'any', addOn.variants?.[0]?.id, parentItemId);
+        }
+      }
+      closeServiceDetail();
+    }
   };
 
   return (
@@ -192,6 +225,56 @@ export function ServiceDetailSheet() {
                                 )}
                               >
                                 {formatAed(v.price)}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {!inCart && addOns.length > 0 && (
+                    <div className="mb-6">
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-text-muted mb-3">
+                        Enhance your ritual
+                      </p>
+                      <div className="space-y-2">
+                        {addOns.map((addOn) => {
+                          const checked = selectedAddOnIds.has(addOn.id);
+                          const v = addOn.variants?.[0];
+                          const addPrice = v?.price ?? addOn.price;
+                          const addDur = v?.durationMin ?? addOn.durationMin;
+                          return (
+                            <button
+                              key={addOn.id}
+                              type="button"
+                              onClick={() => toggleAddOn(addOn.id)}
+                              className={cn(
+                                'w-full flex items-center gap-3 rounded-xl border p-3 text-left transition-colors',
+                                checked
+                                  ? 'border-bg-dark bg-black/[0.03]'
+                                  : 'border-black/15 hover:border-black/30'
+                              )}
+                            >
+                              <span
+                                className={cn(
+                                  'w-5 h-5 rounded-md border flex items-center justify-center shrink-0',
+                                  checked
+                                    ? 'bg-bg-dark border-bg-dark text-white'
+                                    : 'border-black/25'
+                                )}
+                              >
+                                {checked && (
+                                  <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                                )}
+                              </span>
+                              <span className="min-w-0 flex-1">
+                                <span className="block text-sm text-text-primary">
+                                  {addOn.name}
+                                </span>
+                                <span className="block text-[11px] text-text-secondary">
+                                  {formatDuration(addDur)} · +{formatAed(addPrice)}
+                                </span>
                               </span>
                             </button>
                           );

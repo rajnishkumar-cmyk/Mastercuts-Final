@@ -23,6 +23,9 @@ interface CardService {
   name: string;
   durationMin?: number;
   price?: number;
+  // True for add-on lines — rendered indented + tagged. Booking order keeps an
+  // add-on directly after its parent service, so no explicit grouping needed.
+  isAddon?: boolean;
 }
 
 /** Shape both the server and local records normalise into for cards. */
@@ -62,6 +65,7 @@ const fromRemote = (b: ApiBooking): CardBooking => ({
     name: s.name,
     durationMin: s.duration_min,
     price: s.price,
+    isAddon: !!s.is_addon,
   })),
 });
 
@@ -80,6 +84,7 @@ const fromLocal = (b: BookingRecord): CardBooking => ({
     name: i.name,
     durationMin: i.durationMin,
     price: i.price,
+    isAddon: !!i.parentItemId,
   })),
 });
 
@@ -256,7 +261,11 @@ function BookingDetailBody({ b, onClose }: { b: CardBooking; onClose: () => void
                 key={i}
                 className="flex items-baseline justify-between gap-3 text-sm"
               >
-                <span className="text-text-primary">{s.name}</span>
+                <span className={s.isAddon ? 'text-text-secondary pl-3' : 'text-text-primary'}>
+                  {s.isAddon ? '+ ' : ''}
+                  {s.name}
+                  {s.isAddon && <span className="text-text-secondary/60"> · add-on</span>}
+                </span>
                 <span className="text-xs text-text-secondary whitespace-nowrap">
                   {s.durationMin ? `${s.durationMin} min` : ''}
                   {s.price != null

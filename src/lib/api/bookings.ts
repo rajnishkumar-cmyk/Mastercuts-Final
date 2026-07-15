@@ -21,6 +21,11 @@ export interface BookingServiceSnapshot {
   department_id?: string;
   duration_min: number;
   price: number;
+  // Persisted add-on linkage (backend annotates from service_links). Present
+  // only on add-on lines; `parent_service_id` is the booked id of the service
+  // it was attached to, so booking history can render the grouping.
+  is_addon?: boolean;
+  parent_service_id?: string;
 }
 
 export interface BookingCustomer {
@@ -59,6 +64,12 @@ export interface CreateBookingResponse {
   };
 }
 
+/** Links an add-on's booked service id to its parent's booked service id. */
+export interface ServiceLink {
+  service_id: string;
+  parent_service_id: string;
+}
+
 export interface CreateBookingPayload {
   service_ids: string[];
   date: string;
@@ -69,6 +80,10 @@ export interface CreateBookingPayload {
   customer_gender?: string;
   customer_address?: string;
   notes?: string;
+  // Optional add-on linkage. `service_ids` still lists every booked service
+  // (add-ons included); this only tells the backend which are add-ons and their
+  // parent, so the linkage persists in the booking record.
+  service_links?: ServiceLink[];
 }
 
 export function createBooking(

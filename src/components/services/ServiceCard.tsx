@@ -29,6 +29,9 @@ export function ServiceCard({
   const inCart = count > 0;
 
   const hasVariants = (service.variants?.length ?? 0) > 1;
+  // Services that offer add-ons open the selection sheet too (so single-variant
+  // services with add-ons still get the "Enhance your ritual" step).
+  const hasAddOns = (service.addonGroups?.length ?? 0) > 0;
   const startingPrice = hasVariants
     ? Math.min(...(service.variants ?? []).map((v) => v.price))
     : service.price;
@@ -40,7 +43,7 @@ export function ServiceCard({
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (hasVariants) {
+    if (hasVariants || hasAddOns) {
       openServiceDetail(service.id, service.ritualId);
       return;
     }

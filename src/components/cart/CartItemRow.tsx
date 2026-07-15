@@ -12,9 +12,12 @@ import {
 
 interface Props {
   item: CartItem;
+  // Add-on lines attached to this item — rendered nested beneath it so the UI
+  // shows which add-on was booked with which service.
+  addOns?: CartItem[];
 }
 
-export function CartItemRow({ item }: Props) {
+export function CartItemRow({ item, addOns = [] }: Props) {
   const { removeItem, updateTherapistPref, openServiceDetail } = useCart();
   const { getTherapistsForRitual, getTherapist, getService } = useCatalog();
   const isJourney = !!item.journeyId;
@@ -136,6 +139,31 @@ export function CartItemRow({ item }: Props) {
               ))}
             </SelectContent>
           </Select>
+
+          {addOns.length > 0 && (
+            <ul className="mt-3 space-y-1.5 border-l border-black/10 pl-3">
+              {addOns.map((a) => (
+                <li
+                  key={a.id}
+                  className="flex items-center justify-between gap-2"
+                >
+                  <span className="min-w-0 text-xs text-text-secondary truncate">
+                    <span className="text-text-primary">+ {a.name}</span> ·{' '}
+                    {formatAed(a.price)}
+                    <span className="text-text-secondary/70"> · add-on</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeItem(a.id)}
+                    aria-label={`Remove ${a.name}`}
+                    className="w-6 h-6 rounded-full bg-black/5 flex items-center justify-center text-text-secondary hover:bg-black/10 transition-colors shrink-0"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
 
           {/* Per-service guest picker is hidden for now — multi-guest
               selection lives at the booking-contact level instead. Keep the

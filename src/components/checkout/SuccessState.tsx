@@ -110,7 +110,14 @@ export function SuccessState({ booking, onDone }: Props) {
           <div className="border-t border-white/10 pt-4 space-y-2">
             {booking.items.map((item) => (
               <div key={item.id} className="flex items-start justify-between gap-3">
-                <p className="text-sm text-white/80 truncate">{item.name}</p>
+                <p
+                  className={`text-sm truncate ${
+                    item.parentItemId ? 'text-white/55 pl-3' : 'text-white/80'
+                  }`}
+                >
+                  {item.parentItemId ? '+ ' : ''}
+                  {item.name}
+                </p>
                 <p className="text-sm text-white/60 shrink-0">{formatDuration(item.durationMin)}</p>
               </div>
             ))}
