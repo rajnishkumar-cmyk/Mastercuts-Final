@@ -268,6 +268,13 @@ export function ServiceDetailSheet() {
                                   <Check className="w-3.5 h-3.5" strokeWidth={3} />
                                 )}
                               </span>
+                              <span className="w-12 h-12 rounded-lg overflow-hidden bg-black/[0.03] shrink-0">
+                                <img
+                                  src={pickServiceImage(addOn, audience)}
+                                  alt={addOn.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              </span>
                               <span className="min-w-0 flex-1">
                                 <span className="block text-sm text-text-primary">
                                   {addOn.name}

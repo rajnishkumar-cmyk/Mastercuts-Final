@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Check, Calendar, Share2, MapPin } from 'lucide-react';
 import type { BookingRecord } from '@/lib/booking/types';
-import { formatAed, formatDuration } from '@/components/cart/CartProvider';
+import { formatAed, formatAedPrecise, formatDuration } from '@/components/cart/CartProvider';
 
 interface Props {
   booking: BookingRecord;
@@ -28,6 +28,11 @@ function formatTimeLabel(time: string): string {
 
 export function SuccessState({ booking, onDone }: Props) {
   const firstName = booking.guest.name.split(' ')[0] ?? 'friend';
+
+  // Prices are VAT-inclusive (UAE 5%). Derive subtotal + VAT out of the
+  // total so the grand total stays equal to the charged amount.
+  const subtotal = booking.totalPrice / 1.05;
+  const vat = booking.totalPrice - subtotal;
 
   return (
     <div className="flex-1 overflow-y-auto bg-bg-primary">
@@ -126,15 +131,15 @@ export function SuccessState({ booking, onDone }: Props) {
           <div className="border-t border-white/10 pt-4 space-y-1.5">
             <div className="flex items-baseline justify-between">
               <span className="text-xs uppercase tracking-wider text-white/50">Subtotal</span>
-              <span className="text-sm text-white/80">{formatAed(booking.totalPrice)}</span>
+              <span className="text-sm text-white/80">{formatAedPrecise(subtotal)}</span>
             </div>
             <div className="flex items-baseline justify-between">
               <span className="text-xs uppercase tracking-wider text-white/50">VAT (5%)</span>
-              <span className="text-sm text-white/80">{formatAed(Math.round(booking.totalPrice * 0.05))}</span>
+              <span className="text-sm text-white/80">{formatAedPrecise(vat)}</span>
             </div>
             <div className="flex items-baseline justify-between pt-2 border-t border-white/10">
               <span className="text-xs uppercase tracking-wider text-white">Total</span>
-              <span className="font-serif text-2xl">{formatAed(booking.totalPrice + Math.round(booking.totalPrice * 0.05))}</span>
+              <span className="font-serif text-2xl">{formatAed(booking.totalPrice)}</span>
             </div>
             <p className="text-[10px] text-white/40 leading-relaxed pt-1">
               All prices in AED. Includes 5% VAT.
