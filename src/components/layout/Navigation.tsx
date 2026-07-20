@@ -9,6 +9,7 @@ import { CartIcon } from '@/components/cart/CartIcon';
 import { useAudience } from '@/components/services/useAudience';
 import { DesktopMenu } from './DesktopMenu';
 import { BrandLockup } from './BrandLockup';
+import { STUDIO_PHONE_DISPLAY, STUDIO_PHONE_E164 } from '@/lib/contact';
 
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -249,11 +250,11 @@ export function Navigation() {
           {/* Right cluster — Phone, Search, Cart, Login */}
           <div className="hidden lg:flex items-center gap-5 shrink-0">
             <a
-              href="tel:+971564667165"
+              href={`tel:${STUDIO_PHONE_E164}`}
               className="flex items-center gap-2 text-sm text-white transition-colors duration-200 hover:opacity-70"
             >
               <Phone className="w-4 h-4" />
-              <span className="font-medium">+971 56 466 7165</span>
+              <span className="font-medium">{STUDIO_PHONE_DISPLAY}</span>
               <span className="text-xs text-white/60">Dubai</span>
             </a>
 
@@ -304,7 +305,7 @@ export function Navigation() {
             </button>
 
             <a
-              href="tel:+971564667165"
+              href={`tel:${STUDIO_PHONE_E164}`}
               aria-label="Call Mastercuts"
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-200 ${
                 darkChrome
@@ -474,11 +475,11 @@ export function Navigation() {
                     )}
                     <div className="border-t border-black/10 pt-5">
                       <a
-                        href="tel:+971564667165"
+                        href={`tel:${STUDIO_PHONE_E164}`}
                         className="flex items-center gap-3 text-text-secondary hover:text-text-primary transition-colors"
                       >
                         <Phone className="w-4 h-4" />
-                        <span className="text-sm">+971 56 466 7165</span>
+                        <span className="text-sm">{STUDIO_PHONE_DISPLAY}</span>
                       </a>
                     </div>
                   </div>

@@ -6,9 +6,10 @@ import { useCart } from '@/components/cart/CartProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { submitLead, type LeadInterest } from '@/lib/api/leads';
+import { STUDIO_PHONE_DISPLAY, STUDIO_WHATSAPP } from '@/lib/contact';
 
 const STORAGE_KEY = 'ra-membership-requests';
-const WHATSAPP_PHONE = '971564667165';
+const WHATSAPP_PHONE = STUDIO_WHATSAPP;
 
 // Map the form's interest keys to the backend leads enum.
 const INTEREST_TO_LEAD: Record<Interest, LeadInterest> = {
@@ -133,7 +134,7 @@ function Body({ onClose }: BodyProps) {
             </h3>
             <p className="text-sm text-text-secondary leading-relaxed max-w-sm mx-auto mb-6">
               Our concierge will reach out within 24 hours. If WhatsApp didn't
-              open, you can also message us at +971 56 466 7165.
+              open, you can also message us at {STUDIO_PHONE_DISPLAY}.
             </p>
             <button
               type="button"
