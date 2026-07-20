@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { Bell, X, LogOut, User as UserIcon, Users, ChevronRight } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { useCart, formatAed, formatDuration } from '@/components/cart/CartProvider';
+import { useCart, formatAed, formatAedPrecise, formatDuration } from '@/components/cart/CartProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
 import type { BookingRecord } from '@/lib/booking/types';
 import type { BookingRecord as ApiBooking } from '@/lib/api/bookings';
@@ -277,17 +277,36 @@ function BookingDetailBody({ b, onClose }: { b: CardBooking; onClose: () => void
           )}
         </div>
 
-        <div className="flex items-baseline justify-between border-t border-black/10 pt-3 mb-4">
-          <span className="text-sm text-text-primary">
-            Total{b.totalDuration ? ` · ${formatDuration(b.totalDuration)}` : ''}
-          </span>
-          <span className="text-sm font-medium text-text-primary">
-            {formatAed(b.price)}
-          </span>
+        {/* Prices are VAT-inclusive (UAE 5%). Derive subtotal + VAT out of the
+            total so the grand total stays equal to the charged amount. */}
+        <div className="border-t border-black/10 pt-3 mb-4">
+          <div className="flex items-baseline justify-between mb-1.5">
+            <span className="text-xs uppercase tracking-wider text-text-secondary">Subtotal</span>
+            <span className="text-sm text-text-primary tabular-nums">
+              {formatAedPrecise(b.price / 1.05)}
+            </span>
+          </div>
+          <div className="flex items-baseline justify-between mb-2.5 pb-2.5 border-b border-black/10">
+            <span className="text-xs uppercase tracking-wider text-text-secondary">VAT (5%)</span>
+            <span className="text-sm text-text-primary tabular-nums">
+              {formatAedPrecise(b.price - b.price / 1.05)}
+            </span>
+          </div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-sm text-text-primary">
+              Total{b.totalDuration ? ` · ${formatDuration(b.totalDuration)}` : ''}
+            </span>
+            <span className="text-sm font-medium text-text-primary tabular-nums">
+              {formatAed(b.price)}
+            </span>
+          </div>
         </div>
 
         <p className="text-xs text-text-secondary">
           Ref · <span className="text-text-primary">{b.reference}</span>
+        </p>
+        <p className="text-[10px] text-text-secondary/80 leading-relaxed mt-1">
+          All prices in AED. Includes 5% VAT.
         </p>
 
         {canCancel && (
