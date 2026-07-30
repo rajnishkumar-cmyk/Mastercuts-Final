@@ -311,10 +311,17 @@ export function Footer() {
             </button>
             <button
               type="button"
-              onClick={() => navigate('/terms')}
+              onClick={() => navigate('/privacy')}
               className="text-white/50 hover:text-white transition-colors duration-200"
             >
               Privacy Policy
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/refund-policy')}
+              className="text-white/50 hover:text-white transition-colors duration-200"
+            >
+              Refund Policy
             </button>
           </div>
 

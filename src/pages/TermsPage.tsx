@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
@@ -13,6 +14,11 @@ const AT_HOME_TERMS = [
 
 export function TermsPage() {
   const navigate = useNavigate();
+
+  // Reached from the footer at the bottom of the page — open at the top.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
 
   return (
     <main
@@ -88,9 +94,17 @@ export function TermsPage() {
             Cancellations require at least <strong>4 hours&rsquo; notice</strong>{' '}
             before your scheduled appointment.
           </p>
-          <p className="text-xs text-text-secondary italic">
-            Full cancellation, no-show and deposit policy details are being
-            finalised and will appear here shortly.
+          <p className="text-xs text-text-secondary leading-relaxed">
+            Full cancellation, no-show, deposit and refund details are set out
+            in our{' '}
+            <button
+              type="button"
+              onClick={() => navigate('/refund-policy')}
+              className="underline hover:no-underline text-text-primary"
+            >
+              Refund, Cancellation &amp; Rescheduling Policy
+            </button>
+            .
           </p>
         </div>
       </section>
@@ -104,9 +118,17 @@ export function TermsPage() {
           <h2 className="font-serif text-3xl lg:text-4xl text-text-primary leading-[1.05] mb-6">
             Privacy &amp; <span className="italic">terms of service</span>
           </h2>
-          <p className="text-sm text-text-secondary italic leading-relaxed">
-            Our full Privacy Policy and Terms of Service are being finalised
-            and will be published here ahead of the studio opening.
+          <p className="text-sm lg:text-base text-text-primary leading-relaxed">
+            How we collect, use, store and protect your personal information is
+            set out in full in our{' '}
+            <button
+              type="button"
+              onClick={() => navigate('/privacy')}
+              className="underline hover:no-underline text-text-primary"
+            >
+              Privacy Policy
+            </button>
+            .
           </p>
         </div>
       </section>

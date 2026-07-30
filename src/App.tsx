@@ -7,6 +7,8 @@ import { ExplorePage } from './pages/ExplorePage';
 import { AtHomePage } from './pages/AtHomePage';
 import { WellnessHubPage } from './pages/WellnessHubPage';
 import { TermsPage } from './pages/TermsPage';
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
+import { RefundPolicyPage } from './pages/RefundPolicyPage';
 import { CartProvider } from './components/cart/CartProvider';
 import { CatalogProvider } from './lib/booking/CatalogProvider';
 import { CartDrawer } from './components/cart/CartDrawer';
@@ -38,6 +40,8 @@ function App() {
             <Route path="/wellness-hub" element={<WellnessHubPage />} />
             <Route path="/journeys/:id" element={<JourneyPage />} />
             <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/refund-policy" element={<RefundPolicyPage />} />
           </Routes>
 
           {/* Global surfaces */}
