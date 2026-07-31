@@ -620,7 +620,7 @@ export function ProfileDrawer() {
                 className="flex items-center gap-2 text-xs uppercase tracking-wider text-text-secondary hover:text-text-primary transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                Forget me on this device
+                Logout
               </button>
             </div>
           )}
