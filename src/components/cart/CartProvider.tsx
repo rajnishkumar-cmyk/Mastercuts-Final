@@ -536,25 +536,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       address: address ?? undefined,
     };
 
-    // Build the API payload. Journey items (synthetic `journey:<id>` ids)
-    // expand into their constituent serviceIds so the backend gets the real
-    // bookable ids. Regular cart items pass through as-is.
-    // Book the selected variant's REAL backend id. `serviceId` is the stable
-    // variant_group slug (UI identity), so it is not bookable on its own —
-    // `variantId` carries the chosen duration's backend service id. Every cart
-    // item has a variantId (adapter always builds variants[]); the `?? serviceId`
-    // guard is a defensive fallback only.
+    // Build the API payload. Book the selected variant's REAL backend id.
+    // `serviceId` is the stable variant_group slug (UI identity), so it is not
+    // bookable on its own — `variantId` carries the chosen duration's backend
+    // service id. Every cart item has a variantId (adapter always builds
+    // variants[]); the `?? serviceId` guard is a defensive fallback only.
     const bookedId = (it: CartItem) => it.variantId ?? it.serviceId;
-    const serviceIds: string[] = [];
+    // Shared with the availability grid (see resolveBookedServiceIds) so the
+    // slots we offered are computed from the exact ids we now reserve.
+    const serviceIds = resolveBookedServiceIds(items);
     const serviceLinks: ServiceLink[] = [];
     for (const item of items) {
-      if (item.journeyServiceIds && item.journeyServiceIds.length > 0) {
-        serviceIds.push(...item.journeyServiceIds);
-        continue;
-      }
-      serviceIds.push(bookedId(item));
       // Add-on line → record its parent's booked id so the backend persists the
       // grouping (both still ship as flat service_ids for capacity/pricing).
+      // Journey items never carry parentItemId, so skipping them here matches
+      // the expansion resolveBookedServiceIds already did.
       if (item.parentItemId) {
         const parent = items.find((i) => i.id === item.parentItemId);
         if (parent) {
@@ -880,6 +876,35 @@ export function useCartTotals() {
       count: cart.items.length,
     };
   }, [cart]);
+}
+
+/**
+ * The flat list of REAL backend service ids this cart books, in order and
+ * keeping duplicates — the same list `confirmBooking` posts as `service_ids`.
+ *
+ * Shared deliberately: `/availability` must be asked about the exact same set
+ * of services the booking will reserve, or the grid offers start times that
+ * `reserveSpan` then rejects with a 409. Journey items (synthetic
+ * `journey:<id>` ids) expand into their constituent ids; every other item
+ * books its selected variant's id.
+ */
+export function resolveBookedServiceIds(items: CartItem[]): string[] {
+  const bookedId = (it: CartItem) => it.variantId ?? it.serviceId;
+  const ids: string[] = [];
+  for (const item of items) {
+    if (item.journeyServiceIds && item.journeyServiceIds.length > 0) {
+      ids.push(...item.journeyServiceIds);
+      continue;
+    }
+    ids.push(bookedId(item));
+  }
+  return ids;
+}
+
+/** Stable, memoised `resolveBookedServiceIds` over the live cart. */
+export function useCartServiceIds(): string[] {
+  const { cart } = useCart();
+  return useMemo(() => resolveBookedServiceIds(cart.items), [cart.items]);
 }
 
 export function formatAed(value: number): string {

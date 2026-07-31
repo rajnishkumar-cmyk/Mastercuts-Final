@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Bell, Check } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
-import { useCart, useCartTotals, formatDuration } from '../CartProvider';
+import { useCart, useCartTotals, useCartServiceIds, formatDuration } from '../CartProvider';
 import {
   groupSlotsByPeriod,
   toDateKey,
@@ -34,6 +34,9 @@ export function DateTimeStep() {
     removeWaitlistRequest,
   } = useCart();
   const { totalDuration } = useCartTotals();
+  // The exact ids the booking will post — availability must be asked about
+  // the same set, or the grid offers start times that reserveSpan rejects.
+  const serviceIds = useCartServiceIds();
   const { getTherapist } = useCatalog();
   const [waitlistContext, setWaitlistContext] = useState<WaitlistContext | null>(null);
 
@@ -46,7 +49,7 @@ export function DateTimeStep() {
   );
 
   const dateKey = date ? toDateKey(date) : null;
-  const availability = useAvailability(dateKey, totalDuration);
+  const availability = useAvailability(dateKey, serviceIds);
   const slots = availability.slots;
   const grouped = useMemo(() => groupSlotsByPeriod(slots), [slots]);
 

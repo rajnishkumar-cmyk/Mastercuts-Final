@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { Bell, Check } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
-import { useCart, useCartTotals, formatDuration } from '@/components/cart/CartProvider';
+import { useCart, useCartTotals, useCartServiceIds, formatDuration } from '@/components/cart/CartProvider';
 import {
   groupSlotsByPeriod,
   toDateKey,
@@ -38,6 +38,9 @@ export function Step1DateTime({ onContinue }: Props) {
     removeWaitlistRequest,
   } = useCart();
   const { totalDuration } = useCartTotals();
+  // The exact ids the booking will post — availability must be asked about
+  // the same set, or the grid offers start times that reserveSpan rejects.
+  const serviceIds = useCartServiceIds();
   const { getTherapist } = useCatalog();
   const reduce = useReducedMotion();
   const slotsHeadingRef = useRef<HTMLParagraphElement | null>(null);
@@ -52,7 +55,7 @@ export function Step1DateTime({ onContinue }: Props) {
   );
 
   const dateKey = date ? toDateKey(date) : null;
-  const availability = useAvailability(dateKey, totalDuration);
+  const availability = useAvailability(dateKey, serviceIds);
   const slots = availability.slots;
   const grouped = useMemo(() => groupSlotsByPeriod(slots), [slots]);
 
