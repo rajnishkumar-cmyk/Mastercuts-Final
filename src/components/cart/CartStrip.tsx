@@ -18,15 +18,15 @@ export function CartStrip() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 140, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-          className="lg:hidden fixed left-4 right-4 z-40"
-          style={{
-            bottom: 'calc(4rem + 0.75rem + env(safe-area-inset-bottom))',
-          }}
+          // Sits above the mobile bottom nav; on desktop that nav is gone, so it
+          // floats centred near the bottom edge instead. The wrapper spans the
+          // viewport for centring, so it must not swallow clicks in the gutters.
+          className="fixed inset-x-0 z-40 px-4 flex justify-center pointer-events-none bottom-[calc(4rem+0.75rem+env(safe-area-inset-bottom))] lg:bottom-6"
         >
           <button
             type="button"
             onClick={() => openCart({ name: 'basket' })}
-            className="group w-full rounded-full bg-bg-dark text-white pl-3 pr-5 py-2.5 flex items-center gap-3 shadow-xl shadow-black/30 active:scale-[0.99] transition-transform"
+            className="group pointer-events-auto w-full lg:w-auto lg:min-w-[26rem] lg:max-w-xl rounded-full bg-bg-dark text-white pl-3 pr-5 py-2.5 lg:py-3 lg:pr-6 flex items-center gap-3 lg:gap-5 shadow-xl shadow-black/30 active:scale-[0.99] transition-transform"
           >
             {/* Thumbnail stack */}
             <div className="flex -space-x-6 flex-shrink-0">
