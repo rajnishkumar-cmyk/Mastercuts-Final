@@ -1,7 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, ChevronDown, Phone, Search as SearchIcon, X, User as UserIcon } from 'lucide-react';
+import {
+  Menu,
+  ChevronDown,
+  Phone,
+  Search as SearchIcon,
+  X,
+  User as UserIcon,
+  Navigation as NavigationIcon,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetClose, SheetTrigger } from '@/components/ui/sheet';
 import { useCart } from '@/components/cart/CartProvider';
@@ -258,6 +266,17 @@ export function Navigation() {
               <span className="text-xs text-white/60">Dubai</span>
             </a>
 
+            {/* Directions — jumps to the Visit the studio card (address + map) */}
+            <button
+              type="button"
+              onClick={() => goToSection('visit-studio')}
+              aria-label="Get directions to the studio"
+              title="Get directions"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-colors duration-200"
+            >
+              <NavigationIcon className="w-4 h-4" />
+            </button>
+
             <button
               type="button"
               onClick={openSearch}
@@ -315,6 +334,20 @@ export function Navigation() {
             >
               <Phone className="w-4 h-4" />
             </a>
+
+            {/* Directions — jumps to the Visit the studio card (address + map) */}
+            <button
+              type="button"
+              onClick={() => goToSection('visit-studio')}
+              aria-label="Get directions to the studio"
+              className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-200 ${
+                darkChrome
+                  ? 'bg-white/20 text-white hover:bg-white/30'
+                  : 'bg-white/15 text-white hover:bg-white/25 backdrop-blur-sm'
+              }`}
+            >
+              <NavigationIcon className="w-4 h-4" />
+            </button>
 
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
