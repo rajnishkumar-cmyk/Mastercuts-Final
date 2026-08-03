@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu,
   ChevronDown,
-  Phone,
   Search as SearchIcon,
   X,
   User as UserIcon,
@@ -17,7 +16,7 @@ import { useAudience } from '@/components/services/useAudience';
 import { DesktopMenu } from './DesktopMenu';
 import { BrandLockup } from './BrandLockup';
 import { ContactMenu } from './ContactMenu';
-import { STUDIO_PHONE_DISPLAY, STUDIO_PHONE_E164 } from '@/lib/contact';
+import { MenuContactDetails } from './MenuContactDetails';
 
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -488,15 +487,7 @@ export function Navigation() {
                         Log in
                       </Button>
                     )}
-                    <div className="border-t border-black/10 pt-5">
-                      <a
-                        href={`tel:${STUDIO_PHONE_E164}`}
-                        className="flex items-center gap-3 text-text-secondary hover:text-text-primary transition-colors"
-                      >
-                        <Phone className="w-4 h-4" />
-                        <span className="text-sm">{STUDIO_PHONE_DISPLAY}</span>
-                      </a>
-                    </div>
+                    <MenuContactDetails variant="sheet" />
                   </div>
                 </div>
               </SheetContent>

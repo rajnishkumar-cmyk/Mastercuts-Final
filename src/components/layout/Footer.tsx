@@ -4,9 +4,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 import { useCart } from '@/components/cart/CartProvider';
 import { useAudience } from '@/components/services/useAudience';
-import { STUDIO_EMAIL, STUDIO_PHONE_DISPLAY, STUDIO_PHONE_E164 } from '@/lib/contact';
+import {
+  STUDIO_ADDRESS,
+  STUDIO_EMAIL,
+  STUDIO_PHONE_DISPLAY,
+  STUDIO_PHONE_E164,
+} from '@/lib/contact';
 
-const STUDIO_ADDRESS = 'R05 Imperial Avenue, Burj Khalifa Street, Downtown Dubai';
 const STUDIO_PHONE = STUDIO_PHONE_DISPLAY;
 const STUDIO_PHONE_HREF = STUDIO_PHONE_E164;
 const STUDIO_HOURS = '10:00 AM – 10:00 PM · Monday – Sunday';

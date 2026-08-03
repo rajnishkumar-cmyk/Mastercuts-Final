@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Phone } from 'lucide-react';
+import { X } from 'lucide-react';
 import { BrandLockup } from './BrandLockup';
-import { STUDIO_PHONE_DISPLAY, STUDIO_PHONE_E164 } from '@/lib/contact';
+import { MenuContactDetails } from './MenuContactDetails';
 
 interface DesktopMenuProps {
   open: boolean;
@@ -159,18 +159,11 @@ export function DesktopMenu({ open, onClose }: DesktopMenuProps) {
                     Contact
                   </motion.button>
                 </nav>
-
-                <motion.div variants={itemVariants} className="mt-14">
-                  <a
-                    href={`tel:${STUDIO_PHONE_E164}`}
-                    className="inline-flex items-center gap-3 text-text-secondary hover:text-text-primary transition-colors"
-                  >
-                    <Phone className="w-4 h-4" />
-                    <span className="text-sm font-medium">{STUDIO_PHONE_DISPLAY}</span>
-                    <span className="text-xs text-text-muted">Dubai</span>
-                  </a>
-                </motion.div>
               </div>
+
+              <motion.div variants={itemVariants} className="w-full max-w-2xl">
+                <MenuContactDetails variant="overlay" />
+              </motion.div>
             </div>
           </motion.div>
         </motion.div>
