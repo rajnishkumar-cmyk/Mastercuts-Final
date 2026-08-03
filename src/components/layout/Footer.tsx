@@ -54,7 +54,7 @@ export function Footer() {
   ];
 
   return (
-    <footer id="contact" ref={ref}>
+    <footer ref={ref}>
 
       {/* CTA Section — title + button on a full-bleed image background */}
       <section
@@ -206,7 +206,7 @@ export function Footer() {
         {/* Visit the studio — Contact card + map paired as one composition.
             Imperial Avenue is for at-home delivery during the transition;
             the embedded map points to the salon being revamped. */}
-        <div id="visit-studio" className="mt-12 pt-12 border-t border-white/10 scroll-mt-24">
+        <div id="contact" className="mt-12 pt-12 border-t border-white/10 scroll-mt-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 lg:items-stretch">
 
             {/* Contact card */}

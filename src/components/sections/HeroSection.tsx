@@ -154,7 +154,7 @@ export function HeroSection() {
         'An urban sanctuary for longevity, restoration and elevated wellbeing — where science-led wellness meets stillness, healing and renewal.',
       media: {
         type: 'image',
-        src: '/assets/New%20Images%20/Ra%20Wellness%20hub%20new.jpg',
+        src: '/assets/New%20Images/Ra%20Wellness%20hub%20new.jpg',
         position: 'center',
       },
       topMark: '/assets/Logo/ra-emblem.png',

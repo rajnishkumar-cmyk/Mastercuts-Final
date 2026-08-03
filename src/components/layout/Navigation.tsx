@@ -8,7 +8,6 @@ import {
   Search as SearchIcon,
   X,
   User as UserIcon,
-  Navigation as NavigationIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetClose, SheetTrigger } from '@/components/ui/sheet';
@@ -17,6 +16,7 @@ import { CartIcon } from '@/components/cart/CartIcon';
 import { useAudience } from '@/components/services/useAudience';
 import { DesktopMenu } from './DesktopMenu';
 import { BrandLockup } from './BrandLockup';
+import { ContactMenu } from './ContactMenu';
 import { STUDIO_PHONE_DISPLAY, STUDIO_PHONE_E164 } from '@/lib/contact';
 
 export function Navigation() {
@@ -244,6 +244,15 @@ export function Navigation() {
               Ra Wellness Hub
             </button>
 
+            {/* Contact — jumps to the Visit the studio card in the footer */}
+            <button
+              type="button"
+              onClick={() => goToSection('contact')}
+              className="text-sm font-medium text-white transition-colors duration-200 hover:opacity-70 whitespace-nowrap"
+            >
+              Contact
+            </button>
+
             {/* More — opens the full-screen DesktopMenu overlay */}
             <button
               type="button"
@@ -257,25 +266,20 @@ export function Navigation() {
 
           {/* Right cluster — Phone, Contact, Search, Cart, Login */}
           <div className="hidden lg:flex items-center gap-5 shrink-0">
-            <a
-              href={`tel:${STUDIO_PHONE_E164}`}
-              className="flex items-center gap-2 text-sm text-white transition-colors duration-200 hover:opacity-70"
-            >
-              <Phone className="w-4 h-4" />
-              <span className="font-medium">{STUDIO_PHONE_DISPLAY}</span>
-              <span className="text-xs text-white/60">Dubai</span>
-            </a>
-
-            {/* Directions — jumps to the Visit the studio card (address + map) */}
-            <button
-              type="button"
-              onClick={() => goToSection('visit-studio')}
-              aria-label="Get directions to the studio"
-              title="Get directions"
-              className="w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-colors duration-200"
-            >
-              <NavigationIcon className="w-4 h-4" />
-            </button>
+            {/* Phone + location. The number opens a Call / WhatsApp menu;
+                "Dubai" is its own control that jumps to the Visit the studio
+                card (address + map) in the footer. */}
+            <div className="flex items-center gap-2 text-sm">
+              <ContactMenu variant="desktop" />
+              <button
+                type="button"
+                onClick={() => goToSection('contact')}
+                title="View the studio address"
+                className="text-xs text-white/60 underline-offset-4 hover:text-white hover:underline transition-colors duration-200"
+              >
+                Dubai
+              </button>
+            </div>
 
             <button
               type="button"
@@ -323,31 +327,9 @@ export function Navigation() {
               <SearchIcon className="w-4 h-4" />
             </button>
 
-            <a
-              href={`tel:${STUDIO_PHONE_E164}`}
-              aria-label="Call Mastercuts"
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-200 ${
-                darkChrome
-                  ? 'bg-white/20 text-white hover:bg-white/30'
-                  : 'bg-white/15 text-white hover:bg-white/25 backdrop-blur-sm'
-              }`}
-            >
-              <Phone className="w-4 h-4" />
-            </a>
-
-            {/* Directions — jumps to the Visit the studio card (address + map) */}
-            <button
-              type="button"
-              onClick={() => goToSection('visit-studio')}
-              aria-label="Get directions to the studio"
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-200 ${
-                darkChrome
-                  ? 'bg-white/20 text-white hover:bg-white/30'
-                  : 'bg-white/15 text-white hover:bg-white/25 backdrop-blur-sm'
-              }`}
-            >
-              <NavigationIcon className="w-4 h-4" />
-            </button>
+            {/* Phone icon opens the Call / WhatsApp menu — no Contact text
+                here, the icon carries both options on mobile. */}
+            <ContactMenu variant="mobile" darkChrome={darkChrome} />
 
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
