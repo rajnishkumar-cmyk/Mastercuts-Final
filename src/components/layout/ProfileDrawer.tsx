@@ -466,14 +466,14 @@ export function ProfileDrawer() {
                 Save your <span className="italic">visits</span>
               </h3>
               <p className="text-sm text-text-secondary leading-relaxed mb-6">
-                Sign in with your phone to save your details and view bookings.
+                Sign in to save your details and view bookings.
               </p>
               <button
                 type="button"
                 onClick={handleSignIn}
                 className="w-full rounded-full bg-bg-dark text-white py-4 text-sm font-medium hover:bg-bg-darker transition-colors"
               >
-                Sign in with phone
+                Sign in
               </button>
             </div>
           ) : (
