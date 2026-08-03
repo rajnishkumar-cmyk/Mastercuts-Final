@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu,
   ChevronDown,
+  Phone,
   Search as SearchIcon,
   X,
   User as UserIcon,
@@ -16,7 +17,7 @@ import { useAudience } from '@/components/services/useAudience';
 import { DesktopMenu } from './DesktopMenu';
 import { BrandLockup } from './BrandLockup';
 import { ContactMenu } from './ContactMenu';
-import { MenuContactDetails } from './MenuContactDetails';
+import { STUDIO_PHONE_DISPLAY, STUDIO_PHONE_E164 } from '@/lib/contact';
 
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -488,7 +489,27 @@ export function Navigation() {
                         Log in
                       </Button>
                     )}
-                    <MenuContactDetails variant="sheet" />
+                    <div className="border-t border-black/10 pt-5">
+                      <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary mb-4">
+                        Get in touch
+                      </p>
+                      <a
+                        href={`tel:${STUDIO_PHONE_E164}`}
+                        className="group flex items-center gap-3"
+                      >
+                        <span className="shrink-0 w-9 h-9 rounded-full bg-black/[0.04] flex items-center justify-center text-accent-gold group-hover:bg-black/[0.08] transition-colors duration-200">
+                          <Phone className="w-4 h-4" />
+                        </span>
+                        <span className="flex flex-col">
+                          <span className="text-[10px] uppercase tracking-[0.18em] text-text-secondary">
+                            Call
+                          </span>
+                          <span className="text-sm text-text-primary group-hover:opacity-60 transition-opacity">
+                            {STUDIO_PHONE_DISPLAY}
+                          </span>
+                        </span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </SheetContent>

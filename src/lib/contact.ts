@@ -44,11 +44,6 @@ function readStudioEmail(): string {
 /** Contact email (e.g. "ask@mastercuts.ae") — for `mailto:` and display. */
 export const STUDIO_EMAIL = readStudioEmail();
 
-/** Street address, shown in the footer and the navigation menus. */
+/** Street address, shown in the footer's Visit the studio card. */
 export const STUDIO_ADDRESS =
   'R05 Imperial Avenue, Burj Khalifa Street, Downtown Dubai';
-
-/** Google Maps search link for the address above — opens directions. */
-export const STUDIO_MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-  STUDIO_ADDRESS,
-)}`;
