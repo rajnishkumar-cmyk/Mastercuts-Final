@@ -13,6 +13,7 @@ import {
 import { useAvailability } from '@/lib/booking/useAvailability';
 import { useCatalog } from '@/lib/booking/CatalogProvider';
 import { WaitlistSheet, type WaitlistContext } from '@/components/cart/WaitlistSheet';
+import { SlotGridSkeleton } from '@/components/cart/SlotGridSkeleton';
 import { cn } from '@/lib/utils';
 
 function formatDateLabel(key: string): string {
@@ -101,9 +102,16 @@ export function Step1DateTime({ onContinue }: Props) {
 
   // True when there are zero *bookable* slots on this date — either the
   // slot array is empty (duration doesn't fit) or every slot is marked
-  // unavailable. This is the trigger for the date-full waitlist CTA.
+  // unavailable. This is the trigger for the date-full notice.
+  //
+  // Gated on `status === 'ready'` deliberately: while the fetch is in flight
+  // (or has failed) `slots` is empty for reasons that have nothing to do with
+  // the date being full, and claiming "fully booked" there is a lie the user
+  // acts on. Those states render their own branches below.
   const noSlotsAvailable =
-    !!dateKey && (slots.length === 0 || slots.every((s) => !s.available));
+    !!dateKey &&
+    availability.status === 'ready' &&
+    (slots.length === 0 || slots.every((s) => !s.available));
 
   // Find unique therapists the user explicitly picked in the cart that
   // happen to be busy on this date — each surfaces its own waitlist CTA.
@@ -216,7 +224,22 @@ export function Step1DateTime({ onContinue }: Props) {
             </div>
           )}
 
-          {noSlotsAvailable ? (
+          {availability.status === 'loading' ? (
+            <SlotGridSkeleton />
+          ) : availability.status === 'error' ? (
+            <div
+              className="rounded-2xl border border-black/10 bg-black/[0.02] p-5"
+              aria-live="polite"
+            >
+              <p className="font-serif text-lg text-text-primary leading-tight mb-2">
+                We couldn't load times for this date.
+              </p>
+              <p className="text-sm text-text-secondary">
+                Check your connection and pick the date again on the calendar
+                above.
+              </p>
+            </div>
+          ) : noSlotsAvailable ? (
             dateOnlyWaitlistEntry ? (
               <div
                 className="rounded-2xl border border-accent-gold/30 bg-accent-gold/5 p-5"
@@ -244,10 +267,11 @@ export function Step1DateTime({ onContinue }: Props) {
                 aria-live="polite"
               >
                 <p className="font-serif text-lg text-text-primary leading-tight mb-2">
-                  No slots on this date.
+                  Fully booked on {formatDateLabel(dateKey)}.
                 </p>
                 <p className="text-sm text-text-secondary mb-4">
-                  Join the waitlist and we'll let you know if a slot opens up.
+                  Please pick the next available date on the calendar above —
+                  we'll show every open time for it.
                 </p>
                 <button
                   type="button"
@@ -257,10 +281,10 @@ export function Step1DateTime({ onContinue }: Props) {
                       source: 'date-full',
                     })
                   }
-                  className="inline-flex items-center gap-2 rounded-full bg-bg-dark text-white px-5 py-3 text-sm font-medium hover:bg-bg-darker transition-colors"
+                  className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-text-secondary underline underline-offset-4 hover:text-text-primary transition-colors"
                 >
-                  <Bell className="w-4 h-4" strokeWidth={1.5} />
-                  Join the waitlist
+                  <Bell className="w-3 h-3" strokeWidth={1.5} />
+                  Or join the waitlist for this date
                 </button>
               </div>
             )

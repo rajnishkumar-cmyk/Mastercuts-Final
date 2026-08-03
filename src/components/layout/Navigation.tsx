@@ -9,8 +9,7 @@ import { CartIcon } from '@/components/cart/CartIcon';
 import { useAudience } from '@/components/services/useAudience';
 import { DesktopMenu } from './DesktopMenu';
 import { BrandLockup } from './BrandLockup';
-import { ContactLinks, ContactTrigger } from './ContactMenu';
-import { STUDIO_PHONE_E164 } from '@/lib/contact';
+import { STUDIO_PHONE_DISPLAY, STUDIO_PHONE_E164 } from '@/lib/contact';
 
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -248,9 +247,16 @@ export function Navigation() {
             </button>
           </div>
 
-          {/* Right cluster — Contact, Search, Cart, Login */}
+          {/* Right cluster — Phone, Contact, Search, Cart, Login */}
           <div className="hidden lg:flex items-center gap-5 shrink-0">
-            <ContactTrigger />
+            <a
+              href={`tel:${STUDIO_PHONE_E164}`}
+              className="flex items-center gap-2 text-sm text-white transition-colors duration-200 hover:opacity-70"
+            >
+              <Phone className="w-4 h-4" />
+              <span className="font-medium">{STUDIO_PHONE_DISPLAY}</span>
+              <span className="text-xs text-white/60">Dubai</span>
+            </a>
 
             <button
               type="button"
@@ -468,10 +474,13 @@ export function Navigation() {
                       </Button>
                     )}
                     <div className="border-t border-black/10 pt-5">
-                      <ContactLinks
-                        tone="light"
-                        onSelect={() => setMobileMenuOpen(false)}
-                      />
+                      <a
+                        href={`tel:${STUDIO_PHONE_E164}`}
+                        className="flex items-center gap-3 text-text-secondary hover:text-text-primary transition-colors"
+                      >
+                        <Phone className="w-4 h-4" />
+                        <span className="text-sm">{STUDIO_PHONE_DISPLAY}</span>
+                      </a>
                     </div>
                   </div>
                 </div>
