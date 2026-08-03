@@ -98,7 +98,10 @@ export function Navigation() {
   // On ritual pages the hero is dark, so treat nav like scrolled (dark chrome).
   const darkChrome = scrolled || !isHome;
 
-  const initials = account?.name
+  // Initials only ever come from a real name. A guest who signed in with a
+  // phone but hasn't given a name falls through to the person glyph — digits
+  // from a phone number read as noise, not as an identity.
+  const initials = account?.name?.trim()
     ? account.name
         .trim()
         .split(/\s+/)
@@ -106,9 +109,7 @@ export function Navigation() {
         .slice(0, 2)
         .join('')
         .toUpperCase()
-    : account?.phone
-      ? account.phone.slice(-2)
-      : '';
+    : '';
 
   const goToSection = (sectionId: string) => {
     if (isHome) {
