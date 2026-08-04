@@ -388,8 +388,7 @@ export const services: Service[] = [
   },
 
   // Body Rituals (Massages) — Ra at Home launch catalog. Real services
-  // provided by the client. Single-therapist roster (Pinky Casimero) at
-  // launch.
+  // provided by the client.
   {
     id: 'somatic-signature-massage',
     ritualId: 'somatic-recovery',
@@ -907,18 +906,11 @@ export const services: Service[] = [
   },
 ];
 
-// Launch roster — Ra at Home Body Rituals only. Names + designation +
-// service-tag (via ritualIds). No images, no bios per the client direction
-// (inclusive, non-promotional presentation).
-export const therapists: Therapist[] = [
-  {
-    id: 'pinky-casimero',
-    name: 'Pinky Casimero',
-    title: 'DHA-Certified Therapist',
-    ritualIds: ['somatic-recovery'],
-    languages: [],
-  },
-];
+// Named roster is intentionally empty — every service falls back to
+// "Any available (recommended)" in the therapist picker. Names + designation +
+// service-tag (via ritualIds) only, no images or bios, if a roster is ever
+// reinstated (inclusive, non-promotional presentation).
+export const therapists: Therapist[] = [];
 
 export const packages: Package[] = [
   {
