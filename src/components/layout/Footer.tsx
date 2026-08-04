@@ -21,7 +21,9 @@ const STORE_MAP_SRC =
 export function Footer() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const { openExplorePicker, openAudiencePicker, openWellnessHub } = useCart();
+  const { cart, surface, openExplorePicker, openAudiencePicker, openWellnessHub } = useCart();
+  // Mirrors CartStrip's own visibility rule.
+  const cartStripVisible = cart.items.length > 0 && surface === 'none';
   const [, setAudience] = useAudience();
   const navigate = useNavigate();
   const location = useLocation();
@@ -105,8 +107,11 @@ export function Footer() {
         </motion.div>
       </section>
 
-      {/* Dark surface — Links + Visit + Copyright */}
-      <div className="bg-bg-dark pb-8">
+      {/* Dark surface — Links + Visit + Copyright. The cart strip is fixed to
+          the bottom edge, so while it is showing the legal row needs extra
+          room to scroll clear of it — padded here rather than with a spacer so
+          the dark surface keeps running to the page end. */}
+      <div className={cartStripVisible ? 'bg-bg-dark pb-32 lg:pb-28' : 'bg-bg-dark pb-8'}>
         <div className="w-full px-6 lg:px-12 xl:px-20">
 
         {/* Footer Links — Services | Our Salon | Social (Contact now lives below with the map) */}

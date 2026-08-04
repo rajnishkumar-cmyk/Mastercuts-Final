@@ -8,6 +8,7 @@ import {
   Search as SearchIcon,
   X,
   User as UserIcon,
+  Navigation as NavigateIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetClose, SheetTrigger } from '@/components/ui/sheet';
@@ -276,9 +277,11 @@ export function Navigation() {
                 type="button"
                 onClick={() => goToSection('contact')}
                 title="View the studio address"
-                className="text-xs text-white/60 underline-offset-4 hover:text-white hover:underline transition-colors duration-200"
+                aria-label="View the studio address"
+                className="group flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors duration-200"
               >
-                Dubai
+                <span className="underline-offset-4 group-hover:underline">Dubai</span>
+                <NavigateIcon className="w-3.5 h-3.5" />
               </button>
             </div>
 
@@ -315,6 +318,21 @@ export function Navigation() {
 
           {/* Mobile Right Buttons */}
           <div className="flex items-center gap-2 lg:hidden">
+            {/* Studio address — icon only here; the "Dubai" label it carries on
+                desktop would crowd the mobile cluster. */}
+            <button
+              type="button"
+              onClick={() => goToSection('contact')}
+              aria-label="View the studio address"
+              className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-200 ${
+                darkChrome
+                  ? 'bg-white/20 text-white hover:bg-white/30'
+                  : 'bg-white/15 text-white hover:bg-white/25 backdrop-blur-sm'
+              }`}
+            >
+              <NavigateIcon className="w-4 h-4" />
+            </button>
+
             <button
               type="button"
               onClick={openSearch}

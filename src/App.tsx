@@ -20,6 +20,7 @@ import { AudiencePickerSheet } from './components/layout/AudiencePickerSheet';
 import { ExploreCategoriesSheet } from './components/layout/ExploreCategoriesSheet';
 import { WellnessHubSheet } from './components/layout/WellnessHubSheet';
 import { BottomNav } from './components/layout/BottomNav';
+import { BackToTop } from './components/layout/BackToTop';
 import { ServiceDetailSheet } from './components/services/ServiceDetailSheet';
 import { WelcomeAnnouncement } from './components/layout/WelcomeAnnouncement';
 import { SearchSheet } from './components/layout/SearchSheet';
@@ -56,6 +57,7 @@ function App() {
           <ServiceDetailSheet />
           <CartStrip />
           <BottomNav />
+          <BackToTop />
           <WelcomeAnnouncement />
           <SearchSheet />
 
