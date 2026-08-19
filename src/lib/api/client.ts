@@ -12,7 +12,7 @@
  * for that surface would cost more than it saves, and the typed fetch
  * here is small enough to read top-to-bottom.
  */
-import { getApiBaseUrl } from './env';
+import { getApiBaseUrl, getPartnerId } from './env';
 import { ApiError, NetworkError } from './errors';
 
 /** Subset of envelope fields we care about decoding. */
@@ -63,6 +63,13 @@ async function request<T>(
   };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (opts.token) headers.Authorization = `Bearer ${opts.token}`;
+  // Tenant context for the salon lambdas. Set here rather than at each call
+  // site so every endpoint — public reads and authenticated writes alike —
+  // carries it, and no future endpoint can forget it. A build with no
+  // VITE_PARTNER_ID omits the header and the backend keeps its current
+  // behaviour, so this is safe to ship ahead of the backend.
+  const partnerId = getPartnerId();
+  if (partnerId) headers['X-Partner-Id'] = partnerId;
 
   // Combine caller signal with our timeout via AbortController.
   const controller = new AbortController();

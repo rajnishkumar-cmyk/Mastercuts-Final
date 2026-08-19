@@ -15,6 +15,8 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string;
   readonly VITE_OTP_LENGTH?: string;
   readonly VITE_OTP_RESEND_COOLDOWN_SEC?: string;
+  /** Partner (tenant) id sent as `X-Partner-Id`. See src/lib/api/env.ts. */
+  readonly VITE_PARTNER_ID?: string;
 }
 
 interface ImportMeta {
