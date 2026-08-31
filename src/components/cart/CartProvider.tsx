@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import type { Cart, CartItem, DraftCheckout, GuestDetails, GuestProfile, LightAccount, BookingRecord, RitualId, ServiceAddress, WaitlistRequest } from '@/lib/booking/types';
+import type { Cart, CartItem, DraftCheckout, GuestDetails, GuestProfile, LightAccount, BookingRecord, ServiceAddress, WaitlistRequest } from '@/lib/booking/types';
 import { pickServiceImage } from '@/lib/booking/types';
 import { useAudience } from '@/components/services/useAudience';
 import { useCatalog } from '@/lib/booking/CatalogProvider';
@@ -29,6 +29,7 @@ import {
   cancelBooking as cancelBookingApi,
   type BookingRecord as ApiBooking,
   type ServiceLink,
+  type ServiceUnits,
 } from '@/lib/api/bookings';
 import { ApiError, NetworkError, toErrorMessage } from '@/lib/api/errors';
 
@@ -48,14 +49,13 @@ export type CheckoutStep = 'none' | 'email-login' | 'otp-verify' | 'address' | '
 
 export type DrawerView =
   | { name: 'basket' }
-  | { name: 'ritual-index' }
-  | { name: 'ritual-services'; ritualId: RitualId }
+  | { name: 'section-index' }
+  | { name: 'section-services'; sectionId: string }
   | { name: 'journey-index' }
   | { name: 'journey-detail'; journeyId: string };
 
 export interface ServiceDetailContext {
   serviceId: string;
-  ritualId: RitualId;
 }
 
 interface CartContextValue {
@@ -100,14 +100,18 @@ interface CartContextValue {
   openExplorePicker: () => void;
   openPaymentMethod: () => void;
   openWellnessHub: () => void;
-  openServiceDetail: (serviceId: string, ritualId: RitualId) => void;
+  openServiceDetail: (serviceId: string) => void;
   closeServiceDetail: () => void;
   closeAll: () => void;
   pushDrawerView: (view: DrawerView) => void;
   popDrawerView: () => void;
 
   // cart actions
-  addToCart: (serviceId: string, therapistPref?: string | 'any', variantId?: string, parentItemId?: string) => string | null;
+  /**
+   * `units` applies only to a unit-priced variant (per nail); it is ignored for
+   * ordinary services, whose price already covers the whole line.
+   */
+  addToCart: (serviceId: string, therapistPref?: string | 'any', variantId?: string, parentItemId?: string, units?: number) => string | null;
   addJourneyToCart: (journeyId: string) => boolean;
   removeItem: (itemId: string) => void;
   updateTherapistPref: (itemId: string, therapistPref: string | 'any') => void;
@@ -151,10 +155,10 @@ const CartContext = createContext<CartContextValue | null>(null);
 
 const emptyCart: Cart = { items: [], updatedAt: Date.now() };
 const BASKET_VIEW: DrawerView = { name: 'basket' };
-const RITUAL_INDEX_VIEW: DrawerView = { name: 'ritual-index' };
+const SECTION_INDEX_VIEW: DrawerView = { name: 'section-index' };
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const { getService, getJourney, getJourneyTotals } = useCatalog();
+  const { getService, getJourney } = useCatalog();
   const [cart, setCart] = useState<Cart>(emptyCart);
   const [account, setAccount] = useState<LightAccount | null>(null);
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
@@ -242,7 +246,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [surface]);
 
   const addToCart = useCallback<CartContextValue['addToCart']>(
-    (serviceId, therapistPref = 'any', variantId, parentItemId) => {
+    (serviceId, therapistPref = 'any', variantId, parentItemId, units) => {
       const service = getService(serviceId);
       if (!service) {
         toast.error('Service not found');
@@ -254,9 +258,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const selectedVariant =
         variants.find((v) => v.id === variantId) ?? variants[0] ?? null;
       const effectiveDuration = selectedVariant?.durationMin ?? service.durationMin;
-      const effectivePrice = selectedVariant?.price ?? service.price;
       const effectiveVariantId = selectedVariant?.id;
       const effectiveVariantLabel = selectedVariant?.label;
+
+      // Unit pricing: the variant's `price` is a RATE, so the line price is
+      // rate x units. Ordinary variants have no pricingUnit and keep their
+      // price verbatim, exactly as before.
+      const unit = selectedVariant?.pricingUnit;
+      const isUnitPriced = !!unit && unit !== 'service';
+      const unitRate = selectedVariant?.price ?? service.price;
+      const unitQty = isUnitPriced ? Math.max(1, Math.floor(units ?? 1)) : 1;
+      const effectivePrice = isUnitPriced ? unitRate * unitQty : unitRate;
 
       // Generate the id up front so we can return it — the caller links add-ons
       // to their parent via this id (passed back in as parentItemId).
@@ -269,15 +281,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
         const item: CartItem = {
           id: newId,
-          serviceId: service.id,
-          ritualId: service.ritualId,
-          name: service.name,
+          serviceId: service.id,          name: service.name,
           durationMin: effectiveDuration,
           price: effectivePrice,
           image: pickServiceImage(service, audienceRef.current),
           therapistPref,
           variantId: effectiveVariantId,
           variantLabel: effectiveVariantLabel,
+          // Only on genuinely unit-priced lines, so ordinary items persist the
+          // same shape they always have (and older carts hydrate unchanged).
+          ...(isUnitPriced
+            ? { pricingUnit: unit, unitPrice: unitRate, units: unitQty }
+            : {}),
           parentItemId,
           addedAt: Date.now(),
         };
@@ -305,33 +320,36 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         toast.error('Journey not found');
         return false;
       }
-      const resolved = journey.serviceIds.map(getService).filter(Boolean);
-      if (resolved.length === 0) {
-        toast.error('Journey has no services');
+      // The backend rejects a package whose member was deactivated or deleted
+      // (400, naming the member) rather than booking a shrunken package. Catch
+      // it at add-to-cart so the customer is not told at checkout.
+      if (journey.incomplete) {
+        toast.error(`${journey.name} is temporarily unavailable`);
         return false;
       }
-      const totals = getJourneyTotals(journey);
-      const firstService = resolved[0]!;
-      const bundleServiceId = `journey:${journey.id}`;
 
       let added = false;
       setCart((prev) => {
-        const existing = prev.items.find((i) => i.serviceId === bundleServiceId);
+        // The package id IS a real service id since Phase 6.6 — no synthetic
+        // `journey:<id>` prefix, because the booking now sends this id itself.
+        const existing = prev.items.find((i) => i.serviceId === journey.id);
         if (existing) {
           toast.info(`${journey.name} is already in your cart`);
           return prev;
         }
         if (prev.items.length >= 10) {
-          toast.warning('Your cart is generously full \u2014 please complete this booking first.');
+          toast.warning('Your cart is generously full — please complete this booking first.');
           return prev;
         }
         const item: CartItem = {
           id: crypto.randomUUID(),
-          serviceId: bundleServiceId,
-          ritualId: firstService.ritualId,
+          serviceId: journey.id,
           name: journey.name,
-          durationMin: totals.totalDuration,
-          price: totals.totalPriceDiscounted,
+          // Backend-authoritative, copied verbatim. The package row carries its
+          // own duration (a combo is scheduled tighter than its parts) and its
+          // own price (the combo price the booking actually charges).
+          durationMin: journey.durationMin,
+          price: journey.price,
           image: journey.image,
           therapistPref: 'any',
           journeyId: journey.id,
@@ -344,7 +362,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       });
       return added;
     },
-    [getService, getJourney, getJourneyTotals]
+    [getJourney]
   );
 
   const removeItem = useCallback((itemId: string) => {
@@ -562,6 +580,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    // Unit quantities for unit-priced lines (per nail). Ordinary lines carry no
+    // `units`, so an ordinary cart produces an empty list and the field is
+    // omitted from the payload entirely.
+    const serviceUnits: ServiceUnits[] = items
+      .filter((it) => it.pricingUnit && it.pricingUnit !== 'service' && (it.units ?? 1) > 1)
+      .map((it) => ({ service_id: bookedId(it), units: it.units as number }));
+
     // Address is a structured ServiceAddress on the frontend; the backend
     // accepts an opaque string today. Serialise to a one-line label.
     const addressLine = address
@@ -582,6 +607,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           customer_mobile: account.phone || guest.phone || undefined,
           customer_address: addressLine,
           service_links: serviceLinks.length > 0 ? serviceLinks : undefined,
+          service_units: serviceUnits.length > 0 ? serviceUnits : undefined,
         },
         account.token,
       );
@@ -697,15 +723,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [account?.token, refreshBookings]);
 
   // openCart picks a sensible default based on cart state, and when opening
-  // directly into a ritual-services view it prepends ritual-index so the back
+  // directly into a section-services view it prepends section-index so the back
   // button has a natural destination.
   const openCart = useCallback((initialView?: DrawerView) => {
     const view =
       initialView ??
-      (cartItemCountRef.current === 0 ? RITUAL_INDEX_VIEW : BASKET_VIEW);
+      (cartItemCountRef.current === 0 ? SECTION_INDEX_VIEW : BASKET_VIEW);
 
     const stack: DrawerView[] =
-      view.name === 'ritual-services' ? [RITUAL_INDEX_VIEW, view] : [view];
+      view.name === 'section-services' ? [SECTION_INDEX_VIEW, view] : [view];
 
     setDrawerStack(stack);
     setSurface('cart');
@@ -758,8 +784,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const closeContactEdit = useCallback(() => setIsContactEditOpen(false), []);
   const openWellnessHub = useCallback(() => setSurface('wellness-hub'), []);
   const openServiceDetail = useCallback<CartContextValue['openServiceDetail']>(
-    (serviceId, ritualId) => {
-      setServiceDetail({ serviceId, ritualId });
+    (serviceId) => {
+      setServiceDetail({ serviceId });
       setSurface('service-detail');
     },
     []
@@ -884,21 +910,27 @@ export function useCartTotals() {
  *
  * Shared deliberately: `/availability` must be asked about the exact same set
  * of services the booking will reserve, or the grid offers start times that
- * `reserveSpan` then rejects with a 409. Journey items (synthetic
- * `journey:<id>` ids) expand into their constituent ids; every other item
- * books its selected variant's id.
+ * `reserveSpan` then rejects with a 409. Since Phase 6.6 a package books under
+ * its own id (one line, combo price, package duration); every other item books
+ * its selected variant's id.
  */
 export function resolveBookedServiceIds(items: CartItem[]): string[] {
   const bookedId = (it: CartItem) => it.variantId ?? it.serviceId;
-  const ids: string[] = [];
-  for (const item of items) {
-    if (item.journeyServiceIds && item.journeyServiceIds.length > 0) {
-      ids.push(...item.journeyServiceIds);
-      continue;
-    }
-    ids.push(bookedId(item));
-  }
-  return ids;
+  // A package books as ONE line under its own id — it is a real service row
+  // whose price IS the combo price and whose duration is what the appointment
+  // occupies. It is NOT expanded into its members.
+  //
+  // Expanding was the old behaviour, and it was a live pricing bug: the cart
+  // displayed the discounted total while the booking sent the member ids, so
+  // the backend priced each one at full rate and the discount was never
+  // actually charged. It also reserved the sum of member durations instead of
+  // the (shorter) package duration.
+  //
+  // `journeyServiceIds` is still carried on the item for display, and older
+  // carts rehydrated from localStorage may still hold a synthetic
+  // `journey:<id>` serviceId — those resolve to nothing server-side and are
+  // rejected as an invalid service id rather than silently mispriced.
+  return items.map(bookedId);
 }
 
 /** Stable, memoised `resolveBookedServiceIds` over the live cart. */
@@ -908,13 +940,13 @@ export function useCartServiceIds(): string[] {
 }
 
 export function formatAed(value: number): string {
-  return `AED ${value.toLocaleString('en-AE')}`;
+  return `AED ${(value ?? 0).toLocaleString('en-AE')}`;
 }
 
 // 2-decimal variant for VAT-inclusive payment breakdowns, where the
 // derived subtotal and VAT have fractional values.
 export function formatAedPrecise(value: number): string {
-  return `AED ${value.toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return `AED ${(value ?? 0).toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 export function formatDuration(min: number): string {
